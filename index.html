@@ -1,0 +1,2474 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>LEVI STREAM PERÚ - Plataforma Premium</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- FIREBASE REALTIME ENGINE -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #060810;
+      --bg-surface: rgba(10, 14, 28, 0.82);
+      --bg-card: rgba(13, 19, 38, 0.94);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 210, 255, 0.35);
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent-cyan: #00d2ff;
+      --accent-violet: #8b5cf6;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-wa: #22c55e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dark: #64748b;
+      --success: #10b981;
+      --danger: #f43f5e;
+      --warning: #f59e0b;
+      --sidebar-w: 275px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    input, textarea, code, pre {
+      user-select: text;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      position: relative;
+    }
+
+    /* Fondo animado Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Scrollbars elegantes */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.25); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+    .glass {
+      background: var(--bg-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+    }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+    }
+
+    /* PANTALLAS DE ACCESO Y BLOQUEO */
+    #auth-screen, #lockout-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #111836 0%, #04050a 85%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 18px;
+    }
+
+    #lockout-screen {
+      display: none;
+      background: radial-gradient(circle at 50% 30%, #450a0a 0%, #030408 85%);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 42px 32px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 210, 255, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(0, 210, 255, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .auth-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-logo-badge {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+      margin: 0 auto 16px auto;
+      box-shadow: 0 8px 24px rgba(0, 210, 255, 0.35);
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    #app-container {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 18px;
+      border-right: 1px solid var(--border-subtle);
+      background: #080c18;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0, 210, 255, 0.3);
+    }
+
+    .brand-text {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - 390px);
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      color: #fff;
+      background: rgba(0, 210, 255, 0.12);
+      border-color: rgba(0, 210, 255, 0.25);
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.15);
+    }
+
+    .nav-btn i {
+      font-size: 1.05rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .main-wrapper {
+      margin-left: var(--sidebar-w);
+      width: calc(100% - var(--sidebar-w));
+      padding: 28px 34px;
+      min-height: 100vh;
+      transition: margin 0.3s ease, width 0.3s ease;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      gap: 14px;
+    }
+
+    .menu-toggle-btn {
+      display: none;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .balance-box {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(99, 102, 241, 0.08));
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 12px;
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+    }
+
+    .balance-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #00ffcc;
+      margin: 4px 0 10px 0;
+      text-shadow: 0 0 12px rgba(0, 255, 204, 0.5);
+    }
+
+    .user-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .role-badge {
+      font-size: 0.68rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(0, 210, 255, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+    }
+
+    .status-badge-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-emerald);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px var(--accent-emerald);
+    }
+
+    /* BOTONES */
+    .btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      border: none;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--primary));
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-success { background: #059669; color: #fff; }
+    .btn-success:hover { background: #047857; }
+
+    .btn-whatsapp { background: #16a34a; color: #fff; }
+    .btn-whatsapp:hover { background: #15803d; }
+
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #f1f5f9; }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.14); }
+
+    /* FILTROS TIENDA */
+    .store-filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+
+    .filter-chip.active, .filter-chip:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: var(--accent-cyan);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+    }
+
+    .section-category-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 20px 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* CATÁLOGO PRODUCTOS */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+      margin-bottom: 30px;
+    }
+
+    .product-card {
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 14px 30px -10px rgba(0, 210, 255, 0.25);
+    }
+
+    .prod-img-wrap {
+      width: 100%;
+      height: 160px;
+      position: relative;
+      background: #090e1a;
+      overflow: hidden;
+    }
+
+    .prod-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .prod-img {
+      transform: scale(1.06);
+    }
+
+    .prod-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(10, 13, 23, 0.88);
+      border: 1px solid var(--border-subtle);
+      backdrop-filter: blur(8px);
+    }
+
+    .delivery-badge {
+      position: absolute;
+      top: 10px; left: 10px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    .badge-auto { background: rgba(37, 99, 235, 0.9); color: #fff; }
+    .badge-wa { background: rgba(22, 163, 74, 0.9); color: #fff; }
+
+    .prod-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .prod-price {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 8px 0;
+    }
+
+    /* FORMULARIOS Y TABLAS */
+    .form-group { margin-bottom: 14px; }
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.25);
+    }
+
+    .form-select option { background: #0f172a; color: #fff; }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 12px;
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.86rem;
+      white-space: nowrap;
+    }
+
+    th {
+      padding: 12px 14px;
+      color: var(--text-dark);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(4, 7, 18, 0.88);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      max-width: 520px;
+      width: 100%;
+      padding: 26px;
+      position: relative;
+    }
+
+    .close-modal-btn {
+      position: absolute;
+      top: 16px; right: 18px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    /* NOTIFICACIÓN 5 Y 10s */
+    #broadcast-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .broadcast-popup {
+      max-width: 480px;
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      border-radius: 20px;
+      padding: 22px;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 210, 255, 0.2);
+    }
+
+    .broadcast-full-image-wrapper {
+      width: 100%;
+      max-height: 280px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #060a14;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .broadcast-full-image {
+      max-width: 100%;
+      max-height: 280px;
+      object-fit: contain;
+    }
+
+    .broadcast-progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .broadcast-progress-inner {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--primary));
+    }
+
+    .receipt-box {
+      max-width: 500px;
+      width: 100%;
+      background: #0d1326;
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      border-radius: 22px;
+      padding: 30px 24px;
+      position: relative;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+    }
+
+    .receipt-badge {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin: 0 auto 16px auto;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .receipt-creds {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 16px 0;
+      text-align: left;
+    }
+
+    .warranty-note {
+      font-size: 0.78rem;
+      background: rgba(244, 63, 94, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fca5a5;
+      text-align: left;
+      margin-top: 14px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-wrapper { margin-left: 0; width: 100%; padding: 16px; }
+      .menu-toggle-btn { display: block; }
+      .catalog-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LIENZO DE AMBIENTE -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- PANTALLA BLOQUEO TRAS 3 FALLOS -->
+  <div id="lockout-screen">
+    <div class="lockout-card">
+      <div style="font-size: 48px; color: var(--danger); margin-bottom: 14px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h2 style="font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 8px;">ACCESO BLOQUEADO</h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 18px;">
+        Has superado los 3 intentos permitidos con contraseñas incorrectas. Tu acceso ha quedado suspendido durante 24 horas por seguridad.
+      </p>
+      <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(244, 63, 94, 0.4); padding: 14px; border-radius: 12px; margin-bottom: 20px;">
+        <span style="font-size: 0.75rem; color: var(--text-dark); display:block;">TIEMPO RESTANTE DE BLOQUEO:</span>
+        <div id="lockout-timer" style="font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 800; color: var(--danger); margin-top: 4px;">24:00:00</div>
+      </div>
+      <button class="btn btn-success" style="width: 100%; justify-content: center; padding: 12px;" onclick="contactWhatsapp('Hola Levi Stream Perú, mi cuenta fue bloqueada temporalmente tras 3 intentos. Solicito asistencia.')">
+        <i class="fa-brands fa-whatsapp"></i> Solicitar Asistencia por WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- PANTALLA LOGIN OBLIGATORIA (TOTALMENTE NATIVA) -->
+  <div id="auth-screen">
+    <div class="auth-card glass">
+      <div class="auth-inner">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div class="auth-logo-badge"><i class="fa-solid fa-play"></i></div>
+          <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;">LEVI STREAM PERÚ</h2>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Plataforma Oficial de Streaming & IPTV</p>
+        </div>
+
+        <form onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Usuario</label>
+            <input type="text" class="form-input" id="auth-user" placeholder="Ingresa tu usuario" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-input" id="auth-pass" placeholder="Ingresa tu contraseña" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 8px;">
+            Ingresar al Panel
+          </button>
+        </form>
+
+        <div style="display:flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle); font-size: 0.82rem;">
+          <a onclick="contactWhatsapp('Hola Levi Stream Perú, deseo solicitar la creación de una nueva cuenta en la plataforma.')" style="color: var(--accent-cyan); text-decoration: none; cursor:pointer; font-weight: 600;">
+            <i class="fa-solid fa-user-plus"></i> Crear cuenta
+          </a>
+          <a onclick="contactWhatsapp('Hola Levi Stream Perú, olvidé mi contraseña de acceso y requiero restablecerla.')" style="color: var(--accent-cyan); text-decoration: none; cursor:pointer; font-weight: 600;">
+            <i class="fa-solid fa-key"></i> Olvidé mi contraseña
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div id="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="brand-box">
+          <div class="brand-icon"><i class="fa-solid fa-play"></i></div>
+          <div>
+            <div class="brand-text">LEVI STREAM</div>
+            <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700; letter-spacing: 1px;">PERÚ EDITION</div>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <div class="nav-btn active" onclick="switchNav('store')"><i class="fa-solid fa-tv"></i> Tienda Streaming</div>
+          <div class="nav-btn" onclick="switchNav('orders')"><i class="fa-solid fa-receipt"></i> Mis Compras</div>
+          <div class="nav-btn" onclick="switchNav('recharge')"><i class="fa-solid fa-wallet"></i> Billetera / Recargas</div>
+
+          <!-- SUB-USUARIOS (RESELLER / SELLER) -->
+          <div id="subusers-menu-section" style="display:none; margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+            <div style="font-size: 0.68rem; color: var(--text-dark); font-weight: 800; padding: 4px 10px; text-transform: uppercase;">Revendedores</div>
+            <div class="nav-btn" onclick="switchNav('manage-subusers')"><i class="fa-solid fa-users"></i> Crear Clientes / Saldo</div>
+          </div>
+
+          <!-- PANEL EXCLUSIVO OWNER -->
+          <div id="owner-menu-section" style="display:none; margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+            <div style="font-size: 0.68rem; color: var(--accent-purple); font-weight: 800; padding: 4px 10px; text-transform: uppercase;">Panel Owner</div>
+            <div class="nav-btn" onclick="switchNav('owner-stock')"><i class="fa-solid fa-key"></i> Gestión de Cuentas</div>
+            <div class="nav-btn" onclick="switchNav('owner-products')"><i class="fa-solid fa-boxes-stacked"></i> Gestionar Tienda</div>
+            <div class="nav-btn" onclick="switchNav('owner-users')"><i class="fa-solid fa-users-gear"></i> Todos los Usuarios</div>
+            <div class="nav-btn" onclick="switchNav('owner-reports')"><i class="fa-solid fa-triangle-exclamation"></i> Reportes de Clientes</div>
+            <div class="nav-btn" onclick="switchNav('owner-sales-audit')"><i class="fa-solid fa-list-check"></i> Cuentas Generadas</div>
+            <div class="nav-btn" onclick="switchNav('owner-export')"><i class="fa-solid fa-file-arrow-down"></i> Descargar TXT</div>
+            <div class="nav-btn" onclick="switchNav('owner-notify')"><i class="fa-solid fa-bullhorn"></i> Notificación Central</div>
+          </div>
+        </nav>
+      </div>
+
+      <div>
+        <div class="balance-box">
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Tu Saldo Actual</div>
+          <div class="balance-num" id="sidebar-balance">S/ 0.00</div>
+          <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 0.75rem; padding: 7px;" onclick="switchNav('recharge')">
+            <i class="fa-solid fa-plus"></i> Recargar Billetera
+          </button>
+        </div>
+
+        <div class="user-footer">
+          <div>
+            <div id="sidebar-username" style="font-weight: 700; font-size: 0.86rem;">EriikAdmin</div>
+            <span class="role-badge" id="sidebar-role">OWNER</span>
+          </div>
+          <button onclick="handleLogout()" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size:1.1rem; padding: 4px;">
+            <i class="fa-solid fa-power-off"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-wrapper">
+      <div class="header-bar glass">
+        <div style="display:flex; align-items:center; gap: 12px;">
+          <button class="menu-toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 style="font-family:'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight:700;" id="page-title">Tienda Oficial</h2>
+        </div>
+        <div class="status-badge-dot">
+          <div class="status-dot"></div> Servidores Activos
+        </div>
+      </div>
+
+      <!-- SECCIÓN TIENDA -->
+      <section id="view-store">
+        <div class="store-filter-bar">
+          <button class="filter-chip active" onclick="setStoreFilter('ALL', this)"><i class="fa-solid fa-border-all"></i> Todos los Planes</button>
+          <button class="filter-chip" onclick="setStoreFilter('AUTO', this)"><i class="fa-solid fa-bolt" style="color: var(--accent-cyan);"></i> Entrega Inmediata (Saldo)</button>
+          <button class="filter-chip" onclick="setStoreFilter('WHATSAPP', this)"><i class="fa-brands fa-whatsapp" style="color: #22c55e;"></i> Pedidos WhatsApp (Manual)</button>
+        </div>
+
+        <div id="section-group-auto">
+          <div class="section-category-title"><i class="fa-solid fa-bolt" style="color: var(--accent-cyan);"></i> Entrega Automática Inmediata (Saldo)</div>
+          <div class="catalog-grid" id="catalog-grid-auto"></div>
+        </div>
+
+        <div id="section-group-wa">
+          <div class="section-category-title"><i class="fa-brands fa-whatsapp" style="color: #22c55e;"></i> Plataformas por WhatsApp (Manual)</div>
+          <div class="catalog-grid" id="catalog-grid-wa"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN MIS COMPRAS -->
+      <section id="view-orders" style="display:none;">
+        <div class="glass" style="padding: 20px;">
+          <h3 style="margin-bottom: 6px;">Historial de Cuentas Adquiridas</h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+            Tus credenciales y días restantes sincronizados en tiempo real.
+          </p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Plataforma</th>
+                  <th>Disp.</th>
+                  <th>Credenciales en Vivo</th>
+                  <th>Días</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="user-orders-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN BILLETERA / RECARGAS -->
+      <section id="view-recharge" style="display:none;">
+        <div class="glass" style="max-width: 580px; margin: 0 auto; padding: 32px; text-align: center;">
+          <div style="width: 54px; height: 54px; border-radius: 14px; background: rgba(0, 210, 255, 0.15); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 14px auto;">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <h3 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 6px;">Recargar Billetera Virtual</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 22px;">Acreditación y validación directa por WhatsApp.</p>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 18px; margin-bottom: 22px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Saldo Actual en Cuenta</div>
+            <div style="font-family: 'Orbitron'; font-size: 2rem; font-weight: 800; color: #00ffcc; margin: 6px 0;" id="recharge-view-balance">S/ 0.00</div>
+          </div>
+          <button class="btn btn-success" style="padding: 13px 24px; font-size: 0.92rem; width: 100%; justify-content: center;" onclick="contactWhatsapp('Hola Levi Stream Perú, deseo recargar saldo a mi billetera. Mi usuario es: ' + currentUser.username)">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem;"></i> Solicitar Recarga por WhatsApp
+          </button>
+        </div>
+      </section>
+
+      <!-- SECCIÓN SUB-USUARIOS (RESELLER / SELLER) -->
+      <section id="view-manage-subusers" style="display:none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;">Crear Sub-Usuario</h4>
+            <form onsubmit="handleCreateSubUser(event)">
+              <div class="form-group">
+                <label class="form-label">Usuario</label>
+                <input type="text" class="form-input" id="sub-name" required autocomplete="off" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-input" id="sub-pass" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Rol Permitido</label>
+                <select class="form-select" id="sub-role" required></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Transferir Saldo Inicial (S/)</label>
+                <input type="number" class="form-input" id="sub-init-balance" min="0" step="0.5" value="0" required />
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Registrar Cuenta</button>
+            </form>
+          </div>
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;">Tus Cuentas Creadas</h4>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Usuario</th><th>Rol</th><th>Saldo</th><th>Acción</th></tr></thead>
+                <tbody id="subusers-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER: GESTIÓN DE CUENTAS / STOCK -->
+      <section id="view-owner-stock" style="display:none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px;">
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;">Insertar Stock a Inventario</h4>
+            <form onsubmit="handleAddStock(event)">
+              <div class="form-group">
+                <label class="form-label">Plataforma Automática</label>
+                <select class="form-select" id="stock-product-select" required></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Credenciales (usuario:contraseña)</label>
+                <textarea class="form-textarea" id="stock-raw" rows="6" placeholder="correo@flujo.com:clave123" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Insertar en Inventario</button>
+            </form>
+          </div>
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;">Inventario en Tiempo Real</h4>
+            <div class="table-container" style="max-height: 440px; overflow-y: auto;">
+              <table>
+                <thead><tr><th>Plataforma</th><th>Credenciales</th><th>Cupos</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="owner-stock-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER: GESTIONAR TIENDA (CREAR / EDITAR PLATAFORMAS) -->
+      <section id="view-owner-products" style="display:none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;" id="product-form-title">Crear Nueva Plataforma</h4>
+            <form onsubmit="handleSaveProduct(event)">
+              <input type="hidden" id="prod-edit-id" />
+              <div class="form-group">
+                <label class="form-label">Nombre del Plan</label>
+                <input type="text" class="form-input" id="p-name" placeholder="Ej. Netflix 1 Mes Ultra" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Modalidad de Entrega</label>
+                <select class="form-select" id="p-delivery-type" required>
+                  <option value="AUTO">⚡ Generar Automáticamente (Stock en Sistema)</option>
+                  <option value="WHATSAPP">💬 Solicitar por WhatsApp (Entrega Manual)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dispositivos Permitidos</label>
+                <select class="form-select" id="p-devices" required>
+                  <option value="1">1 Dispositivo (2 ventas por stock si es auto)</option>
+                  <option value="3">3 Dispositivos (1 venta exclusiva)</option>
+                  <option value="4">4 Dispositivos</option>
+                  <option value="5">5 Dispositivos</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Precio (PEN S/)</label>
+                <input type="number" class="form-input" id="p-price" step="0.5" placeholder="10.00" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Días de Servicio</label>
+                <input type="number" class="form-input" id="p-days" value="30" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">URL de Imagen</label>
+                <input type="url" class="form-input" id="p-img-url" placeholder="https://..." oninput="previewProductImgUrl(this.value)" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">O Subir Archivo de Imagen</label>
+                <input type="file" class="form-input" id="p-img-file" accept="image/*" onchange="previewProductImgFile(this)" />
+              </div>
+
+              <!-- GUÍA VISUAL OFICIAL -->
+              <div style="background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 10px; padding: 10px; margin-bottom: 12px; font-size: 0.78rem; color: var(--text-muted);">
+                <i class="fa-solid fa-circle-info" style="color: var(--accent-cyan);"></i>
+                <strong>Dimensión Recomendada:</strong> 600 x 340 píxeles (Aspecto 16:9). Peso &lt; 2MB. Se adaptará automáticamente sin recortar márgenes.
+              </div>
+
+              <div style="margin-bottom: 14px;">
+                <img id="p-preview" src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80" style="width: 100%; height: 110px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-subtle);" />
+              </div>
+              <div style="display:flex; gap: 8px;">
+                <button type="submit" class="btn btn-primary" style="flex:1; justify-content: center;" id="p-submit-btn">Guardar Plataforma</button>
+                <button type="button" class="btn btn-secondary" onclick="resetProductForm()" id="p-cancel-btn" style="display:none;">Cancelar</button>
+              </div>
+            </form>
+          </div>
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;">Catálogo Actual</h4>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Vista</th><th>Nombre</th><th>Entrega</th><th>Disp</th><th>Precio</th><th>Acciones</th></tr></thead>
+                <tbody id="owner-products-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER: USUARIOS -->
+      <section id="view-owner-users" style="display:none;">
+        <div class="glass" style="padding: 20px; margin-bottom: 20px; background: rgba(0, 210, 255, 0.05); border-color: rgba(0, 210, 255, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700;">AUTOGESTIÓN DE SALDO (OWNER)</div>
+              <div style="font-size: 1.6rem; font-family:'Orbitron'; font-weight: 800; color: #00ffcc;" id="owner-self-balance">S/ 0.00</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-success" onclick="modifyOwnerBalance(true)"><i class="fa-solid fa-plus"></i> Sumar Saldo</button>
+              <button class="btn btn-danger" onclick="modifyOwnerBalance(false)"><i class="fa-solid fa-minus"></i> Restar Saldo</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px;">
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;">Crear Usuario (Cualquier Rango)</h4>
+            <form onsubmit="handleOwnerCreateUser(event)">
+              <div class="form-group">
+                <label class="form-label">Usuario</label>
+                <input type="text" class="form-input" id="ow-name" required autocomplete="off" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-input" id="ow-pass" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Rol de Acceso</label>
+                <select class="form-select" id="ow-role" required>
+                  <option value="CLIENTE">CLIENTE</option>
+                  <option value="SELLER">SELLER</option>
+                  <option value="RESELLER">RESELLER</option>
+                  <option value="OWNER">OWNER</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Saldo Inicial (S/)</label>
+                <input type="number" class="form-input" id="ow-balance" value="0" step="1" required />
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Crear Cuenta</button>
+            </form>
+          </div>
+          <div class="glass" style="padding: 20px;">
+            <h4 style="margin-bottom: 12px;">Usuarios Registrados</h4>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Usuario</th><th>Contraseña</th><th>Rol</th><th>Saldo</th><th>Acciones</th></tr></thead>
+                <tbody id="owner-users-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER: REPORTES DE CLIENTES -->
+      <section id="view-owner-reports" style="display:none;">
+        <div class="glass" style="padding: 20px;">
+          <h3 style="margin-bottom: 16px;">Reportes de Clientes</h3>
+          <div class="table-container">
+            <table>
+              <thead><tr><th>Fecha</th><th>Cliente</th><th>Plataforma</th><th>Mensaje de Falla</th><th>Credencial</th><th>Estado</th><th>Acción</th></tr></thead>
+              <tbody id="owner-reports-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER: AUDITORÍA DE COMPRAS -->
+      <section id="view-owner-sales-audit" style="display:none;">
+        <div class="glass" style="padding: 20px;">
+          <h3 style="margin-bottom: 16px;">Cuentas Generadas Globalmente</h3>
+          <div class="table-container">
+            <table>
+              <thead><tr><th>Fecha</th><th>Generador</th><th>Rol</th><th>Plataforma</th><th>Credencial en Vivo</th><th>Estado Cliente</th><th>Acciones Owner</th></tr></thead>
+              <tbody id="owner-audit-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER: DESCARGA TXT -->
+      <section id="view-owner-export" style="display:none;">
+        <div class="glass" style="max-width: 700px; margin: 0 auto; padding: 26px;">
+          <h3 style="margin-bottom: 16px;">Descarga de Datos en Formato TXT</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+            <button class="btn btn-secondary" onclick="exportStockTXT()"><i class="fa-solid fa-key"></i> Stock (.txt)</button>
+            <button class="btn btn-secondary" onclick="exportActiveAccountsTXT()"><i class="fa-solid fa-user-check"></i> Cuentas Activas (.txt)</button>
+            <button class="btn btn-secondary" onclick="exportSalesTXT()"><i class="fa-solid fa-receipt"></i> Historial Ventas (.txt)</button>
+            <button class="btn btn-secondary" onclick="exportUsersTXT()"><i class="fa-solid fa-users"></i> Usuarios (.txt)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- OWNER: NOTIFICACIÓN CENTRAL (10s) -->
+      <section id="view-owner-notify" style="display:none;">
+        <div class="glass" style="max-width: 620px; margin: 0 auto; padding: 24px;">
+          <h3 style="margin-bottom: 8px;">Emitir Notificación en Pantalla (10 Segundos)</h3>
+          <form onsubmit="handleSendBroadcast(event)">
+            <div class="form-group">
+              <label class="form-label">Destinatario</label>
+              <select class="form-select" id="notify-target" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Título del Comunicado</label>
+              <input type="text" class="form-input" id="notify-title" placeholder="Ej. Promoción Especial" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mensaje</label>
+              <textarea class="form-textarea" id="notify-message" rows="3" placeholder="Escribe el mensaje..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL de Imagen (Opcional)</label>
+              <input type="url" class="form-input" id="notify-image-url" placeholder="https://..." oninput="previewNotifyUrl(this.value)" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">O Subir Archivo de Imagen</label>
+              <input type="file" class="form-input" id="notify-image-file" accept="image/*" onchange="previewNotifyFile(this)" />
+            </div>
+            <div id="notify-preview-box" style="display:none; margin-bottom: 14px; text-align: center;">
+              <img id="notify-preview-img" src="" style="max-width: 100%; max-height: 160px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border-subtle);" />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+              <i class="fa-solid fa-paper-plane"></i> Lanzar Notificación
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- POPUP NOTIFICACIÓN CENTRAL -->
+  <div id="broadcast-modal">
+    <div class="broadcast-popup">
+      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeBroadcastPopup()"></i>
+      <div class="broadcast-full-image-wrapper" id="broadcast-img-wrapper">
+        <img id="broadcast-img-display" src="" alt="Notificación" class="broadcast-full-image" />
+      </div>
+      <h3 id="broadcast-title-display" style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 6px;"></h3>
+      <p id="broadcast-msg-display" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;"></p>
+      <div class="broadcast-progress-bar">
+        <div class="broadcast-progress-inner" id="broadcast-progress-inner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RECIBO DE COMPRA -->
+  <div class="modal-overlay" id="purchase-success-modal">
+    <div class="receipt-box glass">
+      <div class="receipt-badge"><i class="fa-solid fa-check"></i></div>
+      <h3 style="font-family:'Space Grotesk'; font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 4px;">¡CUENTA GENERADA CON ÉXITO!</h3>
+      <p style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 600;" id="receipt-platform-name">Plan Seleccionado</p>
+
+      <div class="receipt-creds">
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">USUARIO / CORREO:</span>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <code id="receipt-user" style="font-size: 0.95rem; color: var(--accent-cyan);">usuario</code>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="copyElementText('receipt-user')"><i class="fa-solid fa-copy"></i></button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">CONTRASEÑA:</span>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <code id="receipt-pass" style="font-size: 0.95rem; color: #38bdf8;">contraseña</code>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="copyElementText('receipt-pass')"><i class="fa-solid fa-copy"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="warranty-note" id="receipt-warranty-note" style="display:none;">
+        <i class="fa-solid fa-triangle-exclamation"></i> <strong>NOTA DE GARANTÍA:</strong> Esta cuenta es para uso exclusivo en 1 solo dispositivo. En caso de detectarse más dispositivos conectados simultáneamente, se suspenderá el servicio de inmediato y no se otorgará garantía.
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 600; margin: 14px 0 18px 0;">Muchas gracias por preferir nuestro servicio.</p>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal('purchase-success-modal'); switchNav('orders');">Ir a Mis Compras</button>
+    </div>
+  </div>
+
+  <!-- MODAL REPORTAR FALLA -->
+  <div class="modal-overlay" id="report-modal">
+    <div class="modal-box glass">
+      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('report-modal')"></i>
+      <h3 style="margin-bottom: 8px;">Reportar Problema con la Cuenta</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;" id="report-modal-subtitle"></p>
+      <form onsubmit="handleSendReport(event)">
+        <input type="hidden" id="report-purchase-id" />
+        <div class="form-group">
+          <label class="form-label">Escriba el motivo del reporte</label>
+          <textarea class="form-textarea" id="report-message" rows="4" placeholder="Ej. No entra la cuenta, dice contraseña incorrecta..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center;">Enviar Reporte</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL RESOLVER REPORTE (OWNER) -->
+  <div class="modal-overlay" id="resolve-report-modal">
+    <div class="modal-box glass">
+      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('resolve-report-modal')"></i>
+      <h3 style="margin-bottom: 8px;">Editar y Resolver Reporte</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;" id="resolve-modal-details"></p>
+      <form onsubmit="handleSaveResolvedReport(event)">
+        <input type="hidden" id="resolve-report-id" />
+        <input type="hidden" id="resolve-stock-id" />
+        <input type="hidden" id="resolve-client-username" />
+        <div class="form-group">
+          <label class="form-label">Nuevo Usuario / Correo</label>
+          <input type="text" class="form-input" id="resolve-new-user" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nueva Contraseña</label>
+          <input type="text" class="form-input" id="resolve-new-pass" required />
+        </div>
+        <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center;">Actualizar Cuenta y Marcar como Resuelto</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR CUENTA EN VIVO (OWNER) -->
+  <div class="modal-overlay" id="edit-stock-modal">
+    <div class="modal-box glass">
+      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('edit-stock-modal')"></i>
+      <h3 style="margin-bottom: 12px;">Editar Credenciales</h3>
+      <form onsubmit="handleSaveEditedStock(event)">
+        <input type="hidden" id="edit-stock-id" />
+        <div class="form-group">
+          <label class="form-label">Usuario / Correo</label>
+          <input type="text" class="form-input" id="edit-stock-user" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="text" class="form-input" id="edit-stock-pass" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Actualizar en Tiempo Real</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    /* =======================================================
+       BLINDAJE Y SEGURIDAD CLIENT-SIDE (ANTI-TAMPERING)
+       ======================================================= */
+    (function initSecurityHardening() {
+      // 1. Congelar Object Prototype para mitigar Prototype Pollution
+      try {
+        Object.freeze(Object.prototype);
+      } catch(e) {}
+
+      // 2. Deshabilitar Menú Contextual (Clic Derecho)
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showToast('Acción protegida por el sistema de seguridad.', 'info');
+      });
+
+      // 3. Bloqueo de Atajos de Teclado de Inspección (F12, Ctrl+Shift+I, etc.)
+      document.addEventListener('keydown', function(e) {
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+          (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S'))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          showToast('Función de desarrollo restringida.', 'error');
+        }
+      });
+
+      // 4. Sanitización de Consola
+      try {
+        const noop = function() {};
+        window.console.log = noop;
+        window.console.warn = noop;
+        window.console.error = noop;
+      } catch(e) {}
+    })();
+
+    // Sanitización contra inyecciones XSS
+    function escapeHtml(string) {
+      if (typeof string !== 'string') return string;
+      const entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      };
+      return String(string).replace(/[&<>"']/g, function(s) {
+        return entityMap[s];
+      });
+    }
+
+    /* =======================================================
+       CONEXIÓN Y LÓGICA DE FIREBASE DIRECTA
+       ======================================================= */
+    const FIREBASE_DB_URL = "https://levi-store-default-rtdb.firebaseio.com/";
+
+    const DEFAULT_PRODUCTS = [
+      // 1 Dispositivo (Entrega Automática)
+      { id: 'flujo-1m-1d', name: 'FlujoTV 1 Mes', deliveryType: 'AUTO', devices: 1, price: 5.00, days: 30, img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80' },
+      { id: 'flujo-3m-1d', name: 'FlujoTV 3 Meses', deliveryType: 'AUTO', devices: 1, price: 15.00, days: 90, img: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80' },
+      { id: 'flujo-7m-1d', name: 'FlujoTV 7 Meses', deliveryType: 'AUTO', devices: 1, price: 30.00, days: 210, img: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600&auto=format&fit=crop&q=80' },
+      { id: 'flujo-14m-1d', name: 'FlujoTV 14 Meses', deliveryType: 'AUTO', devices: 1, price: 60.00, days: 420, img: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?w=600&auto=format&fit=crop&q=80' },
+      // 3 Dispositivos Simultáneos (Entrega Automática)
+      { id: 'flujo-1m-3d', name: 'FlujoTV 1 Mes (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 8.00, days: 30, img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80' },
+      { id: 'flujo-3m-3d', name: 'FlujoTV 3 Meses (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 24.00, days: 90, img: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80' },
+      { id: 'flujo-7m-3d', name: 'FlujoTV 7 Meses (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 48.00, days: 210, img: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600&auto=format&fit=crop&q=80' },
+      { id: 'flujo-14m-3d', name: 'FlujoTV 14 Meses (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 96.00, days: 420, img: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?w=600&auto=format&fit=crop&q=80' }
+    ];
+
+    let db = null;
+    let localDB = {
+      users: [{ id: 'u_owner', username: 'EriikAdmin', password: 'teamoayley', role: 'OWNER', balance: 0.00, creator: 'SYSTEM' }],
+      products: DEFAULT_PRODUCTS,
+      stock: [],
+      purchases: [],
+      reports: [],
+      notifications: []
+    };
+
+    try {
+      firebase.initializeApp({ databaseURL: FIREBASE_DB_URL });
+      db = firebase.database();
+    } catch(err) {}
+
+    function listenDatabase() {
+      if (!db) return;
+      db.ref('levi_stream').on('value', (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          if (val.users) localDB.users = Array.isArray(val.users) ? val.users : Object.values(val.users);
+          if (val.products) localDB.products = Array.isArray(val.products) ? val.products : Object.values(val.products);
+          if (val.stock) localDB.stock = Array.isArray(val.stock) ? val.stock : Object.values(val.stock);
+          if (val.purchases) localDB.purchases = Array.isArray(val.purchases) ? val.purchases : Object.values(val.purchases);
+          if (val.reports) localDB.reports = Array.isArray(val.reports) ? val.reports : Object.values(val.reports);
+          if (val.notifications) localDB.notifications = Array.isArray(val.notifications) ? val.notifications : Object.values(val.notifications);
+
+          if (currentUser) {
+            const fresh = localDB.users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+            if (fresh) currentUser = fresh;
+            updateUI();
+          }
+
+          renderStore();
+          renderOrders();
+          checkPendingBroadcasts();
+        } else {
+          syncToDatabase();
+        }
+      });
+    }
+
+    function syncToDatabase() {
+      if (!db) return;
+      db.ref('levi_stream').set({
+        users: localDB.users || [],
+        products: localDB.products || [],
+        stock: localDB.stock || [],
+        purchases: localDB.purchases || [],
+        reports: localDB.reports || [],
+        notifications: localDB.notifications || []
+      });
+    }
+
+    listenDatabase();
+
+    let currentUser = null;
+    let broadcastTimeout = null;
+
+    function contactWhatsapp(text) {
+      const phone = "51904016110";
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // SEGURIDAD POR FUERZA BRUTA (3 INTENTOS FALLIDOS -> BLOQUEO DE 24H)
+    function checkLockoutStatus() {
+      const lockUntil = localStorage.getItem('levi_sec_lock');
+      if (lockUntil) {
+        const remaining = parseInt(lockUntil) - Date.now();
+        if (remaining > 0) {
+          document.getElementById('auth-screen').style.display = 'none';
+          document.getElementById('lockout-screen').style.display = 'flex';
+          startLockoutCountdown(remaining);
+          return true;
+        } else {
+          localStorage.removeItem('levi_sec_lock');
+          localStorage.removeItem('levi_fail_cnt');
+        }
+      }
+      return false;
+    }
+
+    function recordFailedAttempt() {
+      let attempts = parseInt(localStorage.getItem('levi_fail_cnt') || '0') + 1;
+      localStorage.setItem('levi_fail_cnt', attempts);
+
+      if (attempts >= 3) {
+        const unlockTime = Date.now() + (24 * 60 * 60 * 1000);
+        localStorage.setItem('levi_sec_lock', unlockTime);
+        checkLockoutStatus();
+      } else {
+        showToast(`Credenciales erróneas. Intento ${attempts} de 3.`, 'error');
+      }
+    }
+
+    function startLockoutCountdown(durationMs) {
+      const timerEl = document.getElementById('lockout-timer');
+      let timeLeft = Math.floor(durationMs / 1000);
+
+      const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          location.reload();
+          return;
+        }
+        const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
+        const m = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
+        const s = (timeLeft % 60).toString().padStart(2, '0');
+        timerEl.textContent = `${h}:${m}:${s}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    // LOGIN
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      if (checkLockoutStatus()) return;
+
+      const u = document.getElementById('auth-user').value.trim();
+      const p = document.getElementById('auth-pass').value.trim();
+
+      const user = localDB.users.find(x => x.username.toLowerCase() === u.toLowerCase());
+
+      if (user && user.password === p) {
+        localStorage.removeItem('levi_fail_cnt');
+        currentUser = user;
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+
+        updateUI();
+        switchNav('store');
+        checkPendingBroadcasts();
+        showToast(`Bienvenido ${user.username}`, 'success');
+      } else {
+        recordFailedAttempt();
+      }
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      document.getElementById('app-container').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('auth-user').value = '';
+      document.getElementById('auth-pass').value = '';
+      document.getElementById('sidebar').classList.remove('open');
+      showToast('Sesión cerrada.', 'info');
+    }
+
+    function updateUI() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-balance').textContent = `S/ ${currentUser.balance.toFixed(2)}`;
+      document.getElementById('recharge-view-balance').textContent = `S/ ${currentUser.balance.toFixed(2)}`;
+      document.getElementById('sidebar-username').textContent = currentUser.username;
+      document.getElementById('sidebar-role').textContent = currentUser.role;
+
+      document.getElementById('owner-menu-section').style.display = (currentUser.role === 'OWNER') ? 'block' : 'none';
+      document.getElementById('subusers-menu-section').style.display = (currentUser.role === 'RESELLER' || currentUser.role === 'SELLER') ? 'block' : 'none';
+
+      if (currentUser.role === 'OWNER') {
+        document.getElementById('owner-self-balance').textContent = `S/ ${currentUser.balance.toFixed(2)}`;
+      }
+    }
+
+    function switchNav(view) {
+      const views = ['store', 'orders', 'recharge', 'manage-subusers', 'owner-stock', 'owner-products', 'owner-users', 'owner-reports', 'owner-sales-audit', 'owner-export', 'owner-notify'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.style.display = (v === view) ? 'block' : 'none';
+      });
+
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+      const titles = {
+        'store': 'Tienda Streaming',
+        'orders': 'Mis Compras',
+        'recharge': 'Billetera Virtual',
+        'manage-subusers': 'Gestión de Clientes',
+        'owner-stock': 'Gestión de Cuentas',
+        'owner-products': 'Gestionar Tienda',
+        'owner-users': 'Usuarios del Sistema',
+        'owner-reports': 'Reportes de Clientes',
+        'owner-sales-audit': 'Auditoría de Cuentas Generadas',
+        'owner-export': 'Centro de Exportación TXT',
+        'owner-notify': 'Notificaciones Centrales'
+      };
+
+      document.getElementById('page-title').textContent = titles[view] || 'LEVI STREAM';
+
+      if (window.innerWidth <= 860) document.getElementById('sidebar').classList.remove('open');
+
+      if (view === 'store') renderStore();
+      if (view === 'orders') renderOrders();
+      if (view === 'manage-subusers') renderSubUsers();
+      if (view === 'owner-stock') renderOwnerStock();
+      if (view === 'owner-products') renderOwnerProducts();
+      if (view === 'owner-users') renderOwnerUsers();
+      if (view === 'owner-reports') renderOwnerReports();
+      if (view === 'owner-sales-audit') renderOwnerAuditTable();
+      if (view === 'owner-notify') renderNotifyTargets();
+    }
+
+    // TIENDA
+    function setStoreFilter(filter, btn) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('section-group-auto').style.display = (filter === 'WHATSAPP') ? 'none' : 'block';
+      document.getElementById('section-group-wa').style.display = (filter === 'AUTO') ? 'none' : 'block';
+    }
+
+    function renderStore() {
+      const containerAuto = document.getElementById('catalog-grid-auto');
+      const containerWa = document.getElementById('catalog-grid-wa');
+      if (!containerAuto || !containerWa) return;
+      containerAuto.innerHTML = '';
+      containerWa.innerHTML = '';
+
+      localDB.products.forEach(p => {
+        const isAuto = (p.deliveryType !== 'WHATSAPP');
+        if (isAuto) {
+          const maxCap = (p.devices === 1) ? 2 : 1;
+          const availableStockList = localDB.stock.filter(s => s.productId === p.id && (s.soldCount || 0) < maxCap);
+          const hasStock = availableStockList.length > 0;
+
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <div class="prod-img-wrap">
+              <img src="${escapeHtml(p.img)}" class="prod-img" onerror="this.src='https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80'" />
+              <span class="delivery-badge badge-auto"><i class="fa-solid fa-bolt"></i> Automático</span>
+              <span class="prod-badge">${escapeHtml(p.devices)} Disp.</span>
+            </div>
+            <div class="prod-info">
+              <div>
+                <div style="font-weight: 700; font-size: 1.05rem;">${escapeHtml(p.name)}</div>
+                <div class="prod-price">S/ ${p.price.toFixed(2)}</div>
+                <div style="font-size: 0.78rem; color: ${hasStock ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 12px;">
+                  <i class="fa-solid fa-circle" style="font-size: 8px;"></i> ${hasStock ? `${availableStockList.length} cuentas en stock` : 'Sin stock inmediato'}
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center;"
+                ${!hasStock ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}
+                onclick="buyProductAuto('${p.id}')">
+                <i class="fa-solid fa-bolt"></i> Comprar con Saldo
+              </button>
+            </div>
+          `;
+          containerAuto.appendChild(card);
+        } else {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <div class="prod-img-wrap">
+              <img src="${escapeHtml(p.img)}" class="prod-img" onerror="this.src='https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80'" />
+              <span class="delivery-badge badge-wa"><i class="fa-brands fa-whatsapp"></i> Por WhatsApp</span>
+              <span class="prod-badge">${escapeHtml(p.devices)} Disp.</span>
+            </div>
+            <div class="prod-info">
+              <div>
+                <div style="font-weight: 700; font-size: 1.05rem;">${escapeHtml(p.name)}</div>
+                <div class="prod-price">S/ ${p.price.toFixed(2)}</div>
+                <div style="font-size: 0.78rem; color: var(--accent-wa); margin-bottom: 12px;">
+                  <i class="fa-solid fa-headset"></i> Entrega y activación manual
+                </div>
+              </div>
+              <button class="btn btn-whatsapp" style="width: 100%; justify-content: center;"
+                onclick="orderProductViaWhatsapp('${escapeHtml(p.name)}', ${p.devices}, ${p.price})">
+                <i class="fa-brands fa-whatsapp"></i> Solicitar por WhatsApp
+              </button>
+            </div>
+          `;
+          containerWa.appendChild(card);
+        }
+      });
+    }
+
+    function orderProductViaWhatsapp(productName, devices, price) {
+      const msg = `Hola Levi Stream Perú, deseo adquirir:\n` +
+                  `📦 Producto: ${productName}\n` +
+                  `📱 Dispositivos: ${devices}\n` +
+                  `💰 Precio: S/ ${price.toFixed(2)}\n` +
+                  `👤 Usuario: ${currentUser.username}`;
+      contactWhatsapp(msg);
+    }
+
+    // COMPRA DIRECTA AUTOMÁTICA
+    function buyProductAuto(prodId) {
+      const prod = localDB.products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      if (currentUser.balance < prod.price) {
+        showToast('Saldo insuficiente. Realiza una recarga.', 'error');
+        switchNav('recharge');
+        return;
+      }
+
+      const maxCap = (prod.devices === 1) ? 2 : 1;
+      const stockIdx = localDB.stock.findIndex(s => s.productId === prodId && (s.soldCount || 0) < maxCap);
+
+      if (stockIdx === -1) {
+        showToast('No hay stock disponible en este momento.', 'error');
+        return;
+      }
+
+      localDB.stock[stockIdx].soldCount = (localDB.stock[stockIdx].soldCount || 0) + 1;
+
+      const uIdx = localDB.users.findIndex(u => u.username === currentUser.username);
+      localDB.users[uIdx].balance -= prod.price;
+      currentUser.balance = localDB.users[uIdx].balance;
+
+      const assignedStock = localDB.stock[stockIdx];
+
+      localDB.purchases.unshift({
+        id: 'pur_' + Date.now(),
+        stockId: assignedStock.id,
+        buyerUsername: currentUser.username,
+        buyerRole: currentUser.role,
+        productName: prod.name,
+        devices: prod.devices,
+        price: prod.price,
+        daysTotal: prod.days || 30,
+        purchaseDate: new Date().toISOString(),
+        deletedForClient: false
+      });
+
+      syncToDatabase();
+      updateUI();
+      renderStore();
+
+      document.getElementById('receipt-platform-name').textContent = `${prod.name} (${prod.devices} Dispositivo${prod.devices > 1 ? 's' : ''})`;
+      document.getElementById('receipt-user').textContent = assignedStock.user;
+      document.getElementById('receipt-pass').textContent = assignedStock.pass;
+      document.getElementById('receipt-warranty-note').style.display = (prod.devices === 1) ? 'block' : 'none';
+      document.getElementById('purchase-success-modal').style.display = 'flex';
+    }
+
+    // HISTORIAL DE COMPRAS
+    function renderOrders() {
+      const tbody = document.getElementById('user-orders-table');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const list = localDB.purchases.filter(p => p.buyerUsername === currentUser.username && !p.deletedForClient);
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:24px;">No tienes cuentas compradas todavía.</td></tr>`;
+        return;
+      }
+
+      list.forEach(item => {
+        const live = localDB.stock.find(s => s.id === item.stockId) || { user: 'No disp', pass: '***' };
+        const elapsedDays = Math.floor((new Date() - new Date(item.purchaseDate)) / (1000 * 60 * 60 * 24));
+        const daysLeft = Math.max(0, item.daysTotal - elapsedDays);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
+          <td style="font-weight:600;">${escapeHtml(item.productName)}</td>
+          <td><span class="role-badge">${escapeHtml(item.devices)} Disp</span></td>
+          <td>
+            <code style="background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 6px; color:var(--accent-cyan);">
+              ${escapeHtml(live.user)}:${escapeHtml(live.pass)}
+            </code>
+          </td>
+          <td><span style="color: ${daysLeft <= 1 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">${daysLeft} días</span></td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.74rem;" onclick="copyText('${escapeHtml(live.user)}:${escapeHtml(live.pass)}')">
+              <i class="fa-solid fa-copy"></i> Copiar
+            </button>
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.74rem;" onclick="openReportModal('${item.id}', '${escapeHtml(item.productName)}')">
+              <i class="fa-solid fa-triangle-exclamation"></i> Reportar
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function copyText(str) {
+      navigator.clipboard.writeText(str);
+      showToast('Credenciales copiadas al portapapeles', 'info');
+    }
+
+    function copyElementText(elId) {
+      const text = document.getElementById(elId).textContent;
+      navigator.clipboard.writeText(text);
+      showToast('Copiado al portapapeles', 'info');
+    }
+
+    // REPORTES CLIENTE
+    function openReportModal(purchaseId, prodName) {
+      document.getElementById('report-purchase-id').value = purchaseId;
+      document.getElementById('report-modal-subtitle').textContent = `Cuenta: ${prodName}`;
+      document.getElementById('report-message').value = '';
+      document.getElementById('report-modal').style.display = 'flex';
+    }
+
+    function handleSendReport(e) {
+      e.preventDefault();
+      const pId = document.getElementById('report-purchase-id').value;
+      const msg = document.getElementById('report-message').value.trim();
+
+      const pur = localDB.purchases.find(p => p.id === pId);
+      if (!pur) return;
+
+      localDB.reports.unshift({
+        id: 'rep_' + Date.now(),
+        purchaseId: pur.id,
+        stockId: pur.stockId,
+        buyerUsername: currentUser.username,
+        productName: pur.productName,
+        message: msg,
+        status: 'PENDIENTE',
+        date: new Date().toLocaleString()
+      });
+
+      syncToDatabase();
+      closeModal('report-modal');
+      showToast('REPORTE ENVIADO. El soporte técnico revisará tu caso en breve.', 'info');
+    }
+
+    // OWNER: RESOLVER REPORTES CON NOTIFICACIÓN 5s
+    function renderOwnerReports() {
+      const tbody = document.getElementById('owner-reports-tbody');
+      tbody.innerHTML = '';
+
+      if (localDB.reports.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">No hay reportes registrados.</td></tr>`;
+        return;
+      }
+
+      localDB.reports.forEach(r => {
+        const live = localDB.stock.find(s => s.id === r.stockId) || { user: 'No disp', pass: '***' };
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(r.date)}</td>
+          <td style="font-weight:700;">${escapeHtml(r.buyerUsername)}</td>
+          <td>${escapeHtml(r.productName)}</td>
+          <td style="color:#fca5a5;">${escapeHtml(r.message)}</td>
+          <td><code>${escapeHtml(live.user)}:${escapeHtml(live.pass)}</code></td>
+          <td>
+            <span style="color: ${r.status === 'RESUELTO' ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">
+              ${escapeHtml(r.status)}
+            </span>
+          </td>
+          <td>
+            ${r.status === 'PENDIENTE' ? `
+              <button class="btn btn-success" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openResolveReportModal('${r.id}')">
+                <i class="fa-solid fa-wrench"></i> Editar y Resolver
+              </button>
+            ` : '<i class="fa-solid fa-check-double" style="color:var(--success);"></i> Resuelto'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openResolveReportModal(reportId) {
+      const rep = localDB.reports.find(r => r.id === reportId);
+      if (!rep) return;
+
+      const liveStock = localDB.stock.find(s => s.id === rep.stockId) || { user: '', pass: '' };
+
+      document.getElementById('resolve-report-id').value = rep.id;
+      document.getElementById('resolve-stock-id').value = rep.stockId;
+      document.getElementById('resolve-client-username').value = rep.buyerUsername;
+      document.getElementById('resolve-modal-details').textContent = `Cliente: ${rep.buyerUsername} | Problema: "${rep.message}"`;
+      document.getElementById('resolve-new-user').value = liveStock.user;
+      document.getElementById('resolve-new-pass').value = liveStock.pass;
+
+      document.getElementById('resolve-report-modal').style.display = 'flex';
+    }
+
+    function handleSaveResolvedReport(e) {
+      e.preventDefault();
+      const repId = document.getElementById('resolve-report-id').value;
+      const stockId = document.getElementById('resolve-stock-id').value;
+      const clientUser = document.getElementById('resolve-client-username').value;
+      const newUser = document.getElementById('resolve-new-user').value.trim();
+      const newPass = document.getElementById('resolve-new-pass').value.trim();
+
+      const sIdx = localDB.stock.findIndex(s => s.id === stockId);
+      if (sIdx !== -1) {
+        localDB.stock[sIdx].user = newUser;
+        localDB.stock[sIdx].pass = newPass;
+      }
+
+      const rIdx = localDB.reports.findIndex(r => r.id === repId);
+      if (rIdx !== -1) {
+        localDB.reports[rIdx].status = 'RESUELTO';
+      }
+
+      localDB.notifications.push({
+        id: 'notif_' + Date.now(),
+        target: clientUser,
+        title: '¡REPORTE SOLUCIONADO!',
+        message: 'La cuenta que reportaste ha sido solucionada con éxito. Revisa tu historial de compras.',
+        img: '',
+        duration: 5,
+        seenBy: []
+      });
+
+      syncToDatabase();
+      closeModal('resolve-report-modal');
+      renderOwnerReports();
+      showToast('Reporte resuelto y notificado al cliente.', 'success');
+    }
+
+    // OWNER: AUDITORÍA
+    function renderOwnerAuditTable() {
+      const tbody = document.getElementById('owner-audit-tbody');
+      tbody.innerHTML = '';
+
+      if (localDB.purchases.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">Sin compras registradas.</td></tr>`;
+        return;
+      }
+
+      localDB.purchases.forEach(item => {
+        const live = localDB.stock.find(s => s.id === item.stockId) || { user: 'No disp', pass: '***' };
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
+          <td style="font-weight:700;">${escapeHtml(item.buyerUsername)}</td>
+          <td><span class="role-badge">${escapeHtml(item.buyerRole)}</span></td>
+          <td>${escapeHtml(item.productName)} (${item.devices} Disp)</td>
+          <td><code>${escapeHtml(live.user)}:${escapeHtml(live.pass)}</code></td>
+          <td>
+            <span style="color: ${item.deletedForClient ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">
+              ${item.deletedForClient ? 'ELIMINADA PARA CLIENTE' : 'ACTIVA EN CLIENTE'}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem;" onclick="toggleHideFromClient('${item.id}')">
+              ${item.deletedForClient ? 'Restaurar' : 'Ocultar a Cliente'}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleHideFromClient(purchaseId) {
+      const idx = localDB.purchases.findIndex(p => p.id === purchaseId);
+      if (idx !== -1) {
+        localDB.purchases[idx].deletedForClient = !localDB.purchases[idx].deletedForClient;
+        syncToDatabase();
+        renderOwnerAuditTable();
+        showToast('Estado actualizado.');
+      }
+    }
+
+    // OWNER: GESTIÓN DE PRODUCTOS
+    let currentPreviewImg = 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80';
+
+    function previewProductImgUrl(url) {
+      if (url.trim()) {
+        currentPreviewImg = url;
+        document.getElementById('p-preview').src = url;
+      }
+    }
+
+    function previewProductImgFile(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          currentPreviewImg = e.target.result;
+          document.getElementById('p-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function handleSaveProduct(e) {
+      e.preventDefault();
+      const editId = document.getElementById('prod-edit-id').value;
+      const name = document.getElementById('p-name').value.trim();
+      const deliveryType = document.getElementById('p-delivery-type').value;
+      const devices = parseInt(document.getElementById('p-devices').value);
+      const price = parseFloat(document.getElementById('p-price').value);
+      const days = parseInt(document.getElementById('p-days').value);
+
+      if (editId) {
+        const idx = localDB.products.findIndex(p => p.id === editId);
+        if (idx !== -1) {
+          localDB.products[idx].name = name;
+          localDB.products[idx].deliveryType = deliveryType;
+          localDB.products[idx].devices = devices;
+          localDB.products[idx].price = price;
+          localDB.products[idx].days = days;
+          localDB.products[idx].img = currentPreviewImg;
+          showToast(`Plataforma "${name}" actualizada.`, 'success');
+        }
+      } else {
+        localDB.products.push({
+          id: 'prod_' + Date.now(),
+          name: name,
+          deliveryType: deliveryType,
+          devices: devices,
+          price: price,
+          days: days,
+          img: currentPreviewImg
+        });
+        showToast(`Plataforma "${name}" creada exitosamente.`, 'success');
+      }
+
+      syncToDatabase();
+      resetProductForm();
+      renderOwnerProducts();
+      renderStore();
+    }
+
+    function editProduct(id) {
+      const p = localDB.products.find(x => x.id === id);
+      if (!p) return;
+
+      document.getElementById('prod-edit-id').value = p.id;
+      document.getElementById('p-name').value = p.name;
+      document.getElementById('p-delivery-type').value = p.deliveryType || 'AUTO';
+      document.getElementById('p-devices').value = p.devices;
+      document.getElementById('p-price').value = p.price;
+      document.getElementById('p-days').value = p.days || 30;
+      document.getElementById('p-img-url').value = p.img.startsWith('data:') ? '' : p.img;
+      currentPreviewImg = p.img;
+      document.getElementById('p-preview').src = p.img;
+
+      document.getElementById('product-form-title').textContent = 'Editar Plataforma';
+      document.getElementById('p-submit-btn').textContent = 'Guardar Cambios';
+      document.getElementById('p-cancel-btn').style.display = 'inline-flex';
+    }
+
+    function resetProductForm() {
+      document.getElementById('prod-edit-id').value = '';
+      document.getElementById('p-name').value = '';
+      document.getElementById('p-delivery-type').value = 'AUTO';
+      document.getElementById('p-devices').value = '1';
+      document.getElementById('p-price').value = '';
+      document.getElementById('p-days').value = '30';
+      document.getElementById('p-img-url').value = '';
+      document.getElementById('p-img-file').value = '';
+      currentPreviewImg = 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80';
+      document.getElementById('p-preview').src = currentPreviewImg;
+
+      document.getElementById('product-form-title').textContent = 'Crear Nueva Plataforma';
+      document.getElementById('p-submit-btn').textContent = 'Guardar Plataforma';
+      document.getElementById('p-cancel-btn').style.display = 'none';
+    }
+
+    function deleteProduct(id) {
+      if (!confirm('¿Eliminar esta plataforma de la tienda?')) return;
+      localDB.products = localDB.products.filter(p => p.id !== id);
+      syncToDatabase();
+      renderOwnerProducts();
+      renderStore();
+      showToast('Plataforma eliminada.', 'info');
+    }
+
+    function renderOwnerProducts() {
+      const tbody = document.getElementById('owner-products-tbody');
+      tbody.innerHTML = '';
+
+      localDB.products.forEach(p => {
+        const isAuto = (p.deliveryType !== 'WHATSAPP');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><img src="${escapeHtml(p.img)}" style="width: 42px; height: 30px; object-fit: cover; border-radius: 6px;" /></td>
+          <td style="font-weight:600;">${escapeHtml(p.name)}</td>
+          <td><span class="role-badge" style="${isAuto ? '' : 'color:#22c55e; border-color:#22c55e;'}">${isAuto ? 'Automático' : 'WhatsApp'}</span></td>
+          <td>${escapeHtml(p.devices)} Disp</td>
+          <td style="color:var(--accent-cyan); font-weight:700;">S/ ${p.price.toFixed(2)}</td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="editProduct('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem;" onclick="deleteProduct('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // OWNER: STOCK
+    function renderOwnerStock() {
+      const select = document.getElementById('stock-product-select');
+      select.innerHTML = '';
+      localDB.products.filter(p => p.deliveryType !== 'WHATSAPP').forEach(p => {
+        select.innerHTML += `<option value="${p.id}">${escapeHtml(p.name)} (${p.devices} Disp) - S/ ${p.price.toFixed(2)}</option>`;
+      });
+
+      const tbody = document.getElementById('owner-stock-tbody');
+      tbody.innerHTML = '';
+
+      if (localDB.stock.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">Inventario vacío.</td></tr>`;
+        return;
+      }
+
+      localDB.stock.forEach(item => {
+        const prod = localDB.products.find(p => p.id === item.productId) || { name: 'Plataforma', devices: 1 };
+        const maxCap = (prod.devices === 1) ? 2 : 1;
+        const sold = item.soldCount || 0;
+        const isAvailable = (sold < maxCap);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(prod.name)}</td>
+          <td><code>${escapeHtml(item.user)}:${escapeHtml(item.pass)}</code></td>
+          <td>${sold} / ${maxCap} ventas</td>
+          <td><span style="color: ${isAvailable ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">${isAvailable ? 'DISPONIBLE' : 'AGOTADA'}</span></td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openEditStock('${item.id}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem;" onclick="deleteStock('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleAddStock(e) {
+      e.preventDefault();
+      const prodId = document.getElementById('stock-product-select').value;
+      const raw = document.getElementById('stock-raw').value.trim();
+
+      const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+      lines.forEach(line => {
+        const [u, p] = line.split(':');
+        if (u && p) {
+          localDB.stock.push({
+            id: 'stk_' + Math.random().toString(36).substr(2, 9),
+            productId: prodId,
+            user: u.trim(),
+            pass: p.trim(),
+            soldCount: 0
+          });
+        }
+      });
+
+      syncToDatabase();
+      document.getElementById('stock-raw').value = '';
+      renderOwnerStock();
+      renderStore();
+      showToast(`${lines.length} cuenta(s) insertadas.`, 'success');
+    }
+
+    function openEditStock(id) {
+      const item = localDB.stock.find(s => s.id === id);
+      if (!item) return;
+
+      document.getElementById('edit-stock-id').value = item.id;
+      document.getElementById('edit-stock-user').value = item.user;
+      document.getElementById('edit-stock-pass').value = item.pass;
+      document.getElementById('edit-stock-modal').style.display = 'flex';
+    }
+
+    function handleSaveEditedStock(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-stock-id').value;
+      const u = document.getElementById('edit-stock-user').value.trim();
+      const p = document.getElementById('edit-stock-pass').value.trim();
+
+      const idx = localDB.stock.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        localDB.stock[idx].user = u;
+        localDB.stock[idx].pass = p;
+        syncToDatabase();
+        closeModal('edit-stock-modal');
+        renderOwnerStock();
+        showToast('Credenciales actualizadas en tiempo real.', 'success');
+      }
+    }
+
+    function deleteStock(id) {
+      localDB.stock = localDB.stock.filter(s => s.id !== id);
+      syncToDatabase();
+      renderOwnerStock();
+      renderStore();
+      showToast('Cuenta eliminada.', 'info');
+    }
+
+    // OWNER: USUARIOS Y AUTOGESTIÓN DE SALDO
+    function modifyOwnerBalance(isAdd) {
+      const amount = parseFloat(prompt(`Monto a ${isAdd ? 'sumar' : 'restar'}:`, "50"));
+      if (isNaN(amount) || amount <= 0) return;
+
+      const idx = localDB.users.findIndex(u => u.username === currentUser.username);
+      if (isAdd) localDB.users[idx].balance += amount;
+      else localDB.users[idx].balance = Math.max(0, localDB.users[idx].balance - amount);
+
+      currentUser.balance = localDB.users[idx].balance;
+      syncToDatabase();
+      updateUI();
+      renderOwnerUsers();
+    }
+
+    function handleOwnerCreateUser(e) {
+      e.preventDefault();
+      const u = document.getElementById('ow-name').value.trim();
+      const p = document.getElementById('ow-pass').value.trim();
+      const r = document.getElementById('ow-role').value;
+      const b = parseFloat(document.getElementById('ow-balance').value) || 0;
+
+      if (localDB.users.some(x => x.username.toLowerCase() === u.toLowerCase())) {
+        showToast('El usuario ya existe.', 'error');
+        return;
+      }
+
+      localDB.users.push({ id: 'u_' + Date.now(), username: u, password: p, role: r, balance: b, creator: 'OWNER' });
+      syncToDatabase();
+      renderOwnerUsers();
+      e.target.reset();
+      showToast(`Usuario ${u} creado con éxito.`, 'success');
+    }
+
+    function renderOwnerUsers() {
+      const tbody = document.getElementById('owner-users-tbody');
+      tbody.innerHTML = '';
+
+      localDB.users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight:600;">${escapeHtml(u.username)}</td>
+          <td><code>${escapeHtml(u.password)}</code></td>
+          <td><span class="role-badge">${escapeHtml(u.role)}</span></td>
+          <td style="color:var(--accent-cyan); font-weight:700;">S/ ${u.balance.toFixed(2)}</td>
+          <td>
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.72rem;" onclick="adminEditBalance('${escapeHtml(u.username)}')">Saldo</button>
+            ${u.username !== 'EriikAdmin' ? `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.72rem;" onclick="adminDeleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function adminEditBalance(username) {
+      const amt = parseFloat(prompt(`Nuevo saldo total para ${username}:`));
+      if (isNaN(amt)) return;
+
+      const idx = localDB.users.findIndex(u => u.username === username);
+      if (idx !== -1) {
+        localDB.users[idx].balance = amt;
+        if (currentUser.username === username) currentUser.balance = amt;
+        syncToDatabase();
+        updateUI();
+        renderOwnerUsers();
+        showToast(`Saldo de ${username} actualizado.`);
+      }
+    }
+
+    function adminDeleteUser(id) {
+      if (!confirm('¿Eliminar usuario?')) return;
+      localDB.users = localDB.users.filter(u => u.id !== id);
+      syncToDatabase();
+      renderOwnerUsers();
+      showToast('Usuario eliminado.');
+    }
+
+    // SUB-USUARIOS
+    function renderSubUsers() {
+      const roleSelect = document.getElementById('sub-role');
+      roleSelect.innerHTML = (currentUser.role === 'RESELLER') ? '<option value="SELLER">SELLER</option><option value="CLIENTE">CLIENTE</option>' : '<option value="CLIENTE">CLIENTE</option>';
+
+      const tbody = document.getElementById('subusers-table-body');
+      tbody.innerHTML = '';
+      const list = localDB.users.filter(u => u.creator === currentUser.username);
+
+      list.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(u.username)}</td>
+          <td><span class="role-badge">${escapeHtml(u.role)}</span></td>
+          <td>S/ ${u.balance.toFixed(2)}</td>
+          <td>
+            <button class="btn btn-primary" style="padding:4px 8px; font-size:0.74rem;" onclick="transferBalanceToSubUser('${escapeHtml(u.username)}')">Transferir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleCreateSubUser(e) {
+      e.preventDefault();
+      const u = document.getElementById('sub-name').value.trim();
+      const p = document.getElementById('sub-pass').value.trim();
+      const r = document.getElementById('sub-role').value;
+      const b = parseFloat(document.getElementById('sub-init-balance').value) || 0;
+
+      if (currentUser.balance < b) {
+        showToast('Saldo insuficiente.', 'error');
+        return;
+      }
+
+      if (localDB.users.some(x => x.username.toLowerCase() === u.toLowerCase())) {
+        showToast('El usuario ya existe.', 'error');
+        return;
+      }
+
+      const cIdx = localDB.users.findIndex(x => x.username === currentUser.username);
+      localDB.users[cIdx].balance -= b;
+      currentUser.balance = localDB.users[cIdx].balance;
+
+      localDB.users.push({ id: 'u_' + Date.now(), username: u, password: p, role: r, balance: b, creator: currentUser.username });
+
+      syncToDatabase();
+      updateUI();
+      renderSubUsers();
+      e.target.reset();
+      showToast(`Usuario ${u} creado con éxito.`, 'success');
+    }
+
+    function transferBalanceToSubUser(subUser) {
+      const amount = parseFloat(prompt(`Monto a transferir a ${subUser}:`, "10"));
+      if (isNaN(amount) || amount <= 0 || currentUser.balance < amount) return;
+
+      const cIdx = localDB.users.findIndex(x => x.username === currentUser.username);
+      const sIdx = localDB.users.findIndex(x => x.username === subUser);
+
+      localDB.users[cIdx].balance -= amount;
+      localDB.users[sIdx].balance += amount;
+      currentUser.balance = localDB.users[cIdx].balance;
+
+      syncToDatabase();
+      updateUI();
+      renderSubUsers();
+      showToast(`Transferido S/ ${amount.toFixed(2)} a ${subUser}`);
+    }
+
+    // NOTIFICACIONES
+    let broadcastSelectedImg = '';
+    function previewNotifyUrl(url) {
+      if (url.trim()) {
+        broadcastSelectedImg = url;
+        document.getElementById('notify-preview-img').src = url;
+        document.getElementById('notify-preview-box').style.display = 'block';
+      }
+    }
+    function previewNotifyFile(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          broadcastSelectedImg = e.target.result;
+          document.getElementById('notify-preview-img').src = e.target.result;
+          document.getElementById('notify-preview-box').style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function renderNotifyTargets() {
+      const select = document.getElementById('notify-target');
+      select.innerHTML = '<option value="ALL">TODAS LAS CUENTAS (Global)</option>';
+      localDB.users.forEach(u => {
+        select.innerHTML += `<option value="${escapeHtml(u.username)}">${escapeHtml(u.username)} (${escapeHtml(u.role)})</option>`;
+      });
+    }
+
+    function handleSendBroadcast(e) {
+      e.preventDefault();
+      const target = document.getElementById('notify-target').value;
+      const title = document.getElementById('notify-title').value.trim();
+      const msg = document.getElementById('notify-message').value.trim();
+
+      localDB.notifications.push({
+        id: 'notif_' + Date.now(),
+        target: target,
+        title: title,
+        message: msg,
+        img: broadcastSelectedImg,
+        duration: 10,
+        seenBy: []
+      });
+
+      syncToDatabase();
+      e.target.reset();
+      broadcastSelectedImg = '';
+      document.getElementById('notify-preview-box').style.display = 'none';
+      showToast('Notificación enviada.', 'success');
+    }
+
+    function checkPendingBroadcasts() {
+      if (!currentUser || !localDB.notifications) return;
+
+      const unread = localDB.notifications.find(n => 
+        (n.target === 'ALL' || n.target === currentUser.username) &&
+        !(n.seenBy || []).includes(currentUser.username)
+      );
+
+      if (unread) {
+        showBroadcastPopup(unread);
+        if (!unread.seenBy) unread.seenBy = [];
+        unread.seenBy.push(currentUser.username);
+        syncToDatabase();
+      }
+    }
+
+    function showBroadcastPopup(notif) {
+      const modal = document.getElementById('broadcast-modal');
+      document.getElementById('broadcast-title-display').textContent = notif.title;
+      document.getElementById('broadcast-msg-display').textContent = notif.message;
+
+      const wrapper = document.getElementById('broadcast-img-wrapper');
+      const imgEl = document.getElementById('broadcast-img-display');
+
+      if (notif.img && notif.img.trim()) {
+        imgEl.src = notif.img;
+        wrapper.style.display = 'flex';
+      } else {
+        wrapper.style.display = 'none';
+      }
+
+      modal.style.display = 'flex';
+
+      const durationSec = notif.duration || 10;
+      const progress = document.getElementById('broadcast-progress-inner');
+      progress.style.transition = 'none';
+      progress.style.width = '100%';
+
+      setTimeout(() => {
+        progress.style.transition = `width ${durationSec}s linear`;
+        progress.style.width = '0%';
+      }, 50);
+
+      if (broadcastTimeout) clearTimeout(broadcastTimeout);
+      broadcastTimeout = setTimeout(() => {
+        closeBroadcastPopup();
+      }, durationSec * 1000);
+    }
+
+    function closeBroadcastPopup() {
+      if (broadcastTimeout) clearTimeout(broadcastTimeout);
+      document.getElementById('broadcast-modal').style.display = 'none';
+    }
+
+    // EXPORTACIÓN TXT
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function exportStockTXT() {
+      let txt = "================ LEVI STREAM STOCK ================\n\n";
+      localDB.stock.forEach(s => {
+        const prod = localDB.products.find(p => p.id === s.productId) || { name: 'Plan' };
+        txt += `[${prod.name}] -> ${s.user}:${s.pass} (Ventas: ${s.soldCount || 0})\n`;
+      });
+      downloadTextFile('Cuentas_Stock_LeviStream.txt', txt);
+    }
+
+    function exportActiveAccountsTXT() {
+      let txt = "================ CUENTAS ACTIVAS ================\n\n";
+      localDB.purchases.forEach(p => {
+        const s = localDB.stock.find(x => x.id === p.stockId) || { user: 'No disp', pass: '***' };
+        txt += `Cliente: ${p.buyerUsername} | ${p.productName} -> ${s.user}:${s.pass}\n`;
+      });
+      downloadTextFile('Cuentas_Activas_LeviStream.txt', txt);
+    }
+
+    function exportSalesTXT() {
+      let txt = "================ HISTORIAL VENTAS ================\n\n";
+      let total = 0;
+      localDB.purchases.forEach(p => {
+        total += (p.price || 0);
+        txt += `Fecha: ${p.purchaseDate} | Comprador: ${p.buyerUsername} | Plan: ${p.productName} | S/ ${p.price}\n`;
+      });
+      txt += `\nTOTAL RECAUDADO: S/ ${total.toFixed(2)}\n`;
+      downloadTextFile('Historial_Ventas_LeviStream.txt', txt);
+    }
+
+    function exportUsersTXT() {
+      let txt = "================ USUARIOS REGISTRADOS ================\n\n";
+      localDB.users.forEach(u => {
+        txt += `Usuario: ${u.username} | Clave: ${u.password} | Rol: ${u.role} | Saldo: S/ ${u.balance}\n`;
+      });
+      downloadTextFile('Usuarios_LeviStream.txt', txt);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--accent-cyan);"></i> <span>${escapeHtml(msg)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3200);
+    }
+
+    /* =======================================================
+       FONDO ANIMADO CON MICROPARTÍCULAS SUTILES
+       ======================================================= */
+    (function initCanvasParticles() {
+      const canvas = document.getElementById('ambient-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (let i = 0; i < 35; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5 + 0.5,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          color: Math.random() > 0.5 ? 'rgba(0, 210, 255, 0.4)' : 'rgba(99, 102, 241, 0.3)'
+        });
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        }
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
+
+    // Comprobación inicial de bloqueo
+    checkLockoutStatus();
+  </script>
+</body>
+</html>
