@@ -1,295 +1,970 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>LEVI STREAM PERÚ - Plataforma Oficial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>LEVI STREAM PERÚ | Elite Cyber SaaS & Streaming</title>
   
+  <!-- Tipografía de Lujo y Fuentes Cyberpunk -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- FIREBASE REALTIME SDK -->
+  <!-- FIREBASE REALTIME ENGINE -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
   <style>
     :root {
-      --bg-dark: #05070e;
-      --bg-surface: rgba(13, 18, 33, 0.9);
-      --bg-card: #0c1222;
+      --bg-dark: #04060c;
+      --bg-surface: rgba(10, 14, 28, 0.85);
+      --bg-card: rgba(13, 19, 38, 0.92);
+      --bg-card-hover: rgba(18, 26, 52, 0.98);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-glow: rgba(0, 210, 255, 0.35);
+      --border-purple: rgba(157, 78, 221, 0.35);
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
       --accent-cyan: #00d2ff;
-      --accent-purple: #8b5cf6;
+      --accent-purple: #9d4edd;
+      --accent-violet: #7928ca;
+      --accent-emerald: #00ffcc;
       --accent-wa: #22c55e;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dark: #64748b;
       --success: #10b981;
-      --danger: #ef4444;
-      --sidebar-w: 265px;
+      --danger: #f43f5e;
+      --warning: #f59e0b;
+      --sidebar-w: 280px;
+      --bottom-nav-h: 70px;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; overflow-x: hidden; display: flex; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    input, textarea, code, pre {
+      user-select: text;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      position: relative;
+    }
+
+    /* Fondo dinámico canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Scanline sutil retro-futurista */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+      z-index: 1;
+      background-size: 100% 3px, 6px 100%;
+      pointer-events: none;
+      opacity: 0.6;
+    }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.25); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
 
-    .glass { background: var(--bg-surface); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--border-subtle); border-radius: 16px; }
+    /* Glassmorphism 2.0 */
+    .glass {
+      background: var(--bg-surface);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+    }
 
-    /* SEGURIDAD / BLOQUEO 3 FALLOS */
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .neon-border {
+      position: relative;
+    }
+    .neon-border::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent-cyan), transparent 60%, var(--accent-purple));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+    .neon-border:hover::after {
+      opacity: 1;
+    }
+
+    /* PANTALLAS DE ACCESO Y BLOQUEO */
+    #auth-screen, #lockout-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #0f1938 0%, #03050a 85%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 18px;
+    }
+
     #lockout-screen {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: radial-gradient(circle, #450a0a 0%, #050202 85%);
-      display: none; align-items: center; justify-content: center; z-index: 999999; padding: 20px; text-align: center;
-    }
-    .lockout-card {
-      max-width: 460px; width: 100%; padding: 36px 26px; border: 2px solid var(--danger);
-      box-shadow: 0 0 50px rgba(239, 68, 68, 0.3); border-radius: 20px; background: rgba(20, 8, 8, 0.95);
+      display: none;
+      background: radial-gradient(circle at 50% 30%, #4c0519 0%, #020306 85%);
     }
 
-    /* PANTALLA LOGIN */
-    #auth-screen {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: radial-gradient(circle at 50% 25%, #111d40 0%, #04060b 80%);
-      display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 18px;
-    }
     .auth-card {
-      width: 100%; max-width: 410px; padding: 38px 28px; border: 1px solid var(--border-subtle);
-      border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 210, 255, 0.1);
+      width: 100%;
+      max-width: 420px;
+      padding: 44px 34px;
+      border-radius: 26px;
+      box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.95), 0 0 45px rgba(0, 210, 255, 0.15);
+      position: relative;
+      overflow: hidden;
     }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      animation: ambientRotate 10s linear infinite;
+    }
+
+    @keyframes ambientRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .auth-inner {
+      position: relative;
+      z-index: 1;
+    }
+
     .auth-logo-badge {
-      width: 54px; height: 54px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
-      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px;
-      margin: 0 auto 14px auto; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 28px;
+      margin: 0 auto 16px auto;
+      box-shadow: 0 10px 30px rgba(0, 210, 255, 0.4);
     }
-
-    /* APP CONTAINER */
-    #app-container { display: none; width: 100%; min-height: 100vh; }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: var(--sidebar-w); height: 100vh; position: fixed; left: 0; top: 0;
-      display: flex; flex-direction: column; justify-content: space-between;
-      padding: 22px 16px; border-right: 1px solid var(--border-subtle); background: #080c18;
-      z-index: 1000; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .brand-box { display: flex; align-items: center; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid var(--border-subtle); }
-    .brand-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--accent-cyan)); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; }
-    .brand-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.15rem; letter-spacing: -0.5px; }
-
-    .nav-list { display: flex; flex-direction: column; gap: 5px; margin-top: 14px; overflow-y: auto; max-height: calc(100vh - 380px); }
-    .nav-btn {
-      display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px;
-      color: var(--text-muted); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent;
-    }
-    .nav-btn:hover, .nav-btn.active { color: #fff; background: rgba(0, 210, 255, 0.12); border-color: rgba(0, 210, 255, 0.3); }
-    .nav-btn i { font-size: 1.05rem; width: 20px; text-align: center; }
 
     /* CONTENEDOR PRINCIPAL */
-    .main-wrapper { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); padding: 24px 30px; min-height: 100vh; }
-    .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; margin-bottom: 22px; gap: 14px; }
-    .menu-toggle-btn { display: none; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-subtle); color: #fff; font-size: 1.15rem; padding: 8px 12px; border-radius: 10px; cursor: pointer; }
-
-    .balance-box {
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(0, 210, 255, 0.08));
-      border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 14px; padding: 14px; text-align: center; margin-bottom: 12px;
+    #app-container {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
     }
-    .balance-num { font-family: 'Orbitron', sans-serif; font-size: 1.55rem; font-weight: 800; color: #00ffcc; margin: 4px 0 10px 0; }
-    .user-footer { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.03); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-subtle); }
-    .role-badge { font-size: 0.68rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; background: rgba(0, 210, 255, 0.15); color: var(--accent-cyan); border: 1px solid rgba(0, 210, 255, 0.3); }
+
+    /* SIDEBAR (DESKTOP) */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 18px;
+      border-right: 1px solid var(--border-subtle);
+      background: #070a14;
+      z-index: 1000;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.35);
+    }
+
+    .brand-text {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.18rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, var(--accent-cyan) 60%, var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 18px;
+      overflow-y: auto;
+      max-height: calc(100vh - 410px);
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      color: #fff;
+      background: linear-gradient(90deg, rgba(0, 210, 255, 0.14), rgba(157, 78, 221, 0.08));
+      border-color: rgba(0, 210, 255, 0.3);
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.15);
+      transform: translateX(3px);
+    }
+
+    .nav-btn i {
+      font-size: 1.1rem;
+      width: 22px;
+      text-align: center;
+      transition: transform 0.25s ease;
+    }
+
+    .nav-btn:hover i {
+      transform: scale(1.15);
+      color: var(--accent-cyan);
+    }
+
+    /* CONTENEDOR PRINCIPAL Y HEADER */
+    .main-wrapper {
+      margin-left: var(--sidebar-w);
+      width: calc(100% - var(--sidebar-w));
+      padding: 28px 36px 60px 36px;
+      min-height: 100vh;
+      transition: margin 0.35s ease, width 0.35s ease;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 26px;
+      margin-bottom: 26px;
+      gap: 14px;
+      position: sticky;
+      top: 18px;
+      z-index: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .menu-toggle-btn {
+      display: none;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      font-size: 1.25rem;
+      padding: 9px 13px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-toggle-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* BILLETERA GLOW */
+    .balance-box {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.14), rgba(157, 78, 221, 0.1));
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 25px rgba(0, 210, 255, 0.12), inset 0 0 15px rgba(157, 78, 221, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 900;
+      color: var(--accent-emerald);
+      margin: 4px 0 10px 0;
+      text-shadow: 0 0 16px rgba(0, 255, 204, 0.6);
+    }
+
+    .user-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .role-badge {
+      font-size: 0.7rem;
+      padding: 4px 9px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: rgba(0, 210, 255, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 12px var(--accent-emerald);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
 
     /* BOTONES */
-    .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; border: none; outline: none; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-success { background: #059669; color: #fff; }
-    .btn-whatsapp { background: #16a34a; color: #fff; }
-    .btn-danger { background: #dc2626; color: #fff; }
-    .btn-secondary { background: rgba(255, 255, 255, 0.07); color: #f1f5f9; }
-
-    /* FILTROS TIENDA */
-    .store-filter-bar { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
-    .filter-chip { padding: 8px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border-subtle); background: rgba(255, 255, 255, 0.03); color: var(--text-muted); transition: all 0.2s; }
-    .filter-chip.active, .filter-chip:hover { background: rgba(0, 210, 255, 0.15); border-color: var(--accent-cyan); color: #fff; }
-    .section-category-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 700; margin: 20px 0 14px 0; display: flex; align-items: center; gap: 10px; }
-
-    /* CATÁLOGO PRODUCTOS */
-    .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    .product-card { border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border-subtle); background: var(--bg-card); transition: transform 0.25s, border-color 0.25s; }
-    .product-card:hover { transform: translateY(-4px); border-color: rgba(0, 210, 255, 0.4); }
-    .prod-img-wrap { width: 100%; height: 155px; position: relative; background: #080c18; }
-    .prod-img { width: 100%; height: 100%; object-fit: cover; }
-    .prod-badge { position: absolute; top: 10px; right: 10px; padding: 4px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; background: rgba(10, 13, 23, 0.85); border: 1px solid var(--border-subtle); }
-    .delivery-badge { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; }
-    .badge-auto { background: rgba(37, 99, 235, 0.9); color: #fff; }
-    .badge-wa { background: rgba(22, 163, 74, 0.9); color: #fff; }
-    .prod-info { padding: 16px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-    .prod-price { font-family: 'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight: 700; color: #fff; margin: 8px 0; }
-
-    /* FORMULARIOS Y TABLAS */
-    .form-group { margin-bottom: 14px; }
-    .form-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
-    .form-input, .form-select, .form-textarea { width: 100%; padding: 11px 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: 10px; color: #fff; font-size: 0.9rem; outline: none; }
-    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--border-focus); }
-    .form-select option { background: #0f172a; color: #fff; }
-
-    .table-container { overflow-x: auto; margin-top: 12px; border-radius: 12px; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.86rem; white-space: nowrap; }
-    th { padding: 12px 14px; color: var(--text-dark); border-bottom: 1px solid var(--border-subtle); font-size: 0.72rem; text-transform: uppercase; }
-    td { padding: 13px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); }
-
-    /* MODAL */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(4, 7, 18, 0.85); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 16px; }
-    .modal-box { max-width: 520px; width: 100%; padding: 24px; position: relative; }
-    .close-modal-btn { position: absolute; top: 16px; right: 18px; color: var(--text-muted); cursor: pointer; font-size: 1.25rem; }
-
-    .stock-counter-badge {
-      display: inline-block; font-size: 0.75rem; padding: 4px 10px; border-radius: 6px;
-      background: rgba(0, 210, 255, 0.15); color: var(--accent-cyan); font-weight: 700; border: 1px solid rgba(0, 210, 255, 0.3);
+    .btn {
+      padding: 11px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: none;
+      outline: none;
+      position: relative;
+      overflow: hidden;
     }
 
-    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999999; display: flex; flex-direction: column; gap: 8px; max-width: 90vw; }
-    .toast { padding: 12px 16px; border-radius: 10px; background: #1e293b; border-left: 4px solid var(--accent-cyan); color: #fff; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
+    .btn::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 120%; height: 120%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 70%);
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      transition: transform 0.4s, opacity 0.3s;
+    }
+    .btn:active::after {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      transition: 0s;
+    }
 
-    @media (max-width: 860px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .main-wrapper { margin-left: 0; width: 100%; padding: 16px; }
-      .menu-toggle-btn { display: block; }
-      .catalog-grid { grid-template-columns: 1fr; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--primary) 70%, var(--accent-purple));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0, 210, 255, 0.35);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 25px rgba(0, 210, 255, 0.55);
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    .btn-success:hover {
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 4px 18px rgba(34, 197, 94, 0.35);
+    }
+    .btn-whatsapp:hover {
+      box-shadow: 0 6px 24px rgba(34, 197, 94, 0.55);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+      color: #fff;
+    }
+    .btn-danger:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: #f1f5f9;
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* FILTROS TIENDA */
+    .store-filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-chip.active, .filter-chip:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: var(--accent-cyan);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(0, 210, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .section-category-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin: 26px 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* CATÁLOGO PRODUCTOS (GRID DE ALTO IMPACTO) */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+      gap: 24px;
+      margin-bottom: 34px;
+    }
+
+    .product-card {
+      border-radius: 22px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 20px 40px -15px rgba(0, 210, 255, 0.3), 0 0 25px rgba(157, 78, 221, 0.15);
+    }
+
+    .prod-img-wrap {
+      width: 100%;
+      height: 165px;
+      position: relative;
+      background: #070b16;
+      overflow: hidden;
+    }
+
+    .prod-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .prod-img {
+      transform: scale(1.08);
+    }
+
+    .prod-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      padding: 5px 11px;
+      border-radius: 10px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      background: rgba(10, 13, 23, 0.88);
+      border: 1px solid var(--border-subtle);
+      backdrop-filter: blur(10px);
+    }
+
+    .delivery-badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      padding: 5px 11px;
+      border-radius: 10px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      backdrop-filter: blur(10px);
+    }
+
+    .badge-auto {
+      background: rgba(37, 99, 235, 0.9);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+    }
+    .badge-wa {
+      background: rgba(34, 197, 94, 0.95);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
+
+    .prod-info {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .prod-price {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: #fff;
+      margin: 10px 0;
+      letter-spacing: -0.5px;
+    }
+
+    /* FORMULARIOS Y TABLAS */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .form-select option { background: #0c1224; color: #fff; }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 14px;
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+
+    th {
+      padding: 14px 16px;
+      color: var(--text-dark);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 800;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* MODALES */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(4, 7, 18, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal-box {
+      max-width: 520px;
+      width: 100%;
+      padding: 28px;
+      position: relative;
+      animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(20px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .close-modal-btn {
+      position: absolute;
+      top: 18px; right: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.35rem;
+      transition: color 0.2s;
+    }
+    .close-modal-btn:hover { color: #fff; }
+
+    .stock-counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(0, 210, 255, 0.15);
+      color: var(--accent-cyan);
+      font-weight: 800;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 9999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 90vw;
+    }
+
+    .toast {
+      padding: 13px 18px;
+      border-radius: 12px;
+      background: #131d38;
+      border-left: 4px solid var(--accent-cyan);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      animation: slideToast 0.3s ease;
+    }
+
+    @keyframes slideToast {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* BARRA DE NAVEGACIÓN INFERIOR (MÓVIL) */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; width: 100%;
+      height: var(--bottom-nav-h);
+      background: rgba(8, 12, 24, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-subtle);
+      z-index: 900;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+      box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.6);
+    }
+
+    .mob-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mob-nav-item i {
+      font-size: 1.25rem;
+    }
+
+    .mob-nav-item.active, .mob-nav-item:active {
+      color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    .mob-drawer-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+    }
+
+    /* RESPONSIVE MÓVIL Y TABLET */
+    @media (max-width: 880px) {
+      .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 10px 0 40px rgba(0, 0, 0, 0.8);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+        padding: 16px 16px 90px 16px;
+      }
+      .menu-toggle-btn {
+        display: block;
+      }
+      .mobile-bottom-nav {
+        display: flex;
+      }
+      .catalog-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal-box {
+        padding: 22px;
+      }
+      .auth-card {
+        padding: 34px 22px;
+      }
     }
   </style>
 </head>
 <body>
 
+  <!-- AMBIENTE CANVAS DE PARTICULAS CONSTELLATION -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- OVERLAY PARA MENÚ MÓVIL -->
+  <div class="mob-drawer-overlay" id="mob-drawer-overlay" onclick="toggleSidebar()"></div>
+
   <!-- PANTALLA BLOQUEO 3 FALLOS -->
   <div id="lockout-screen">
-    <div class="lockout-card">
+    <div class="lockout-card glass neon-border" style="padding: 36px 26px; border: 2px solid var(--danger); text-align: center;">
       <div style="font-size: 48px; color: var(--danger); margin-bottom: 14px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <h2 style="font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 8px;">ACCESO BLOQUEADO</h2>
+      <h2 style="font-family: 'Space Grotesk'; font-size: 1.55rem; font-weight: 800; color: #fff; margin-bottom: 8px;">ACCESO BLOQUEADO</h2>
       <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 18px;">
-        Has superado los 3 intentos permitidos. Tu acceso ha quedado suspendido durante 24 horas.
+        Has superado los 3 intentos permitidos con contraseña incorrecta. Tu acceso ha quedado suspendido por 24 horas por seguridad.
       </p>
-      <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(239, 68, 68, 0.4); padding: 14px; border-radius: 12px; margin-bottom: 20px;">
-        <span style="font-size: 0.75rem; color: var(--text-dark); display:block;">TIEMPO RESTANTE:</span>
-        <div id="lockout-timer" style="font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 800; color: var(--danger); margin-top: 4px;">24:00:00</div>
+      <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(244, 63, 94, 0.4); padding: 14px; border-radius: 12px; margin-bottom: 20px;">
+        <span style="font-size: 0.75rem; color: var(--text-dark); display:block;">TIEMPO RESTANTE DE BLOQUEO:</span>
+        <div id="lockout-timer" style="font-family: 'Orbitron'; font-size: 1.8rem; font-weight: 900; color: var(--danger); margin-top: 4px;">24:00:00</div>
       </div>
-      <button class="btn btn-success" style="width: 100%; justify-content: center; padding: 12px;" onclick="contactWhatsapp('Hola Levi Stream Perú, mi cuenta fue bloqueada temporalmente tras 3 intentos. Solicito asistencia.')">
-        <i class="fa-brands fa-whatsapp"></i> Contactar al Owner por WhatsApp
+      <button class="btn btn-success" style="width: 100%; justify-content: center; padding: 13px;" onclick="contactWhatsapp('Hola Levi Stream Perú, mi cuenta fue bloqueada temporalmente tras 3 intentos. Solicito asistencia.')">
+        <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i> Contactar Soporte por WhatsApp
       </button>
     </div>
   </div>
 
-  <!-- PANTALLA LOGIN -->
+  <!-- PANTALLA LOGIN OBLIGATORIA (TOTALMENTE NATIVA) -->
   <div id="auth-screen">
-    <div class="auth-card glass">
-      <div style="text-align: center; margin-bottom: 22px;">
-        <div class="auth-logo-badge"><i class="fa-solid fa-play"></i></div>
-        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.45rem; font-weight: 700;">LEVI STREAM PERÚ</h2>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Portal de Acceso y Gestión</p>
-      </div>
-
-      <form onsubmit="handleLoginSubmit(event)">
-        <div class="form-group">
-          <label class="form-label">Usuario</label>
-          <input type="text" class="form-input" id="auth-user" placeholder="Ingresa tu usuario" required />
+    <div class="auth-card glass neon-border">
+      <div class="auth-inner">
+        <div style="text-align: center; margin-bottom: 26px;">
+          <div class="auth-logo-badge"><i class="fa-solid fa-play"></i></div>
+          <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight: 800; letter-spacing: -0.5px;">LEVI STREAM PERÚ</h2>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Portal de Acceso y Gestión de Streaming</p>
         </div>
-        <div class="form-group">
-          <label class="form-label">Contraseña</label>
-          <input type="password" class="form-input" id="auth-pass" placeholder="Ingresa tu contraseña" required />
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 8px;">
-          Ingresar al Panel
-        </button>
-      </form>
 
-      <div style="display:flex; justify-content: space-between; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border-subtle); font-size: 0.82rem;">
-        <a onclick="contactWhatsapp('Hola Levi Stream Perú, deseo solicitar la creación de una nueva cuenta en la plataforma.')" style="color: var(--accent-cyan); text-decoration: none; cursor:pointer; font-weight: 600;">
-          <i class="fa-solid fa-user-plus"></i> Crear cuenta
-        </a>
-        <a onclick="contactWhatsapp('Hola Levi Stream Perú, olvidé mi contraseña de acceso y requiero restablecerla.')" style="color: var(--accent-cyan); text-decoration: none; cursor:pointer; font-weight: 600;">
-          <i class="fa-solid fa-key"></i> Olvidé mi contraseña
-        </a>
+        <form onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Usuario</label>
+            <input type="text" class="form-input" id="auth-user" placeholder="Ingresa tu usuario" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-input" id="auth-pass" placeholder="Ingresa tu contraseña" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 13px; margin-top: 8px;">
+            Ingresar al Panel
+          </button>
+        </form>
+
+        <div style="display:flex; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle); font-size: 0.82rem;">
+          <a onclick="contactWhatsapp('Hola Levi Stream Perú, deseo solicitar la creación de una nueva cuenta en la plataforma.')" style="color: var(--accent-cyan); text-decoration: none; cursor:pointer; font-weight: 700;">
+            <i class="fa-solid fa-user-plus"></i> Crear cuenta
+          </a>
+          <a onclick="contactWhatsapp('Hola Levi Stream Perú, olvidé mi contraseña de acceso y requiero restablecerla.')" style="color: var(--accent-cyan); text-decoration: none; cursor:pointer; font-weight: 700;">
+            <i class="fa-solid fa-key"></i> Olvidé mi contraseña
+          </a>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- APP PRINCIPAL -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div id="app-container">
+    <!-- SIDEBAR (DESKTOP / DRAWER MÓVIL) -->
     <aside class="sidebar" id="sidebar">
       <div>
         <div class="brand-box">
           <div class="brand-icon"><i class="fa-solid fa-play"></i></div>
           <div>
             <div class="brand-text">LEVI STREAM</div>
-            <div style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 700; letter-spacing: 1px;">PERÚ OFICIAL</div>
+            <div style="font-size: 0.7rem; color: var(--accent-cyan); font-weight: 800; letter-spacing: 1.5px;">PERÚ EDITION</div>
           </div>
         </div>
 
         <nav class="nav-list">
-          <div class="nav-btn active" onclick="switchNav('store')"><i class="fa-solid fa-tv"></i> Tienda Streaming</div>
-          <div class="nav-btn" onclick="switchNav('orders')"><i class="fa-solid fa-receipt"></i> Mis Compras</div>
-          <div class="nav-btn" onclick="switchNav('recharge')"><i class="fa-solid fa-wallet"></i> Billetera / Recargas</div>
+          <div class="nav-btn active" id="nav-btn-store" onclick="switchNav('store')"><i class="fa-solid fa-tv"></i> Tienda Streaming</div>
+          <div class="nav-btn" id="nav-btn-orders" onclick="switchNav('orders')"><i class="fa-solid fa-receipt"></i> Mis Compras</div>
+          <div class="nav-btn" id="nav-btn-recharge" onclick="switchNav('recharge')"><i class="fa-solid fa-wallet"></i> Billetera / Recargas</div>
 
           <!-- SUB-USUARIOS (RESELLER / SELLER) -->
           <div id="subusers-menu-section" style="display:none; margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
             <div style="font-size: 0.68rem; color: var(--text-dark); font-weight: 800; padding: 4px 10px; text-transform: uppercase;">Revendedores</div>
-            <div class="nav-btn" onclick="switchNav('manage-subusers')"><i class="fa-solid fa-users"></i> Crear Clientes / Saldo</div>
+            <div class="nav-btn" id="nav-btn-subusers" onclick="switchNav('manage-subusers')"><i class="fa-solid fa-users"></i> Crear Clientes / Saldo</div>
           </div>
 
           <!-- PANEL EXCLUSIVO OWNER -->
           <div id="owner-menu-section" style="display:none; margin-top: 12px; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
             <div style="font-size: 0.68rem; color: var(--accent-purple); font-weight: 800; padding: 4px 10px; text-transform: uppercase;">Panel Owner</div>
-            <div class="nav-btn" onclick="switchNav('owner-stock')"><i class="fa-solid fa-key"></i> Gestión de Cuentas</div>
-            <div class="nav-btn" onclick="switchNav('owner-products')"><i class="fa-solid fa-boxes-stacked"></i> Gestionar Tienda</div>
-            <div class="nav-btn" onclick="switchNav('owner-users')"><i class="fa-solid fa-users-gear"></i> Todos los Usuarios</div>
-            <div class="nav-btn" onclick="switchNav('owner-reports')"><i class="fa-solid fa-triangle-exclamation"></i> Reportes de Clientes</div>
-            <div class="nav-btn" onclick="switchNav('owner-sales-audit')"><i class="fa-solid fa-list-check"></i> Cuentas Generadas</div>
-            <div class="nav-btn" onclick="switchNav('owner-export')"><i class="fa-solid fa-file-arrow-down"></i> Descargar TXT</div>
-            <div class="nav-btn" onclick="switchNav('owner-notify')"><i class="fa-solid fa-bullhorn"></i> Notificación Central</div>
+            <div class="nav-btn" id="nav-btn-owner-stock" onclick="switchNav('owner-stock')"><i class="fa-solid fa-key"></i> Gestión de Cuentas</div>
+            <div class="nav-btn" id="nav-btn-owner-products" onclick="switchNav('owner-products')"><i class="fa-solid fa-boxes-stacked"></i> Gestionar Tienda</div>
+            <div class="nav-btn" id="nav-btn-owner-users" onclick="switchNav('owner-users')"><i class="fa-solid fa-users-gear"></i> Todos los Usuarios</div>
+            <div class="nav-btn" id="nav-btn-owner-reports" onclick="switchNav('owner-reports')"><i class="fa-solid fa-triangle-exclamation"></i> Reportes de Clientes</div>
+            <div class="nav-btn" id="nav-btn-owner-audit" onclick="switchNav('owner-sales-audit')"><i class="fa-solid fa-list-check"></i> Cuentas Generadas</div>
+            <div class="nav-btn" id="nav-btn-owner-export" onclick="switchNav('owner-export')"><i class="fa-solid fa-file-arrow-down"></i> Descargar TXT</div>
+            <div class="nav-btn" id="nav-btn-owner-notify" onclick="switchNav('owner-notify')"><i class="fa-solid fa-bullhorn"></i> Notificación Central</div>
           </div>
         </nav>
       </div>
 
       <div>
         <div class="balance-box">
-          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Tu Saldo Actual</div>
+          <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">Tu Saldo Actual</div>
           <div class="balance-num" id="sidebar-balance">S/ 0.00</div>
-          <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 0.75rem; padding: 7px;" onclick="switchNav('recharge')">
+          <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 0.78rem; padding: 8px;" onclick="switchNav('recharge')">
             <i class="fa-solid fa-plus"></i> Recargar Billetera
           </button>
         </div>
 
         <div class="user-footer">
           <div>
-            <div id="sidebar-username" style="font-weight: 700; font-size: 0.86rem;">EriikAdmin</div>
+            <div id="sidebar-username" style="font-weight: 800; font-size: 0.9rem;">EriikAdmin</div>
             <span class="role-badge" id="sidebar-role">OWNER</span>
           </div>
-          <button onclick="handleLogout()" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size:1.1rem; padding: 4px;">
+          <button onclick="handleLogout()" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size:1.15rem; padding: 4px;">
             <i class="fa-solid fa-power-off"></i>
           </button>
         </div>
       </div>
     </aside>
 
-    <!-- Main Workspace -->
+    <!-- ÁREA DE TRABAJO PRINCIPAL -->
     <main class="main-wrapper">
-      <div class="header-bar glass">
+      <div class="header-bar glass neon-border">
         <div style="display:flex; align-items:center; gap: 12px;">
           <button class="menu-toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-          <h2 style="font-family:'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight:700;" id="page-title">Tienda Oficial</h2>
+          <h2 style="font-family:'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight:800;" id="page-title">Tienda Oficial</h2>
         </div>
-        <div style="display:flex; align-items:center; gap: 8px;">
-          <span style="font-size:0.8rem; color:var(--text-muted);"><i class="fa-solid fa-circle" style="color:var(--success); font-size:8px;"></i> Servidores en Línea</span>
+        <div class="status-badge-dot">
+          <div class="status-dot"></div> Servidores Activos
         </div>
       </div>
 
@@ -307,17 +982,17 @@
         </div>
 
         <div id="section-group-wa">
-          <div class="section-category-title"><i class="fa-brands fa-whatsapp" style="color: #22c55e;"></i> Plataformas por WhatsApp (Manual)</div>
+          <div class="section-category-title"><i class="fa-brands fa-whatsapp" style="color: #22c55e;"></i> Plataformas por WhatsApp (14 Meses y Manuales)</div>
           <div class="catalog-grid" id="catalog-grid-wa"></div>
         </div>
       </section>
 
       <!-- SECCIÓN MIS COMPRAS -->
       <section id="view-orders" style="display:none;">
-        <div class="glass" style="padding: 20px;">
-          <h3 style="margin-bottom: 6px;">Historial de Compras Sincronizado</h3>
-          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
-            Tus credenciales y días restantes sincronizados en tiempo real en la nube.
+        <div class="glass-card" style="padding: 22px;">
+          <h3 style="margin-bottom: 6px; font-size: 1.25rem;">Historial de Cuentas Adquiridas</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+            Tus credenciales y días restantes sincronizados en tiempo real entre todos tus dispositivos.
           </p>
           <div class="table-container">
             <table>
@@ -339,31 +1014,31 @@
 
       <!-- SECCIÓN BILLETERA / RECARGAS -->
       <section id="view-recharge" style="display:none;">
-        <div class="glass" style="max-width: 580px; margin: 0 auto; padding: 30px; text-align: center;">
-          <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 14px auto;">
+        <div class="glass-card neon-border" style="max-width: 580px; margin: 0 auto; padding: 36px; text-align: center;">
+          <div style="width: 58px; height: 58px; border-radius: 16px; background: rgba(0, 210, 255, 0.15); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px auto;">
             <i class="fa-solid fa-wallet"></i>
           </div>
-          <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 6px;">Recargar Billetera Virtual</h3>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 22px;">Acreditación en tiempo real por WhatsApp.</p>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 18px; margin-bottom: 22px;">
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Saldo Actual</div>
-            <div style="font-family: 'Space Grotesk'; font-size: 1.9rem; font-weight: 700; color: var(--accent-cyan); margin: 6px 0;" id="recharge-view-balance">S/ 0.00</div>
+          <h3 style="font-size: 1.45rem; font-weight: 800; margin-bottom: 8px;">Recargar Billetera Virtual</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">Acreditación y validación directa por WhatsApp.</p>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Saldo Actual en Cuenta</div>
+            <div style="font-family: 'Orbitron'; font-size: 2.2rem; font-weight: 900; color: #00ffcc; margin: 6px 0;" id="recharge-view-balance">S/ 0.00</div>
           </div>
-          <button class="btn btn-success" style="padding: 13px 24px; font-size: 0.92rem; width: 100%; justify-content: center;" onclick="contactWhatsapp('Hola Levi Stream Perú, deseo recargar saldo a mi billetera. Mi usuario es: ' + currentUser.username)">
-            <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem;"></i> Solicitar Recarga por WhatsApp
+          <button class="btn btn-success" style="padding: 14px 28px; font-size: 0.95rem; width: 100%; justify-content: center;" onclick="contactWhatsapp('Hola Levi Stream Perú, deseo recargar saldo a mi billetera. Mi usuario es: ' + currentUser.username)">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Solicitar Recarga por WhatsApp
           </button>
         </div>
       </section>
 
       <!-- SECCIÓN SUB-USUARIOS (RESELLER / SELLER) -->
       <section id="view-manage-subusers" style="display:none;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-          <div class="glass" style="padding: 20px;">
-            <h4 style="margin-bottom: 12px;">Crear Sub-Usuario</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 24px;">
+          <div class="glass-card" style="padding: 22px;">
+            <h4 style="margin-bottom: 14px; font-size: 1.15rem;">Crear Sub-Usuario</h4>
             <form onsubmit="handleCreateSubUser(event)">
               <div class="form-group">
                 <label class="form-label">Usuario</label>
-                <input type="text" class="form-input" id="sub-name" required />
+                <input type="text" class="form-input" id="sub-name" required autocomplete="off" />
               </div>
               <div class="form-group">
                 <label class="form-label">Contraseña</label>
@@ -380,8 +1055,8 @@
               <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Registrar Cuenta</button>
             </form>
           </div>
-          <div class="glass" style="padding: 20px;">
-            <h4 style="margin-bottom: 12px;">Tus Cuentas Creadas</h4>
+          <div class="glass-card" style="padding: 22px;">
+            <h4 style="margin-bottom: 14px; font-size: 1.15rem;">Tus Cuentas Creadas</h4>
             <div class="table-container">
               <table>
                 <thead><tr><th>Usuario</th><th>Rol</th><th>Saldo</th><th>Acción</th></tr></thead>
@@ -394,13 +1069,12 @@
 
       <!-- OWNER: GESTIÓN DE CUENTAS / STOCK MASIVO Y ATÓMICO -->
       <section id="view-owner-stock" style="display:none;">
-        <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-          <!-- Panel de Inserción Masiva -->
-          <div class="glass" style="padding: 22px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+          <div class="glass-card neon-border" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
               <div>
-                <h4 style="font-size: 1.15rem;"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--accent-cyan);"></i> Inserción Masiva de Cuentas</h4>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Pega 100, 150 o más cuentas sin que se sobrescriban. Todas se acumulan en la base de datos.</p>
+                <h4 style="font-size: 1.25rem;"><i class="fa-solid fa-cloud-arrow-up" style="color:var(--accent-cyan);"></i> Inserción Masiva de Cuentas</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">Pega 100, 150 o más cuentas de golpe. Se acumulan al instante en la base de datos sin sobrescribirse.</p>
               </div>
               <div id="stock-total-badge" class="stock-counter-badge">Cargando stock...</div>
             </div>
@@ -412,38 +1086,37 @@
                   <select class="form-select" id="stock-product-select" required onchange="updateStockCounterView()"></select>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Acción de Inventario</label>
-                  <div style="padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); font-size: 0.85rem; color: var(--success);">
-                    <i class="fa-solid fa-circle-check"></i> Acumular al stock existente (No borra lo anterior)
+                  <label class="form-label">Modo de Ingestión</label>
+                  <div style="padding: 11px; border-radius: 12px; background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.2); font-size: 0.85rem; color: var(--accent-cyan); font-weight: 700;">
+                    <i class="fa-solid fa-layer-group"></i> Acumular al stock existente (Batch Atómico)
                   </div>
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Lista de Cuentas (usuario:contraseña) - 1 cuenta por línea</label>
-                <textarea class="form-textarea" id="stock-raw" rows="7" placeholder="usuario1@correo.com:clave123&#10;usuario2@correo.com:clave456&#10;usuario3@correo.com:clave789" required></textarea>
+                <label class="form-label">Lista de Cuentas (usuario:contraseña) - 1 por línea</label>
+                <textarea class="form-textarea" id="stock-raw" rows="7" placeholder="usuario1@correo.com:clave123&#10;usuario2@correo.com:clave456" required></textarea>
               </div>
 
               <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <span id="stock-lines-detected" style="font-size: 0.8rem; color: var(--text-muted);">Líneas detectadas: 0</span>
-                <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">
+                <span id="stock-lines-detected" style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 700;">Líneas detectadas: 0</span>
+                <button type="submit" class="btn btn-primary" style="padding: 12px 28px;">
                   <i class="fa-solid fa-plus-circle"></i> Guardar Todo el Lote
                 </button>
               </div>
             </form>
           </div>
 
-          <!-- Filtro y Visualización de Cuentas Acumuladas -->
-          <div class="glass" style="padding: 22px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+          <div class="glass-card" style="padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
               <div>
-                <h4 style="font-size: 1.15rem;"><i class="fa-solid fa-boxes-stacked" style="color:var(--accent-purple);"></i> Inventario en Tiempo Real</h4>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Filtrado por plan con estado de cupos en vivo</p>
+                <h4 style="font-size: 1.25rem;"><i class="fa-solid fa-boxes-stacked" style="color:var(--accent-purple);"></i> Inventario en Tiempo Real</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted);">Filtrado exacto por plan para monitoreo instantáneo</p>
               </div>
-              <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 0.8rem; color: var(--text-muted);">Filtrar por plan:</span>
-                <select class="form-select" id="stock-filter-product" onchange="renderOwnerStock()" style="width: auto; padding: 6px 12px;"></select>
-                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.75rem;" onclick="clearFilteredStock()">
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Filtrar plan:</span>
+                <select class="form-select" id="stock-filter-product" onchange="renderOwnerStock()" style="width: auto; padding: 7px 14px;"></select>
+                <button class="btn btn-danger" style="padding: 7px 14px; font-size: 0.78rem;" onclick="clearFilteredStock()">
                   <i class="fa-solid fa-trash"></i> Vaciar Plan Seleccionado
                 </button>
               </div>
@@ -461,9 +1134,9 @@
 
       <!-- OWNER: GESTIONAR TIENDA (CREAR / EDITAR PLATAFORMAS) -->
       <section id="view-owner-products" style="display:none;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-          <div class="glass" style="padding: 20px;">
-            <h4 style="margin-bottom: 12px;" id="product-form-title">Crear Nueva Plataforma</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+          <div class="glass-card" style="padding: 22px;">
+            <h4 style="margin-bottom: 14px; font-size: 1.15rem;" id="product-form-title">Crear Nueva Plataforma</h4>
             <form onsubmit="handleSaveProduct(event)">
               <input type="hidden" id="prod-edit-id" />
               <div class="form-group">
@@ -502,16 +1175,16 @@
                 <input type="file" class="form-input" id="p-img-file" accept="image/*" onchange="previewProductImgFile(this)" />
               </div>
               <div style="margin-bottom: 14px;">
-                <img id="p-preview" src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80" style="width: 100%; height: 110px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-subtle);" />
+                <img id="p-preview" src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-subtle);" />
               </div>
               <div style="display:flex; gap: 8px;">
-                <button type="submit" class="btn btn-primary" style="flex:1; justify-content: center;" id="p-submit-btn">Guardar en la Nube</button>
+                <button type="submit" class="btn btn-primary" style="flex:1; justify-content: center;" id="p-submit-btn">Guardar Plataforma</button>
                 <button type="button" class="btn btn-secondary" onclick="resetProductForm()" id="p-cancel-btn" style="display:none;">Cancelar</button>
               </div>
             </form>
           </div>
-          <div class="glass" style="padding: 20px;">
-            <h4 style="margin-bottom: 12px;">Catálogo Actual</h4>
+          <div class="glass-card" style="padding: 22px;">
+            <h4 style="margin-bottom: 14px; font-size: 1.15rem;">Catálogo Actual</h4>
             <div class="table-container">
               <table>
                 <thead><tr><th>Vista</th><th>Nombre</th><th>Entrega</th><th>Disp</th><th>Precio</th><th>Acciones</th></tr></thead>
@@ -522,28 +1195,28 @@
         </div>
       </section>
 
-      <!-- OWNER: USUARIOS (NUBE) -->
+      <!-- OWNER: USUARIOS -->
       <section id="view-owner-users" style="display:none;">
-        <div class="glass" style="padding: 20px; margin-bottom: 20px; background: rgba(37, 99, 235, 0.05); border-color: rgba(56, 189, 248, 0.3);">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div class="glass-card neon-border" style="padding: 22px; margin-bottom: 24px; background: rgba(0, 210, 255, 0.04); border-color: rgba(0, 210, 255, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
             <div>
-              <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700;">AUTOGESTIÓN DE SALDO (OWNER)</div>
-              <div style="font-size: 1.6rem; font-family:'Space Grotesk'; font-weight: 700; color: var(--accent-cyan);" id="owner-self-balance">S/ 0.00</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 800;">AUTOGESTIÓN DE SALDO (OWNER)</div>
+              <div style="font-size: 1.8rem; font-family:'Orbitron'; font-weight: 900; color: #00ffcc;" id="owner-self-balance">S/ 0.00</div>
             </div>
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; gap: 10px;">
               <button class="btn btn-success" onclick="modifyOwnerBalance(true)"><i class="fa-solid fa-plus"></i> Sumar Saldo</button>
               <button class="btn btn-danger" onclick="modifyOwnerBalance(false)"><i class="fa-solid fa-minus"></i> Restar Saldo</button>
             </div>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px;">
-          <div class="glass" style="padding: 20px;">
-            <h4 style="margin-bottom: 12px;">Crear Usuario (Cualquier Rango)</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 24px;">
+          <div class="glass-card" style="padding: 22px;">
+            <h4 style="margin-bottom: 14px; font-size: 1.15rem;">Crear Usuario (Cualquier Rango)</h4>
             <form onsubmit="handleOwnerCreateUser(event)">
               <div class="form-group">
                 <label class="form-label">Usuario</label>
-                <input type="text" class="form-input" id="ow-name" required />
+                <input type="text" class="form-input" id="ow-name" required autocomplete="off" />
               </div>
               <div class="form-group">
                 <label class="form-label">Contraseña</label>
@@ -562,11 +1235,11 @@
                 <label class="form-label">Saldo Inicial (S/)</label>
                 <input type="number" class="form-input" id="ow-balance" value="0" step="1" required />
               </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Crear en la Nube</button>
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Crear Cuenta</button>
             </form>
           </div>
-          <div class="glass" style="padding: 20px;">
-            <h4 style="margin-bottom: 12px;">Usuarios Registrados en Tiempo Real</h4>
+          <div class="glass-card" style="padding: 22px;">
+            <h4 style="margin-bottom: 14px; font-size: 1.15rem;">Usuarios Registrados</h4>
             <div class="table-container">
               <table>
                 <thead><tr><th>Usuario</th><th>Contraseña</th><th>Rol</th><th>Saldo</th><th>Acciones</th></tr></thead>
@@ -579,8 +1252,8 @@
 
       <!-- OWNER: REPORTES DE CLIENTES -->
       <section id="view-owner-reports" style="display:none;">
-        <div class="glass" style="padding: 20px;">
-          <h3 style="margin-bottom: 16px;">Reportes de Clientes (Sincronización en Nube)</h3>
+        <div class="glass-card" style="padding: 22px;">
+          <h3 style="margin-bottom: 18px; font-size: 1.25rem;">Reportes de Clientes</h3>
           <div class="table-container">
             <table>
               <thead><tr><th>Fecha</th><th>Cliente</th><th>Plataforma</th><th>Mensaje de Falla</th><th>Credencial</th><th>Estado</th><th>Acción</th></tr></thead>
@@ -592,8 +1265,8 @@
 
       <!-- OWNER: AUDITORÍA DE COMPRAS -->
       <section id="view-owner-sales-audit" style="display:none;">
-        <div class="glass" style="padding: 20px;">
-          <h3 style="margin-bottom: 16px;">Cuentas Generadas Globalmente</h3>
+        <div class="glass-card" style="padding: 22px;">
+          <h3 style="margin-bottom: 18px; font-size: 1.25rem;">Cuentas Generadas Globalmente</h3>
           <div class="table-container">
             <table>
               <thead><tr><th>Fecha</th><th>Generador</th><th>Rol</th><th>Plataforma</th><th>Credencial en Vivo</th><th>Estado Cliente</th><th>Acciones Owner</th></tr></thead>
@@ -605,8 +1278,8 @@
 
       <!-- OWNER: DESCARGA TXT -->
       <section id="view-owner-export" style="display:none;">
-        <div class="glass" style="max-width: 700px; margin: 0 auto; padding: 26px;">
-          <h3 style="margin-bottom: 16px;">Descarga de Datos en Formato TXT</h3>
+        <div class="glass-card" style="max-width: 700px; margin: 0 auto; padding: 28px;">
+          <h3 style="margin-bottom: 18px; font-size: 1.25rem;">Descarga de Datos en Formato TXT</h3>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
             <button class="btn btn-secondary" onclick="exportStockTXT()"><i class="fa-solid fa-key"></i> Stock (.txt)</button>
             <button class="btn btn-secondary" onclick="exportActiveAccountsTXT()"><i class="fa-solid fa-user-check"></i> Cuentas Activas (.txt)</button>
@@ -618,8 +1291,8 @@
 
       <!-- OWNER: NOTIFICACIÓN CENTRAL (10s) -->
       <section id="view-owner-notify" style="display:none;">
-        <div class="glass" style="max-width: 620px; margin: 0 auto; padding: 24px;">
-          <h3 style="margin-bottom: 8px;">Emitir Notificación en Pantalla (10 Segundos)</h3>
+        <div class="glass-card neon-border" style="max-width: 620px; margin: 0 auto; padding: 26px;">
+          <h3 style="margin-bottom: 10px; font-size: 1.25rem;">Emitir Notificación en Pantalla (10 Segundos)</h3>
           <form onsubmit="handleSendBroadcast(event)">
             <div class="form-group">
               <label class="form-label">Destinatario</label>
@@ -627,7 +1300,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Título del Comunicado</label>
-              <input type="text" class="form-input" id="notify-title" placeholder="Ej. Mantenimiento del Servidor" required />
+              <input type="text" class="form-input" id="notify-title" placeholder="Ej. Promoción Especial" required />
             </div>
             <div class="form-group">
               <label class="form-label">Mensaje</label>
@@ -635,26 +1308,52 @@
             </div>
             <div class="form-group">
               <label class="form-label">URL de Imagen (Opcional)</label>
-              <input type="url" class="form-input" id="notify-image-url" placeholder="https://..." />
+              <input type="url" class="form-input" id="notify-image-url" placeholder="https://..." oninput="previewNotifyUrl(this.value)" />
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
-              <i class="fa-solid fa-paper-plane"></i> Lanzar a la Nube
+            <div class="form-group">
+              <input type="file" class="form-input" id="notify-image-file" accept="image/*" onchange="previewNotifyFile(this)" />
+            </div>
+            <div id="notify-preview-box" style="display:none; margin-bottom: 14px; text-align: center;">
+              <img id="notify-preview-img" src="" style="max-width: 100%; max-height: 160px; object-fit: contain; border-radius: 10px; border: 1px solid var(--border-subtle);" />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 13px;">
+              <i class="fa-solid fa-paper-plane"></i> Lanzar Notificación
             </button>
           </form>
         </div>
       </section>
     </main>
+
+    <!-- BARRA INFERIOR DE NAVEGACIÓN MÓVIL (THUMB-FRIENDLY) -->
+    <nav class="mobile-bottom-nav">
+      <div class="mob-nav-item active" id="mob-nav-store" onclick="switchNav('store')">
+        <i class="fa-solid fa-tv"></i>
+        <span>Tienda</span>
+      </div>
+      <div class="mob-nav-item" id="mob-nav-orders" onclick="switchNav('orders')">
+        <i class="fa-solid fa-receipt"></i>
+        <span>Compras</span>
+      </div>
+      <div class="mob-nav-item" id="mob-nav-recharge" onclick="switchNav('recharge')">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Billetera</span>
+      </div>
+      <div class="mob-nav-item" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+        <span>Más</span>
+      </div>
+    </nav>
   </div>
 
   <!-- POPUP NOTIFICACIÓN CENTRAL -->
   <div id="broadcast-modal">
-    <div class="broadcast-popup">
+    <div class="broadcast-popup glass neon-border">
       <i class="fa-solid fa-xmark close-modal-btn" onclick="closeBroadcastPopup()"></i>
       <div class="broadcast-full-image-wrapper" id="broadcast-img-wrapper">
         <img id="broadcast-img-display" src="" alt="Notificación" class="broadcast-full-image" />
       </div>
-      <h3 id="broadcast-title-display" style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 6px;"></h3>
-      <p id="broadcast-msg-display" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;"></p>
+      <h3 id="broadcast-title-display" style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 6px;"></h3>
+      <p id="broadcast-msg-display" style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;"></p>
       <div class="broadcast-progress-bar">
         <div class="broadcast-progress-inner" id="broadcast-progress-inner"></div>
       </div>
@@ -663,62 +1362,62 @@
 
   <!-- MODAL RECIBO DE COMPRA -->
   <div class="modal-overlay" id="purchase-success-modal">
-    <div class="modal-box glass" style="text-align: center;">
-      <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px auto;">
-        <i class="fa-solid fa-circle-check"></i>
+    <div class="glass-card neon-border" style="max-width: 500px; width: 100%; padding: 32px 26px; text-align: center;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px auto; border: 1px solid rgba(16, 185, 129, 0.35);">
+        <i class="fa-solid fa-check"></i>
       </div>
-      <h3 style="font-family:'Space Grotesk'; font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 4px;">¡CUENTA GENERADA CON ÉXITO!</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;" id="receipt-platform-name">Plan Seleccionado</p>
+      <h3 style="font-family:'Space Grotesk'; font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 4px;">¡CUENTA GENERADA CON ÉXITO!</h3>
+      <p style="font-size: 0.88rem; color: var(--accent-cyan); font-weight: 700;" id="receipt-platform-name">Plan Seleccionado</p>
 
-      <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; text-align: left; margin-bottom: 16px;">
-        <div style="margin-bottom: 8px;">
-          <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">USUARIO / CORREO:</span>
+      <div style="background: rgba(0,0,0,0.45); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 14px; padding: 18px; margin: 16px 0; text-align: left;">
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.72rem; color: var(--text-muted); display: block; font-weight: 700;">USUARIO / CORREO:</span>
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <code id="receipt-user" style="font-size: 0.95rem; color: var(--accent-cyan);">usuario</code>
-            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="copyElementText('receipt-user')"><i class="fa-solid fa-copy"></i></button>
+            <code id="receipt-user" style="font-size: 0.98rem; color: var(--accent-cyan);">usuario</code>
+            <button class="btn btn-secondary" style="padding: 5px 9px; font-size: 0.74rem;" onclick="copyElementText('receipt-user')"><i class="fa-solid fa-copy"></i></button>
           </div>
         </div>
         <div>
-          <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">CONTRASEÑA:</span>
+          <span style="font-size: 0.72rem; color: var(--text-muted); display: block; font-weight: 700;">CONTRASEÑA:</span>
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <code id="receipt-pass" style="font-size: 0.95rem; color: #00ffcc;">contraseña</code>
-            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="copyElementText('receipt-pass')"><i class="fa-solid fa-copy"></i></button>
+            <code id="receipt-pass" style="font-size: 0.98rem; color: #00ffcc;">contraseña</code>
+            <button class="btn btn-secondary" style="padding: 5px 9px; font-size: 0.74rem;" onclick="copyElementText('receipt-pass')"><i class="fa-solid fa-copy"></i></button>
           </div>
         </div>
       </div>
 
-      <div id="receipt-warranty-note" style="display:none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; padding: 10px; font-size: 0.78rem; color: #fca5a5; margin-bottom: 16px; text-align: left;">
+      <div id="receipt-warranty-note" style="display:none; background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 12px; padding: 12px 14px; font-size: 0.8rem; color: #fca5a5; margin-bottom: 16px; text-align: left; line-height: 1.45;">
         <i class="fa-solid fa-triangle-exclamation"></i> <strong>NOTA DE GARANTÍA:</strong> Esta cuenta es para uso exclusivo en 1 solo dispositivo. En caso de detectarse más dispositivos conectados simultáneamente, se suspenderá el servicio de inmediato y no se otorgará garantía.
       </div>
 
-      <p style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 600; margin-bottom: 18px;">Muchas gracias por preferir nuestro servicio.</p>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal('purchase-success-modal'); switchNav('orders');">Ir a Mis Compras</button>
+      <p style="font-size: 0.88rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 20px;">Muchas gracias por preferir nuestro servicio.</p>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 13px;" onclick="closeModal('purchase-success-modal'); switchNav('orders');">Ir a Mis Compras</button>
     </div>
   </div>
 
   <!-- MODAL REPORTAR FALLA -->
   <div class="modal-overlay" id="report-modal">
-    <div class="modal-box glass">
+    <div class="modal-box glass neon-border">
       <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('report-modal')"></i>
-      <h3 style="margin-bottom: 8px;">Reportar Problema con la Cuenta</h3>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;" id="report-modal-subtitle"></p>
+      <h3 style="margin-bottom: 8px; font-size: 1.25rem;">Reportar Problema con la Cuenta</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;" id="report-modal-subtitle"></p>
       <form onsubmit="handleSendReport(event)">
         <input type="hidden" id="report-purchase-id" />
         <div class="form-group">
           <label class="form-label">Escriba el motivo del reporte</label>
           <textarea class="form-textarea" id="report-message" rows="4" placeholder="Ej. No entra la cuenta, dice contraseña incorrecta..." required></textarea>
         </div>
-        <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center;">Enviar Reporte</button>
+        <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center; padding: 13px;">Enviar Reporte</button>
       </form>
     </div>
   </div>
 
   <!-- MODAL RESOLVER REPORTE (OWNER) -->
   <div class="modal-overlay" id="resolve-report-modal">
-    <div class="modal-box glass">
+    <div class="modal-box glass neon-border">
       <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('resolve-report-modal')"></i>
-      <h3 style="margin-bottom: 8px;">Editar y Resolver Reporte</h3>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;" id="resolve-modal-details"></p>
+      <h3 style="margin-bottom: 8px; font-size: 1.25rem;">Editar y Resolver Reporte</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;" id="resolve-modal-details"></p>
       <form onsubmit="handleSaveResolvedReport(event)">
         <input type="hidden" id="resolve-report-id" />
         <input type="hidden" id="resolve-stock-id" />
@@ -731,16 +1430,16 @@
           <label class="form-label">Nueva Contraseña</label>
           <input type="text" class="form-input" id="resolve-new-pass" required />
         </div>
-        <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center;">Actualizar Cuenta y Marcar como Resuelto</button>
+        <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center; padding: 13px;">Actualizar Cuenta y Marcar como Resuelto</button>
       </form>
     </div>
   </div>
 
   <!-- MODAL EDITAR CUENTA EN VIVO (OWNER) -->
   <div class="modal-overlay" id="edit-stock-modal">
-    <div class="modal-box glass">
+    <div class="modal-box glass neon-border">
       <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('edit-stock-modal')"></i>
-      <h3 style="margin-bottom: 12px;">Editar Credenciales en la Nube</h3>
+      <h3 style="margin-bottom: 14px; font-size: 1.25rem;">Editar Credenciales</h3>
       <form onsubmit="handleSaveEditedStock(event)">
         <input type="hidden" id="edit-stock-id" />
         <div class="form-group">
@@ -751,7 +1450,7 @@
           <label class="form-label">Contraseña</label>
           <input type="text" class="form-input" id="edit-stock-pass" required />
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Actualizar en Tiempo Real</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 13px;">Actualizar en Tiempo Real</button>
       </form>
     </div>
   </div>
@@ -760,18 +1459,68 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script>
-    // FIREBASE URL DIRECTA
+    /* =======================================================
+       BLINDAJE Y SEGURIDAD CLIENT-SIDE (ANTI-TAMPERING)
+       ======================================================= */
+    (function initSecurityHardening() {
+      try {
+        Object.freeze(Object.prototype);
+      } catch(e) {}
+
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showToast('Acción protegida por seguridad.', 'info');
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+          (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S'))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          showToast('Función de desarrollo restringida.', 'error');
+        }
+      });
+
+      try {
+        const noop = function() {};
+        window.console.log = noop;
+        window.console.warn = noop;
+        window.console.error = noop;
+      } catch(e) {}
+    })();
+
+    function escapeHtml(string) {
+      if (typeof string !== 'string') return string;
+      const entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      };
+      return String(string).replace(/[&<>"']/g, function(s) {
+        return entityMap[s];
+      });
+    }
+
+    /* =======================================================
+       FIREBASE REALTIME MULTI-DEVICE SYNCHRONIZATION
+       ======================================================= */
     const FIREBASE_DB_URL = "https://levi-store-default-rtdb.firebaseio.com/";
 
+    // 14 Meses configurados exclusivamente para entrega manual por WhatsApp
     const DEFAULT_PRODUCTS = [
       { id: 'flujo-1m-1d', name: 'FlujoTV 1 Mes', deliveryType: 'AUTO', devices: 1, price: 5.00, days: 30, img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80' },
       { id: 'flujo-3m-1d', name: 'FlujoTV 3 Meses', deliveryType: 'AUTO', devices: 1, price: 15.00, days: 90, img: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80' },
       { id: 'flujo-7m-1d', name: 'FlujoTV 7 Meses', deliveryType: 'AUTO', devices: 1, price: 30.00, days: 210, img: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600&auto=format&fit=crop&q=80' },
-      { id: 'flujo-14m-1d', name: 'FlujoTV 14 Meses', deliveryType: 'AUTO', devices: 1, price: 60.00, days: 420, img: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?w=600&auto=format&fit=crop&q=80' },
+      { id: 'flujo-14m-1d', name: 'FlujoTV 14 Meses', deliveryType: 'WHATSAPP', devices: 1, price: 60.00, days: 420, img: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?w=600&auto=format&fit=crop&q=80' },
       { id: 'flujo-1m-3d', name: 'FlujoTV 1 Mes (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 8.00, days: 30, img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80' },
       { id: 'flujo-3m-3d', name: 'FlujoTV 3 Meses (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 24.00, days: 90, img: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80' },
       { id: 'flujo-7m-3d', name: 'FlujoTV 7 Meses (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 48.00, days: 210, img: 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=600&auto=format&fit=crop&q=80' },
-      { id: 'flujo-14m-3d', name: 'FlujoTV 14 Meses (3 Disp)', deliveryType: 'AUTO', devices: 3, price: 96.00, days: 420, img: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?w=600&auto=format&fit=crop&q=80' }
+      { id: 'flujo-14m-3d', name: 'FlujoTV 14 Meses (3 Disp)', deliveryType: 'WHATSAPP', devices: 3, price: 96.00, days: 420, img: 'https://images.unsplash.com/photo-1461151304267-38535e780c79?w=600&auto=format&fit=crop&q=80' }
     ];
 
     let db = null;
@@ -787,11 +1536,8 @@
     try {
       firebase.initializeApp({ databaseURL: FIREBASE_DB_URL });
       db = firebase.database();
-    } catch(err) {
-      console.error("Firebase init:", err);
-    }
+    } catch(err) {}
 
-    // SINCRONIZACIÓN ATÓMICA CON LA NUBE
     function listenCloudData() {
       if (!db) return;
       db.ref('levi_stream').on('value', (snapshot) => {
@@ -800,7 +1546,6 @@
           if (val.users) localDB.users = Array.isArray(val.users) ? val.users : Object.values(val.users);
           if (val.products) localDB.products = Array.isArray(val.products) ? val.products : Object.values(val.products);
           
-          // Tratamiento seguro de Stock Masivo (Objetos o Arrays)
           if (val.stock) {
             localDB.stock = Array.isArray(val.stock) ? val.stock.filter(Boolean) : Object.values(val.stock);
           } else {
@@ -820,6 +1565,7 @@
           renderStore();
           renderOrders();
           updateStockCounterView();
+          renderOwnerStock();
           checkPendingBroadcasts();
         } else {
           pushToCloud();
@@ -849,9 +1595,14 @@
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const overlay = document.getElementById('mob-drawer-overlay');
+      sb.classList.toggle('open');
+      overlay.style.display = sb.classList.contains('open') ? 'block' : 'none';
+    }
 
-    // SEGURIDAD POR FUERZA BRUTA
+    // SEGURIDAD POR FUERZA BRUTA (3 INTENTOS FALLIDOS -> 24 HORAS)
     function checkLockoutStatus() {
       const lockUntil = localStorage.getItem('levi_lockout_until');
       if (lockUntil) {
@@ -932,6 +1683,7 @@
       document.getElementById('auth-user').value = '';
       document.getElementById('auth-pass').value = '';
       document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('mob-drawer-overlay').style.display = 'none';
       showToast('Sesión cerrada.', 'info');
     }
 
@@ -958,6 +1710,13 @@
       });
 
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.mob-nav-item').forEach(btn => btn.classList.remove('active'));
+
+      const activeDesk = document.getElementById(`nav-btn-${view}`);
+      if (activeDesk) activeDesk.classList.add('active');
+
+      const activeMob = document.getElementById(`mob-nav-${view}`);
+      if (activeMob) activeMob.classList.add('active');
 
       const titles = {
         'store': 'Tienda Streaming',
@@ -975,7 +1734,10 @@
 
       document.getElementById('page-title').textContent = titles[view] || 'LEVI STREAM';
 
-      if (window.innerWidth <= 860) document.getElementById('sidebar').classList.remove('open');
+      if (window.innerWidth <= 880) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('mob-drawer-overlay').style.display = 'none';
+      }
 
       if (view === 'store') renderStore();
       if (view === 'orders') renderOrders();
@@ -988,7 +1750,7 @@
       if (view === 'owner-notify') renderNotifyTargets();
     }
 
-    // TIENDA ORGANIZADA
+    // TIENDA CON SINCRONIZACIÓN DE STOCK EN TIEMPO REAL
     function setStoreFilter(filter, btn) {
       document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
@@ -1004,25 +1766,27 @@
       containerWa.innerHTML = '';
 
       localDB.products.forEach(p => {
-        const isAuto = (p.deliveryType !== 'WHATSAPP');
-        if (isAuto) {
+        // Validación: los planes de 14 Meses se derivan a WhatsApp
+        const isWa = (p.deliveryType === 'WHATSAPP' || p.days >= 400 || p.name.includes('14 Meses'));
+
+        if (!isWa) {
           const maxCap = (p.devices === 1) ? 2 : 1;
           const availableStockList = localDB.stock.filter(s => s.productId === p.id && (s.soldCount || 0) < maxCap);
           const hasStock = availableStockList.length > 0;
 
           const card = document.createElement('div');
-          card.className = 'product-card';
+          card.className = 'product-card neon-border';
           card.innerHTML = `
             <div class="prod-img-wrap">
-              <img src="${p.img}" class="prod-img" onerror="this.src='https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80'" />
+              <img src="${escapeHtml(p.img)}" class="prod-img" onerror="this.src='https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80'" />
               <span class="delivery-badge badge-auto"><i class="fa-solid fa-bolt"></i> Automático</span>
-              <span class="prod-badge">${p.devices} Disp.</span>
+              <span class="prod-badge">${escapeHtml(p.devices)} Disp.</span>
             </div>
             <div class="prod-info">
               <div>
-                <div style="font-weight: 700; font-size: 1.05rem;">${p.name}</div>
+                <div style="font-weight: 800; font-size: 1.1rem;">${escapeHtml(p.name)}</div>
                 <div class="prod-price">S/ ${p.price.toFixed(2)}</div>
-                <div style="font-size: 0.78rem; color: ${hasStock ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 12px;">
+                <div style="font-size: 0.8rem; color: ${hasStock ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 12px; font-weight: 700;">
                   <i class="fa-solid fa-circle" style="font-size: 8px;"></i> ${hasStock ? `${availableStockList.length} cuentas disponibles` : 'Sin stock inmediato'}
                 </div>
               </div>
@@ -1036,24 +1800,24 @@
           containerAuto.appendChild(card);
         } else {
           const card = document.createElement('div');
-          card.className = 'product-card';
+          card.className = 'product-card neon-border';
           card.innerHTML = `
             <div class="prod-img-wrap">
-              <img src="${p.img}" class="prod-img" onerror="this.src='https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80'" />
-              <span class="delivery-badge badge-wa"><i class="fa-brands fa-whatsapp"></i> Por WhatsApp</span>
-              <span class="prod-badge">${p.devices} Disp.</span>
+              <img src="${escapeHtml(p.img)}" class="prod-img" onerror="this.src='https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80'" />
+              <span class="delivery-badge badge-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp Directo</span>
+              <span class="prod-badge">${escapeHtml(p.devices)} Disp.</span>
             </div>
             <div class="prod-info">
               <div>
-                <div style="font-weight: 700; font-size: 1.05rem;">${p.name}</div>
+                <div style="font-weight: 800; font-size: 1.1rem;">${escapeHtml(p.name)}</div>
                 <div class="prod-price">S/ ${p.price.toFixed(2)}</div>
-                <div style="font-size: 0.78rem; color: var(--accent-wa); margin-bottom: 12px;">
-                  <i class="fa-solid fa-headset"></i> Entrega y activación manual
+                <div style="font-size: 0.8rem; color: var(--accent-wa); margin-bottom: 12px; font-weight: 700;">
+                  <i class="fa-solid fa-shield-halved"></i> Plan Exclusivo • Entrega por Soporte
                 </div>
               </div>
               <button class="btn btn-whatsapp" style="width: 100%; justify-content: center;"
-                onclick="orderProductViaWhatsapp('${p.name}', ${p.devices}, ${p.price})">
-                <i class="fa-brands fa-whatsapp"></i> Solicitar por WhatsApp
+                onclick="orderProductViaWhatsapp('${escapeHtml(p.name)}', ${p.devices}, ${p.price})">
+                <i class="fa-brands fa-whatsapp" style="font-size:1.15rem;"></i> Solicitar por WhatsApp
               </button>
             </div>
           `;
@@ -1063,17 +1827,21 @@
     }
 
     function orderProductViaWhatsapp(productName, devices, price) {
-      const msg = `Hola Levi Stream Perú, deseo adquirir:\n` +
-                  `📦 Producto: ${productName}\n` +
-                  `📱 Dispositivos: ${devices}\n` +
-                  `💰 Precio: S/ ${price.toFixed(2)}\n` +
-                  `👤 Usuario: ${currentUser.username}`;
+      const userStr = currentUser ? currentUser.username : 'Nuevo Cliente';
+      const msg = `Hola Levi Stream Perú, deseo adquirir el siguiente plan:\n\n` +
+                  `📦 *Plan:* ${productName}\n` +
+                  `📱 *Dispositivos:* ${devices}\n` +
+                  `💰 *Precio:* S/ ${price.toFixed(2)}\n` +
+                  `👤 *Usuario:* ${userStr}\n\n` +
+                  `Por favor bríndame los datos de pago y credenciales. Gracias.`;
       contactWhatsapp(msg);
     }
 
     // COMPRA AUTOMÁTICA
     function buyProductAuto(prodId) {
       const prod = localDB.products.find(p => p.id === prodId);
+      if (!prod) return;
+
       if (currentUser.balance < prod.price) {
         showToast('Saldo insuficiente. Realiza una recarga.', 'error');
         switchNav('recharge');
@@ -1141,19 +1909,19 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
-          <td style="font-weight:600;">${item.productName}</td>
-          <td><span class="role-badge">${item.devices} Disp</span></td>
+          <td style="font-weight:700;">${escapeHtml(item.productName)}</td>
+          <td><span class="role-badge">${escapeHtml(item.devices)} Disp</span></td>
           <td>
             <code style="background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 6px; color:var(--accent-cyan);">
-              ${live.user}:${live.pass}
+              ${escapeHtml(live.user)}:${escapeHtml(live.pass)}
             </code>
           </td>
-          <td><span style="color: ${daysLeft <= 1 ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">${daysLeft} días</span></td>
+          <td><span style="color: ${daysLeft <= 1 ? 'var(--danger)' : 'var(--success)'}; font-weight:800;">${daysLeft} días</span></td>
           <td>
-            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.74rem;" onclick="copyText('${live.user}:${live.pass}')">
+            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.76rem;" onclick="copyText('${escapeHtml(live.user)}:${escapeHtml(live.pass)}')">
               <i class="fa-solid fa-copy"></i> Copiar
             </button>
-            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.74rem;" onclick="openReportModal('${item.id}', '${item.productName}')">
+            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.76rem;" onclick="openReportModal('${item.id}', '${escapeHtml(item.productName)}')">
               <i class="fa-solid fa-triangle-exclamation"></i> Reportar
             </button>
           </td>
@@ -1202,12 +1970,13 @@
 
       pushToCloud();
       closeModal('report-modal');
-      showToast('REPORTE ENVIADO. El Owner revisará tu caso en breve.', 'info');
+      showToast('REPORTE ENVIADO. El soporte técnico revisará tu caso en breve.', 'info');
     }
 
     // OWNER: RESOLVER REPORTES
     function renderOwnerReports() {
       const tbody = document.getElementById('owner-reports-tbody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       if (localDB.reports.length === 0) {
@@ -1219,19 +1988,19 @@
         const live = localDB.stock.find(s => s.id === r.stockId) || { user: 'No disp', pass: '***' };
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${r.date}</td>
-          <td style="font-weight:700;">${r.buyerUsername}</td>
-          <td>${r.productName}</td>
-          <td style="color:#fca5a5;">${r.message}</td>
-          <td><code>${live.user}:${live.pass}</code></td>
+          <td>${escapeHtml(r.date)}</td>
+          <td style="font-weight:800;">${escapeHtml(r.buyerUsername)}</td>
+          <td>${escapeHtml(r.productName)}</td>
+          <td style="color:#fca5a5;">${escapeHtml(r.message)}</td>
+          <td><code>${escapeHtml(live.user)}:${escapeHtml(live.pass)}</code></td>
           <td>
-            <span style="color: ${r.status === 'RESUELTO' ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">
-              ${r.status}
+            <span style="color: ${r.status === 'RESUELTO' ? 'var(--success)' : 'var(--danger)'}; font-weight:800;">
+              ${escapeHtml(r.status)}
             </span>
           </td>
           <td>
             ${r.status === 'PENDIENTE' ? `
-              <button class="btn btn-success" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openResolveReportModal('${r.id}')">
+              <button class="btn btn-success" style="padding: 5px 10px; font-size: 0.74rem;" onclick="openResolveReportModal('${r.id}')">
                 <i class="fa-solid fa-wrench"></i> Editar y Resolver
               </button>
             ` : '<i class="fa-solid fa-check-double" style="color:var(--success);"></i> Resuelto'}
@@ -1295,6 +2064,7 @@
     // OWNER: AUDITORÍA
     function renderOwnerAuditTable() {
       const tbody = document.getElementById('owner-audit-tbody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       if (localDB.purchases.length === 0) {
@@ -1307,17 +2077,17 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
-          <td style="font-weight:700;">${item.buyerUsername}</td>
-          <td><span class="role-badge">${item.buyerRole}</span></td>
-          <td>${item.productName} (${item.devices} Disp)</td>
-          <td><code>${live.user}:${live.pass}</code></td>
+          <td style="font-weight:800;">${escapeHtml(item.buyerUsername)}</td>
+          <td><span class="role-badge">${escapeHtml(item.buyerRole)}</span></td>
+          <td>${escapeHtml(item.productName)} (${item.devices} Disp)</td>
+          <td><code>${escapeHtml(live.user)}:${escapeHtml(live.pass)}</code></td>
           <td>
-            <span style="color: ${item.deletedForClient ? 'var(--danger)' : 'var(--success)'}; font-weight:700;">
+            <span style="color: ${item.deletedForClient ? 'var(--danger)' : 'var(--success)'}; font-weight:800;">
               ${item.deletedForClient ? 'ELIMINADA PARA CLIENTE' : 'ACTIVA EN CLIENTE'}
             </span>
           </td>
           <td>
-            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem;" onclick="toggleHideFromClient('${item.id}')">
+            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.74rem;" onclick="toggleHideFromClient('${item.id}')">
               ${item.deletedForClient ? 'Restaurar' : 'Ocultar a Cliente'}
             </button>
           </td>
@@ -1445,49 +2215,51 @@
 
     function renderOwnerProducts() {
       const tbody = document.getElementById('owner-products-tbody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       localDB.products.forEach(p => {
         const isAuto = (p.deliveryType !== 'WHATSAPP');
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><img src="${p.img}" style="width: 42px; height: 30px; object-fit: cover; border-radius: 6px;" /></td>
-          <td style="font-weight:600;">${p.name}</td>
+          <td><img src="${escapeHtml(p.img)}" style="width: 44px; height: 32px; object-fit: cover; border-radius: 8px;" /></td>
+          <td style="font-weight:700;">${escapeHtml(p.name)}</td>
           <td><span class="role-badge" style="${isAuto ? '' : 'color:#22c55e; border-color:#22c55e;'}">${isAuto ? 'Automático' : 'WhatsApp'}</span></td>
-          <td>${p.devices} Disp</td>
-          <td style="color:var(--accent-cyan); font-weight:700;">S/ ${p.price.toFixed(2)}</td>
+          <td>${escapeHtml(p.devices)} Disp</td>
+          <td style="color:var(--accent-cyan); font-weight:800;">S/ ${p.price.toFixed(2)}</td>
           <td>
-            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="editProduct('${p.id}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem;" onclick="deleteProduct('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-secondary" style="padding: 5px 9px; font-size: 0.74rem;" onclick="editProduct('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-danger" style="padding: 5px 9px; font-size: 0.74rem;" onclick="deleteProduct('${p.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // OWNER: MOTOR DE INSERCIÓN MASIVA Y GESTIÓN DE STOCK ATÓMICO
+    // OWNER: INSERCIÓN MASIVA Y GESTIÓN DE STOCK ATÓMICO
     function populateStockSelectors() {
       const selectLoad = document.getElementById('stock-product-select');
       const selectFilter = document.getElementById('stock-filter-product');
       if (!selectLoad || !selectFilter) return;
 
-      const autoProds = localDB.products.filter(p => p.deliveryType !== 'WHATSAPP');
+      const autoProds = localDB.products.filter(p => p.deliveryType !== 'WHATSAPP' && !p.name.includes('14 Meses'));
 
       selectLoad.innerHTML = '';
       selectFilter.innerHTML = '<option value="ALL">Mostrar Todos los Planes</option>';
 
       autoProds.forEach(p => {
         const count = localDB.stock.filter(s => s.productId === p.id).length;
-        selectLoad.innerHTML += `<option value="${p.id}">${p.name} (${p.devices} Disp)</option>`;
-        selectFilter.innerHTML += `<option value="${p.id}">${p.name} (${count} en stock)</option>`;
+        selectLoad.innerHTML += `<option value="${p.id}">${escapeHtml(p.name)} (${p.devices} Disp)</option>`;
+        selectFilter.innerHTML += `<option value="${p.id}">${escapeHtml(p.name)} (${count} cuentas)</option>`;
       });
 
-      // Detector interactivo de conteo de líneas
       const textarea = document.getElementById('stock-raw');
-      textarea.oninput = function() {
-        const lines = this.value.split('\n').map(l => l.trim()).filter(Boolean);
-        document.getElementById('stock-lines-detected').textContent = `Líneas detectadas: ${lines.length} cuentas listas`;
-      };
+      if (textarea) {
+        textarea.oninput = function() {
+          const lines = this.value.split('\n').map(l => l.trim()).filter(Boolean);
+          document.getElementById('stock-lines-detected').textContent = `Líneas detectadas: ${lines.length} cuentas listas`;
+        };
+      }
     }
 
     function updateStockCounterView() {
@@ -1500,7 +2272,7 @@
 
       const badge = document.getElementById('stock-total-badge');
       if (badge) {
-        badge.innerHTML = `<i class="fa-solid fa-server"></i> Total en Nube: <strong>${countTotal}</strong> (${countAvail} disponibles para venta)`;
+        badge.innerHTML = `<i class="fa-solid fa-server"></i> Total en Nube: <strong>${countTotal}</strong> (${countAvail} disponibles)`;
       }
     }
 
@@ -1509,7 +2281,6 @@
       const prodId = document.getElementById('stock-product-select').value;
       const raw = document.getElementById('stock-raw').value;
 
-      // Parser robusto que soporta \r\n, espacios extra y formatos múltiples
       const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
       if (lines.length === 0) {
@@ -1545,7 +2316,7 @@
         return;
       }
 
-      // ACUMULACIÓN ATÓMICA: Se suman al stock existente sin borrar lo anterior
+      // ACUMULACIÓN ATÓMICA EN NUBE
       localDB.stock = localDB.stock.concat(newItems);
       pushToCloud();
 
@@ -1585,14 +2356,14 @@
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td style="color:var(--text-dark); font-weight:700;">#${index + 1}</td>
-          <td>${prod.name}</td>
-          <td><code>${item.user}:${item.pass}</code></td>
+          <td style="color:var(--text-dark); font-weight:800;">#${index + 1}</td>
+          <td style="font-weight:700;">${escapeHtml(prod.name)}</td>
+          <td><code>${escapeHtml(item.user)}:${escapeHtml(item.pass)}</code></td>
           <td><strong>${sold} / ${maxCap}</strong></td>
-          <td><span style="color: ${isAvailable ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">${isAvailable ? 'DISPONIBLE' : 'AGOTADA'}</span></td>
+          <td><span style="color: ${isAvailable ? 'var(--success)' : 'var(--danger)'}; font-weight:800;">${isAvailable ? 'DISPONIBLE' : 'AGOTADA'}</span></td>
           <td>
-            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openEditStock('${item.id}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem;" onclick="deleteStock('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-secondary" style="padding: 5px 9px; font-size: 0.74rem;" onclick="openEditStock('${item.id}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-danger" style="padding: 5px 9px; font-size: 0.74rem;" onclick="deleteStock('${item.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1654,7 +2425,7 @@
       showToast('Inventario depurado correctamente.', 'info');
     }
 
-    // OWNER: USUARIOS
+    // OWNER: USUARIOS Y AUTOGESTIÓN DE SALDO
     function modifyOwnerBalance(isAdd) {
       const amount = parseFloat(prompt(`Monto a ${isAdd ? 'sumar' : 'restar'}:`, "50"));
       if (isNaN(amount) || amount <= 0) return;
@@ -1685,23 +2456,24 @@
       pushToCloud();
       renderOwnerUsers();
       e.target.reset();
-      showToast(`Usuario ${u} creado en la nube. Ya puede ingresar desde cualquier celular.`, 'success');
+      showToast(`Usuario ${u} creado en la nube.`, 'success');
     }
 
     function renderOwnerUsers() {
       const tbody = document.getElementById('owner-users-tbody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       localDB.users.forEach(u => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td style="font-weight:600;">${u.username}</td>
-          <td><code>${u.password}</code></td>
-          <td><span class="role-badge">${u.role}</span></td>
-          <td style="color:var(--accent-cyan); font-weight:700;">S/ ${u.balance.toFixed(2)}</td>
+          <td style="font-weight:700;">${escapeHtml(u.username)}</td>
+          <td><code>${escapeHtml(u.password)}</code></td>
+          <td><span class="role-badge">${escapeHtml(u.role)}</span></td>
+          <td style="color:var(--accent-cyan); font-weight:800;">S/ ${u.balance.toFixed(2)}</td>
           <td>
-            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.72rem;" onclick="adminEditBalance('${u.username}')">Saldo</button>
-            ${u.username !== 'EriikAdmin' ? `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.72rem;" onclick="adminDeleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
+            <button class="btn btn-secondary" style="padding:5px 9px; font-size:0.74rem;" onclick="adminEditBalance('${escapeHtml(u.username)}')">Saldo</button>
+            ${u.username !== 'EriikAdmin' ? `<button class="btn btn-danger" style="padding:5px 9px; font-size:0.74rem;" onclick="adminDeleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
           </td>
         `;
         tbody.appendChild(tr);
@@ -1734,6 +2506,7 @@
     // SUB-USUARIOS
     function renderSubUsers() {
       const roleSelect = document.getElementById('sub-role');
+      if (!roleSelect) return;
       roleSelect.innerHTML = (currentUser.role === 'RESELLER') ? '<option value="SELLER">SELLER</option><option value="CLIENTE">CLIENTE</option>' : '<option value="CLIENTE">CLIENTE</option>';
 
       const tbody = document.getElementById('subusers-table-body');
@@ -1743,11 +2516,11 @@
       list.forEach(u => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${u.username}</td>
-          <td><span class="role-badge">${u.role}</span></td>
+          <td style="font-weight:700;">${escapeHtml(u.username)}</td>
+          <td><span class="role-badge">${escapeHtml(u.role)}</span></td>
           <td>S/ ${u.balance.toFixed(2)}</td>
           <td>
-            <button class="btn btn-primary" style="padding:4px 8px; font-size:0.74rem;" onclick="transferBalanceToSubUser('${u.username}')">Transferir</button>
+            <button class="btn btn-primary" style="padding:5px 10px; font-size:0.76rem;" onclick="transferBalanceToSubUser('${escapeHtml(u.username)}')">Transferir</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1802,11 +2575,32 @@
     }
 
     // NOTIFICACIONES
+    let broadcastSelectedImg = '';
+    function previewNotifyUrl(url) {
+      if (url.trim()) {
+        broadcastSelectedImg = url;
+        document.getElementById('notify-preview-img').src = url;
+        document.getElementById('notify-preview-box').style.display = 'block';
+      }
+    }
+    function previewNotifyFile(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          broadcastSelectedImg = e.target.result;
+          document.getElementById('notify-preview-img').src = e.target.result;
+          document.getElementById('notify-preview-box').style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
     function renderNotifyTargets() {
       const select = document.getElementById('notify-target');
+      if (!select) return;
       select.innerHTML = '<option value="ALL">TODAS LAS CUENTAS (Global)</option>';
       localDB.users.forEach(u => {
-        select.innerHTML += `<option value="${u.username}">${u.username} (${u.role})</option>`;
+        select.innerHTML += `<option value="${escapeHtml(u.username)}">${escapeHtml(u.username)} (${escapeHtml(u.role)})</option>`;
       });
     }
 
@@ -1815,21 +2609,22 @@
       const target = document.getElementById('notify-target').value;
       const title = document.getElementById('notify-title').value.trim();
       const msg = document.getElementById('notify-message').value.trim();
-      const img = document.getElementById('notify-image-url').value.trim();
 
       localDB.notifications.push({
         id: 'notif_' + Date.now(),
         target: target,
         title: title,
         message: msg,
-        img: img,
+        img: broadcastSelectedImg,
         duration: 10,
         seenBy: []
       });
 
       pushToCloud();
       e.target.reset();
-      showToast('Notificación enviada a la nube.', 'success');
+      broadcastSelectedImg = '';
+      document.getElementById('notify-preview-box').style.display = 'none';
+      showToast('Notificación enviada.', 'success');
     }
 
     function checkPendingBroadcasts() {
@@ -1902,7 +2697,7 @@
         const prod = localDB.products.find(p => p.id === s.productId) || { name: 'Plan' };
         txt += `[${prod.name}] -> ${s.user}:${s.pass} (Ventas: ${s.soldCount || 0})\n`;
       });
-      downloadTextFile('Stock_LeviStream.txt', txt);
+      downloadTextFile('Cuentas_Stock_LeviStream.txt', txt);
     }
 
     function exportActiveAccountsTXT() {
@@ -1916,10 +2711,13 @@
 
     function exportSalesTXT() {
       let txt = "================ HISTORIAL VENTAS ================\n\n";
+      let total = 0;
       localDB.purchases.forEach(p => {
+        total += (p.price || 0);
         txt += `Fecha: ${p.purchaseDate} | Comprador: ${p.buyerUsername} | Plan: ${p.productName} | S/ ${p.price}\n`;
       });
-      downloadTextFile('Ventas_LeviStream.txt', txt);
+      txt += `\nTOTAL RECAUDADO: S/ ${total.toFixed(2)}\n`;
+      downloadTextFile('Historial_Ventas_LeviStream.txt', txt);
     }
 
     function exportUsersTXT() {
@@ -1930,16 +2728,119 @@
       downloadTextFile('Usuarios_LeviStream.txt', txt);
     }
 
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
 
     function showToast(msg, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = 'toast';
-      toast.innerHTML = `<i class="fa-solid fa-bolt"></i> <span>${msg}</span>`;
+      toast.innerHTML = `<i class="fa-solid fa-bolt" style="color:var(--accent-cyan);"></i> <span>${escapeHtml(msg)}</span>`;
       container.appendChild(toast);
       setTimeout(() => toast.remove(), 3200);
     }
+
+    /* =======================================================
+       FONDO CONSTELLATION INTERACTIVO (MOVILIDAD Y MOTION)
+       ======================================================= */
+    (function initConstellationCanvas() {
+      const canvas = document.getElementById('ambient-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let mouse = { x: null, y: null, radius: 120 };
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      window.addEventListener('mousemove', function(e) {
+        mouse.x = e.x;
+        mouse.y = e.y;
+      });
+
+      window.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 0) {
+          mouse.x = e.touches[0].clientX;
+          mouse.y = e.touches[0].clientY;
+        }
+      });
+
+      window.addEventListener('mouseleave', function() {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      window.addEventListener('touchend', function() {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      const count = window.innerWidth <= 880 ? 25 : 50;
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 2 + 1,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          color: Math.random() > 0.5 ? '#00d2ff' : '#9d4edd'
+        });
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+          // Reacción al puntero o toque
+          if (mouse.x != null) {
+            const dx = mouse.x - p.x;
+            const dy = mouse.y - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              p.x -= (dx / dist) * force * 3;
+              p.y -= (dy / dist) * force * 3;
+            }
+          }
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = p.color;
+          ctx.fill();
+
+          // Conectar constelaciones
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 110) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(0, 210, 255, ${0.15 - dist / 800})`;
+              ctx.lineWidth = 0.6;
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
 
     checkLockoutStatus();
   </script>
