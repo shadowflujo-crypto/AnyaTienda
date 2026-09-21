@@ -172,6 +172,185 @@
       left: 180%;
     }
 
+    /* SELECTOR OBLIGATORIO DE DISPOSITIVO */
+    .device-selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .device-choice-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      user-select: none;
+    }
+
+    .device-choice-card input[type="radio"] {
+      display: none;
+    }
+
+    .device-choice-card i {
+      font-size: 1.35rem;
+      margin-bottom: 6px;
+      color: var(--text-dim);
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .device-choice-card span {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .device-choice-card:hover {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.06);
+    }
+
+    .device-choice-card.selected {
+      border-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.14);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+    }
+
+    .device-choice-card.selected i {
+      color: var(--accent-red);
+      transform: scale(1.1);
+    }
+
+    /* MODO MÓVIL: ELIMINACIÓN TOTAL DE BORROSIDAD / BLUR */
+    body.mode-mobile * {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
+    }
+
+    body.mode-mobile .ambient-orb {
+      display: none !important;
+    }
+
+    body.mode-mobile .sidebar {
+      background: #0f0f17 !important;
+      border-right: 1.5px solid rgba(239, 68, 68, 0.35) !important;
+      box-shadow: 15px 0 45px rgba(0, 0, 0, 0.98) !important;
+      transform: translateX(-100%);
+      width: 295px;
+      z-index: 100000 !important;
+      pointer-events: auto !important;
+    }
+
+    body.mode-mobile .sidebar.open {
+      transform: translateX(0) !important;
+    }
+
+    body.mode-mobile .mob-drawer-overlay {
+      background: rgba(0, 0, 0, 0.75) !important;
+      z-index: 99990 !important;
+    }
+
+    body.mode-mobile .nav-btn {
+      color: #ffffff !important;
+      font-size: 0.95rem !important;
+      padding: 13px 16px !important;
+      background: #181824 !important;
+      margin-bottom: 7px !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+      font-weight: 700 !important;
+      pointer-events: auto !important;
+      touch-action: manipulation;
+    }
+
+    body.mode-mobile .nav-btn i {
+      color: #ff4d4d !important;
+      font-size: 1.2rem !important;
+    }
+
+    body.mode-mobile .nav-btn.active {
+      background: rgba(239, 68, 68, 0.28) !important;
+      border-color: var(--accent-red) !important;
+      color: #ffffff !important;
+    }
+
+    body.mode-mobile .mob-close-sidebar-btn {
+      display: flex !important;
+    }
+
+    body.mode-mobile .main-wrapper {
+      margin-left: 0 !important;
+      width: 100% !important;
+      padding: 12px 12px calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 26px) 12px !important;
+    }
+
+    body.mode-mobile .header-bar {
+      top: 8px !important;
+      padding: 10px 14px !important;
+      margin-bottom: 16px !important;
+      background: #111118 !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+
+    body.mode-mobile .menu-toggle-btn {
+      display: flex !important;
+    }
+
+    body.mode-mobile .mobile-bottom-nav {
+      display: flex !important;
+      background: #0d0d13 !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+    }
+
+    body.mode-mobile .catalog-grid {
+      grid-template-columns: 1fr !important;
+      gap: 14px !important;
+    }
+
+    body.mode-mobile .modal-box,
+    body.mode-mobile .broadcast-popup,
+    body.mode-mobile .glass {
+      background: #121219 !important;
+      border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    }
+
+    /* MODO PC: DISEÑO EXPANDIDO DE ALTA DENSIDAD */
+    body.mode-pc .sidebar {
+      transform: translateX(0) !important;
+      position: fixed !important;
+    }
+
+    body.mode-pc .main-wrapper {
+      margin-left: var(--sidebar-w) !important;
+      width: calc(100% - var(--sidebar-w)) !important;
+      padding: 24px 30px 48px 30px !important;
+    }
+
+    body.mode-pc .menu-toggle-btn {
+      display: none !important;
+    }
+
+    body.mode-pc .mobile-bottom-nav {
+      display: none !important;
+    }
+
+    body.mode-pc .mob-drawer-overlay {
+      display: none !important;
+    }
+
+    body.mode-pc .catalog-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    }
+
     /* Pantalla de Autenticación Centrada Responsive */
     #auth-screen {
       position: fixed;
@@ -194,7 +373,46 @@
       width: 100%;
       min-height: 100vh;
       position: relative;
-      z-index: 2;
+    }
+
+    /* Sidebar Desktop */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px;
+      border-right: 1px solid var(--border-color);
+      background: #0b0b10;
+      z-index: 100000;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .mob-close-sidebar-btn {
+      display: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1.15rem;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
     }
 
     /* Sidebar Desktop */
@@ -865,7 +1083,8 @@
       top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(4px);
-      z-index: 999;
+      z-index: 99990;
+      touch-action: manipulation;
     }
 
     /* Adaptabilidad Móvil */
@@ -955,6 +1174,27 @@
           <label class="form-label">Contraseña</label>
           <input type="password" class="form-input" id="auth-pass" placeholder="Ingresa tu contraseña" required />
         </div>
+
+        <!-- SELECTOR OBLIGATORIO DE MODO DISPOSITIVO -->
+        <div class="form-group" style="margin-top: 14px; margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Dispositivo de Acceso</label>
+            <span style="font-size: 0.7rem; color: var(--accent-red); font-weight: 700;">* Obligatorio</span>
+          </div>
+          <div class="device-selector-grid">
+            <div class="device-choice-card" id="device-card-mobile" onclick="selectDeviceMode('mobile')">
+              <input type="radio" name="device-mode" id="device-radio-mobile" value="mobile" required />
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span>📱 Móvil</span>
+            </div>
+            <div class="device-choice-card" id="device-card-pc" onclick="selectDeviceMode('pc')">
+              <input type="radio" name="device-mode" id="device-radio-pc" value="pc" required />
+              <i class="fa-solid fa-desktop"></i>
+              <span>💻 PC / Laptop</span>
+            </div>
+          </div>
+        </div>
+
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 6px;">
           Iniciar Sesión
         </button>
@@ -977,11 +1217,16 @@
     <aside class="sidebar" id="sidebar">
       <div>
         <div class="brand-box">
-          <div class="brand-icon"><i class="fa-solid fa-play"></i></div>
-          <div>
-            <div class="brand-title">LEVI STREAM</div>
-            <div class="brand-subtitle">PERÚ OFICIAL</div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="brand-icon"><i class="fa-solid fa-play"></i></div>
+            <div>
+              <div class="brand-title">LEVI STREAM</div>
+              <div class="brand-subtitle">PERÚ OFICIAL</div>
+            </div>
           </div>
+          <button class="mob-close-sidebar-btn" onclick="toggleSidebar()" aria-label="Cerrar Menú">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
 
         <nav class="nav-list">
@@ -1679,23 +1924,46 @@
       overlay.style.display = sb.classList.contains('open') ? 'block' : 'none';
     }
 
+    function selectDeviceMode(mode) {
+      document.querySelectorAll('.device-choice-card').forEach(c => c.classList.remove('selected'));
+      const card = document.getElementById(`device-card-${mode}`);
+      const radio = document.getElementById(`device-radio-${mode}`);
+      if (card && radio) {
+        card.classList.add('selected');
+        radio.checked = true;
+      }
+    }
+
     function handleLoginSubmit(e) {
       e.preventDefault();
 
       const u = document.getElementById('auth-user').value.trim();
       const p = document.getElementById('auth-pass').value.trim();
+      const selectedRadio = document.querySelector('input[name="device-mode"]:checked');
 
+      if (!selectedRadio) {
+        showToast('Debes seleccionar obligatoriamente: Móvil o PC.', 'error');
+        return;
+      }
+
+      const deviceMode = selectedRadio.value;
       const user = localDB.users.find(x => x.username.toLowerCase() === u.toLowerCase());
 
       if (user && user.password === p) {
         currentUser = user;
+        
+        // Aplicar el diseño exacto según el dispositivo elegido
+        document.body.classList.remove('mode-mobile', 'mode-pc');
+        document.body.classList.add(`mode-${deviceMode}`);
+        localStorage.setItem('levi_device_mode', deviceMode);
+
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
 
         updateUI();
         switchNav('store');
         checkPendingBroadcasts();
-        showToast(`Bienvenido ${user.username}`, 'success');
+        showToast(`Bienvenido ${user.username} (Modo ${deviceMode.toUpperCase()})`, 'success');
       } else {
         showToast('Usuario o contraseña incorrectos.', 'error');
       }
@@ -2842,7 +3110,7 @@
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
       let particles = [];
-      const particleCount = window.innerWidth < 768 ? 25 : 55;
+      const particleCount = window.innerWidth < 768 ? 35 : 75;
 
       function resize() {
         canvas.width = window.innerWidth;
@@ -2851,30 +3119,38 @@
       window.addEventListener('resize', resize);
       resize();
 
-      class Particle {
+      class CelestialStar {
         constructor() {
           this.x = Math.random() * canvas.width;
           this.y = Math.random() * canvas.height;
-          this.vx = (Math.random() - 0.5) * 0.4;
-          this.vy = (Math.random() - 0.5) * 0.4;
-          this.radius = Math.random() * 1.5 + 1;
+          this.vx = (Math.random() - 0.5) * 0.35;
+          this.vy = (Math.random() - 0.5) * 0.35;
+          this.radius = Math.random() * 1.8 + 0.6;
+          this.alpha = Math.random() * 0.7 + 0.2;
+          this.twinkleSpeed = Math.random() * 0.015 + 0.005;
+          this.isRed = Math.random() > 0.4;
         }
         update() {
           this.x += this.vx;
           this.y += this.vy;
           if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
           if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+          this.alpha += this.twinkleSpeed;
+          if (this.alpha > 0.85 || this.alpha < 0.2) this.twinkleSpeed *= -1;
         }
         draw() {
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+          ctx.fillStyle = this.isRed ? `rgba(239, 68, 68, ${this.alpha})` : `rgba(240, 246, 255, ${this.alpha * 0.9})`;
+          ctx.shadowBlur = this.radius * 3;
+          ctx.shadowColor = this.isRed ? 'rgba(239, 68, 68, 0.6)' : 'rgba(255, 255, 255, 0.5)';
           ctx.fill();
+          ctx.shadowBlur = 0;
         }
       }
 
       for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
+        particles.push(new CelestialStar());
       }
 
       function animate() {
@@ -2886,10 +3162,10 @@
             const dx = particles[i].x - particles[j].x;
             const dy = particles[i].y - particles[j].y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 100) {
+            if (dist < 115) {
               ctx.beginPath();
-              ctx.strokeStyle = `rgba(239, 68, 68, ${0.15 - dist / 700})`;
-              ctx.lineWidth = 0.5;
+              ctx.strokeStyle = `rgba(239, 68, 68, ${0.16 - dist / 800})`;
+              ctx.lineWidth = 0.55;
               ctx.moveTo(particles[i].x, particles[i].y);
               ctx.lineTo(particles[j].x, particles[j].y);
               ctx.stroke();
