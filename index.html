@@ -1261,7 +1261,7 @@
 
             <div class="table-container" style="max-height: 440px; overflow-y: auto;">
               <table>
-                <thead><tr><th>#</th><th>Plataforma</th><th>Credenciales</th><th>Cupos</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <thead><tr><th>#</th><th>Plataforma</th><th>Credenciales</th><th>Cupos / Uso</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody id="owner-stock-tbody"></tbody>
               </table>
             </div>
@@ -1270,6 +1270,68 @@
       </section>
 
       <section id="view-owner-products" style="display:none;">
+        <!-- Banner de Ajuste Global de Precios (Descuento o Aumento Masivo) -->
+        <div class="glass" style="padding: 20px; margin-bottom: 20px; border-color: rgba(239, 68, 68, 0.3); background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(18, 18, 24, 0.95));">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+            <div>
+              <h4 style="font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-tags" style="color: var(--accent-red);"></i> Ajuste Global de Precios (Descuento / Aumento)
+              </h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">
+                Modifica los precios de toda la tienda al instante. Aplica ofertas especiales o incrementos generales con sincronización en vivo.
+              </p>
+            </div>
+            <span style="font-size: 0.72rem; padding: 4px 10px; border-radius: 8px; background: rgba(0, 210, 255, 0.12); color: var(--accent-cyan); font-weight: 700; border: 1px solid rgba(0, 210, 255, 0.25);">
+              <i class="fa-solid fa-bolt"></i> Afecta a toda la tienda
+            </span>
+          </div>
+
+          <form onsubmit="handleApplyGlobalPriceAdjustment(event)">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; align-items: flex-end;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Acción a Realizar</label>
+                <select class="form-select" id="global-adjust-type" onchange="updateGlobalPricePreview()" required>
+                  <option value="DISCOUNT_PERCENT">🏷️ Descuento Porcentual (-%)</option>
+                  <option value="INCREASE_PERCENT">📈 Aumento Porcentual (+%)</option>
+                  <option value="DISCOUNT_FIXED">💵 Descuento Fijo (- USD $)</option>
+                  <option value="INCREASE_FIXED">💰 Aumento Fijo (+ USD $)</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" id="global-adjust-val-label">Valor del Ajuste (% o USD)</label>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <input type="number" step="0.01" min="0.01" class="form-input" id="global-adjust-val" placeholder="Ej. 15" value="10" required oninput="updateGlobalPricePreview()" />
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Aplicar A</label>
+                <select class="form-select" id="global-adjust-target" onchange="updateGlobalPricePreview()" required>
+                  <option value="ALL">Todos los Planes de la Tienda</option>
+                  <option value="AUTO">Solo Entrega Automática (Saldo)</option>
+                  <option value="WHATSAPP">Solo Planes WhatsApp / Manuales</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1; min-height: 44px; font-weight: 700;">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Aplicar a Todo
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="restoreDefaultProductPrices()" title="Restablecer precios iniciales de fábrica">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Vista previa fluida de precios afectados -->
+            <div id="global-price-preview-box" style="margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: rgba(0,0,0,0.35); border: 1px dashed rgba(255,255,255,0.12); font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <span id="global-preview-text" style="color: var(--text-muted);">Configura el monto para ver el impacto en los precios.</span>
+              <span id="global-preview-sample" style="color: var(--accent-emerald); font-weight: 700;"></span>
+            </div>
+          </form>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px;">
           <div class="glass" style="padding: 20px;" id="product-editor-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
@@ -1411,7 +1473,7 @@
           <h3 style="margin-bottom: 14px; font-size: 1.15rem;">Cuentas Generadas Globalmente</h3>
           <div class="table-container">
             <table>
-              <thead><tr><th>Fecha</th><th>Generador</th><th>Rol</th><th>Plataforma</th><th>Credenciales</th><th>Expiración</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Fecha</th><th>Generador</th><th>Rol</th><th>Plataforma</th><th>Credenciales</th><th>Expiración</th><th>Visibilidad Cliente</th><th>Acciones</th></tr></thead>
               <tbody id="owner-audit-tbody"></tbody>
             </table>
           </div>
@@ -1527,12 +1589,61 @@
         </div>
       </div>
 
-      <div id="receipt-warranty-note" style="display:none; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 10px; font-size: 0.78rem; color: #fca5a5; margin-bottom: 14px; text-align: left; line-height: 1.4;">
-        <i class="fa-solid fa-triangle-exclamation"></i> <strong>NOTA DE GARANTÍA:</strong> Esta cuenta es para uso exclusivo en 1 solo dispositivo. En caso de detectarse más dispositivos conectados simultáneamente, se suspenderá el servicio de inmediato.
+  <!-- Modal para Editar Saldo de Usuario (Agregar, Quitar o Fijar Saldo) -->
+  <div class="modal-overlay" id="edit-user-balance-modal">
+    <div class="modal-box" style="border-color: rgba(239, 68, 68, 0.4);">
+      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('edit-user-balance-modal')"></i>
+      <h3 style="margin-bottom: 4px; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-wallet" style="color:var(--accent-red);"></i> Modificar Saldo de Usuario
+      </h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+        Gestiona el saldo disponible para <strong id="edit-bal-target-user" style="color:#fff;">usuario</strong>
+      </p>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px;">
+        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Saldo Actual</div>
+        <div style="font-family:'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--accent-emerald);" id="edit-bal-current-display">$0.00 USD</div>
       </div>
 
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">Muchas gracias por preferir nuestro servicio.</p>
-      <button class="btn btn-primary" style="width: 100%;" onclick="closeModal('purchase-success-modal'); switchNav('orders');">Ir a Mis Compras</button>
+      <form onsubmit="handleSaveUserBalance(event)">
+        <input type="hidden" id="edit-bal-username-hidden" />
+
+        <div class="form-group">
+          <label class="form-label">Tipo de Modificación</label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+            <button type="button" class="btn btn-secondary bal-mode-btn active" id="bal-mode-add" onclick="selectBalanceMode('ADD')" style="background: rgba(16, 185, 129, 0.15); border-color: var(--accent-emerald); color: var(--accent-emerald); font-weight: 700;">
+              <i class="fa-solid fa-plus"></i> Sumar
+            </button>
+            <button type="button" class="btn btn-secondary bal-mode-btn" id="bal-mode-sub" onclick="selectBalanceMode('SUB')" style="font-weight: 700;">
+              <i class="fa-solid fa-minus"></i> Restar
+            </button>
+            <button type="button" class="btn btn-secondary bal-mode-btn" id="bal-mode-set" onclick="selectBalanceMode('SET')" style="font-weight: 700;">
+              <i class="fa-solid fa-equals"></i> Fijar Saldo
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" id="edit-bal-amount-label">Monto a Sumar (USD $)</label>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(5)">$5</button>
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(10)">$10</button>
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(20)">$20</button>
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(50)">$50</button>
+          </div>
+          <input type="number" step="0.01" min="0" class="form-input" id="edit-bal-input-amount" placeholder="0.00" value="10" required oninput="calcBalanceModalPreview()" />
+        </div>
+
+        <!-- Vista previa del resultado -->
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Saldo Resultante:</span>
+          <span style="font-size: 1.15rem; font-weight: 800; font-family:'Space Grotesk', sans-serif; color: #00ffcc;" id="edit-bal-preview-result">$10.00 USD</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-weight: 700;">
+          <i class="fa-solid fa-floppy-disk"></i> Aplicar y Actualizar Saldo
+        </button>
+      </form>
     </div>
   </div>
 
@@ -1817,6 +1928,18 @@
     let currentUser = null;
     let isProcessingPurchase = false;
 
+    let loginFailedAttempts = 0;
+    let lockoutRemainingSeconds = 0;
+    let lockoutInterval = null;
+
+    function requireOwner() {
+      if (!currentUser || currentUser.role !== 'OWNER') {
+        showToast('Acceso denegado: Acción reservada exclusivamente para el OWNER.', 'error');
+        return false;
+      }
+      return true;
+    }
+
     function contactWhatsapp(text) {
       const phone = "51904016110";
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
@@ -1853,6 +1976,11 @@
     function handleLoginSubmit(e) {
       e.preventDefault();
 
+      if (lockoutRemainingSeconds > 0) {
+        showToast(`Acceso bloqueado por seguridad (${lockoutRemainingSeconds}s). Por favor espera.`, 'error');
+        return;
+      }
+
       const u = document.getElementById('auth-user').value.trim();
       const p = document.getElementById('auth-pass').value.trim();
       const selectedRadio = document.querySelector('input[name="device-mode"]:checked');
@@ -1866,6 +1994,7 @@
       const user = localDB.users.find(x => x.username.toLowerCase() === u.toLowerCase());
 
       if (user && user.password === p) {
+        loginFailedAttempts = 0;
         currentUser = user;
         
         const now = new Date();
@@ -1888,7 +2017,21 @@
         switchNav('store');
         showToast(`Bienvenido ${user.username}`, 'success');
       } else {
-        showToast('Usuario o contraseña incorrectos.', 'error');
+        loginFailedAttempts++;
+        if (loginFailedAttempts >= 5) {
+          lockoutRemainingSeconds = 45;
+          showToast('Demasiados intentos fallidos. Bloqueado temporalmente por 45s.', 'error');
+          clearInterval(lockoutInterval);
+          lockoutInterval = setInterval(() => {
+            lockoutRemainingSeconds--;
+            if (lockoutRemainingSeconds <= 0) {
+              clearInterval(lockoutInterval);
+              loginFailedAttempts = 0;
+            }
+          }, 1000);
+        } else {
+          showToast(`Usuario o contraseña incorrectos. (Intento ${loginFailedAttempts} de 5)`, 'error');
+        }
       }
     }
 
@@ -2507,6 +2650,137 @@
       });
     }
 
+    function updateGlobalPricePreview() {
+      const type = document.getElementById('global-adjust-type')?.value;
+      const valInput = document.getElementById('global-adjust-val');
+      const target = document.getElementById('global-adjust-target')?.value || 'ALL';
+      const label = document.getElementById('global-adjust-val-label');
+      const textEl = document.getElementById('global-preview-text');
+      const sampleEl = document.getElementById('global-preview-sample');
+
+      if (!type || !valInput || !textEl || !sampleEl) return;
+      const val = parseFloat(valInput.value) || 0;
+
+      if (label) {
+        if (type.includes('PERCENT')) {
+          label.textContent = 'Porcentaje de Ajuste (%)';
+        } else {
+          label.textContent = 'Monto Fijo en USD ($)';
+        }
+      }
+
+      const products = localDB.products || DEFAULT_PRODUCTS;
+      const targetProds = products.filter(p => {
+        if (target === 'AUTO') return p.deliveryType !== 'WHATSAPP';
+        if (target === 'WHATSAPP') return p.deliveryType === 'WHATSAPP';
+        return true;
+      });
+
+      if (targetProds.length === 0) {
+        textEl.textContent = 'No hay plataformas en la categoría seleccionada.';
+        sampleEl.textContent = '';
+        return;
+      }
+
+      const sample = targetProds[0];
+      const curPrice = sample.priceUSD !== undefined ? sample.priceUSD : ((sample.price || 0) / 3.75);
+      let calculated = curPrice;
+
+      if (type === 'DISCOUNT_PERCENT') {
+        calculated = curPrice * (1 - (val / 100));
+      } else if (type === 'INCREASE_PERCENT') {
+        calculated = curPrice * (1 + (val / 100));
+      } else if (type === 'DISCOUNT_FIXED') {
+        calculated = curPrice - val;
+      } else if (type === 'INCREASE_FIXED') {
+        calculated = curPrice + val;
+      }
+
+      calculated = Math.max(0.10, calculated);
+
+      const actionText = type.startsWith('DISCOUNT') ? 'Descuento' : 'Aumento';
+      textEl.textContent = `Afectará a ${targetProds.length} planes. Ejemplo (${sample.name}):`;
+      sampleEl.innerHTML = `<span style="text-decoration:line-through; color:var(--text-dim); margin-right:4px;">$${curPrice.toFixed(2)}</span> ➜ <span style="color:${type.startsWith('DISCOUNT') ? 'var(--accent-emerald)' : 'var(--accent-gold)'}; font-size:0.95rem;">$${calculated.toFixed(2)} USD</span>`;
+    }
+
+    function handleApplyGlobalPriceAdjustment(e) {
+      e.preventDefault();
+      if (!requireOwner()) return;
+
+      const type = document.getElementById('global-adjust-type').value;
+      const val = parseFloat(document.getElementById('global-adjust-val').value) || 0;
+      const target = document.getElementById('global-adjust-target').value;
+
+      if (val <= 0) {
+        showToast('Ingresa un valor positivo válido para el ajuste.', 'error');
+        return;
+      }
+
+      let modifiedCount = 0;
+      localDB.products = (localDB.products || []).map(p => {
+        const isWa = (p.deliveryType === 'WHATSAPP');
+        let shouldModify = false;
+        if (target === 'ALL') shouldModify = true;
+        else if (target === 'AUTO' && !isWa) shouldModify = true;
+        else if (target === 'WHATSAPP' && isWa) shouldModify = true;
+
+        if (!shouldModify) return p;
+
+        let curUSD = p.priceUSD !== undefined ? p.priceUSD : ((p.price || 0) / 3.75);
+        let newUSD = curUSD;
+
+        if (type === 'DISCOUNT_PERCENT') {
+          newUSD = curUSD * (1 - (val / 100));
+        } else if (type === 'INCREASE_PERCENT') {
+          newUSD = curUSD * (1 + (val / 100));
+        } else if (type === 'DISCOUNT_FIXED') {
+          newUSD = curUSD - val;
+        } else if (type === 'INCREASE_FIXED') {
+          newUSD = curUSD + val;
+        }
+
+        // Mínimo 0.10 USD
+        newUSD = Math.max(0.10, parseFloat(newUSD.toFixed(2)));
+
+        modifiedCount++;
+        return {
+          ...p,
+          priceUSD: newUSD,
+          price: parseFloat((newUSD * 3.75).toFixed(2))
+        };
+      });
+
+      if (db) {
+        db.ref('levi_stream/products').set(localDB.products)
+          .then(() => {
+            showToast(`¡Se aplicó el ajuste a ${modifiedCount} productos con éxito en tiempo real!`, 'success');
+          })
+          .catch(() => {
+            showToast('Ajuste guardado localmente.', 'info');
+          });
+      } else {
+        showToast(`Ajuste aplicado a ${modifiedCount} productos en modo local.`, 'success');
+      }
+
+      renderOwnerProducts();
+      renderStore();
+      populateStockSelectors();
+      updateGlobalPricePreview();
+    }
+
+    function restoreDefaultProductPrices() {
+      if (!requireOwner()) return;
+      localDB.products = DEFAULT_PRODUCTS.map(p => ({ ...p }));
+      if (db) {
+        db.ref('levi_stream/products').set(localDB.products);
+      }
+      renderOwnerProducts();
+      renderStore();
+      populateStockSelectors();
+      updateGlobalPricePreview();
+      showToast('Precios de fábrica restaurados para todos los planes.', 'info');
+    }
+
     function updateStockCounterView() {
       const countTotal = localDB.stock.length;
       const countAvail = localDB.stock.filter(s => {
@@ -2523,6 +2797,7 @@
 
     function handleAddStock(e) {
       e.preventDefault();
+      if (!requireOwner()) return;
       const prodId = document.getElementById('stock-product-select').value;
       const raw = document.getElementById('stock-raw').value;
 
@@ -2575,6 +2850,22 @@
       showToast(`¡Correcto! Se cargaron ${addedCount} cuentas al inventario.`, 'success');
     }
 
+    function resetStockUsage(stockId) {
+      if (!requireOwner()) return;
+      const item = localDB.stock.find(s => s.id === stockId);
+      if (!item) return;
+
+      const previousSold = item.soldCount || 0;
+      item.soldCount = 0;
+
+      pushToCloud();
+      renderOwnerStock();
+      updateStockCounterView();
+      renderStore();
+
+      showToast(`Cuenta restablecida con éxito. Cupos restaurados de ${previousSold} a 0 usos.`, 'success');
+    }
+
     function renderOwnerStock() {
       const tbody = document.getElementById('owner-stock-tbody');
       if (!tbody) return;
@@ -2597,17 +2888,32 @@
         const maxCap = (prod.devices === 1) ? 2 : 1;
         const sold = item.soldCount || 0;
         const isAvailable = (sold < maxCap);
+        const percent = Math.min(100, Math.round((sold / maxCap) * 100));
+
+        let usageIndicator = '';
+        if (sold === 0) {
+          usageIndicator = `<span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-regular fa-circle"></i> 0 / ${maxCap} (Sin usar)</span>`;
+        } else if (isAvailable) {
+          usageIndicator = `<span style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;"><i class="fa-solid fa-clock-rotate-left"></i> ${sold} / ${maxCap} (${percent}% en uso)</span>`;
+        } else {
+          usageIndicator = `<span style="font-size:0.75rem; color:var(--accent-red); font-weight:700;"><i class="fa-solid fa-ban"></i> ${sold} / ${maxCap} (100% Utilizada)</span>`;
+        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="color:var(--text-dim); font-weight:700;">#${index + 1}</td>
           <td>${escapeHtml(prod.name)}</td>
           <td><code>${escapeHtml(item.user)}:${escapeHtml(item.pass)}</code></td>
-          <td>${sold} / ${maxCap}</td>
-          <td><span style="color: ${isAvailable ? 'var(--accent-emerald)' : 'var(--accent-red)'}; font-weight:700;">${isAvailable ? 'DISPONIBLE' : 'AGOTADA'}</span></td>
+          <td>${usageIndicator}</td>
           <td>
-            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px;" onclick="openEditStock('${item.id}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px;" onclick="deleteStock('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+            <span style="color: ${isAvailable ? 'var(--accent-emerald)' : 'var(--accent-red)'}; font-weight:700; padding:3px 7px; border-radius:5px; font-size:0.74rem; background:${isAvailable ? 'rgba(16,185,129,0.14)' : 'rgba(239,68,68,0.14)'};">
+              ${isAvailable ? 'DISPONIBLE' : 'AGOTADA'}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px; color:var(--accent-cyan); border-color:rgba(0,210,255,0.35);" onclick="resetStockUsage('${item.id}')" title="Restablecer cupos a 0 para volver a utilizar la cuenta"><i class="fa-solid fa-rotate-left"></i> Restablecer</button>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px;" onclick="openEditStock('${item.id}')" title="Editar credenciales"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px;" onclick="deleteStock('${item.id}')" title="Eliminar del stock"><i class="fa-solid fa-trash"></i></button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -2677,6 +2983,7 @@
     }
 
     function clearFilteredStock() {
+      if (!requireOwner()) return;
       const filterVal = document.getElementById('stock-filter-product').value;
       if (filterVal === 'ALL') {
         localDB.stock = [];
@@ -2707,6 +3014,7 @@
 
     function handleSaveEditedGeneratedAccount(e) {
       e.preventDefault();
+      if (!requireOwner()) return;
       const stockId = document.getElementById('edit-gen-stock-id').value;
       const newUser = document.getElementById('edit-gen-user').value.trim();
       const newPass = document.getElementById('edit-gen-pass').value.trim();
@@ -2724,13 +3032,34 @@
       showToast('Credenciales actualizadas y sincronizadas con el comprador.', 'success');
     }
 
+    function toggleHidePurchaseForClient(purchaseId) {
+      if (!requireOwner()) return;
+      const pur = localDB.purchases.find(p => p.id === purchaseId);
+      if (!pur) return;
+
+      pur.deletedForClient = !pur.deletedForClient;
+
+      pushToCloud();
+      renderOwnerAuditTable();
+
+      if (currentUser && currentUser.username.toLowerCase() === pur.buyerUsername.toLowerCase()) {
+        renderOrders();
+      }
+
+      if (pur.deletedForClient) {
+        showToast(`Cuenta oculta para "${pur.buyerUsername}". Ya NO aparecerá en su Historial de Compras (solo tú el dueño la ves aquí).`, 'info');
+      } else {
+        showToast(`Cuenta visible nuevamente para "${pur.buyerUsername}". Volverá a aparecer en su Historial de Compras.`, 'success');
+      }
+    }
+
     function renderOwnerAuditTable() {
       const tbody = document.getElementById('owner-audit-tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
       if (localDB.purchases.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">Sin compras registradas.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:20px;">Sin compras registradas.</td></tr>`;
         return;
       }
 
@@ -2742,6 +3071,11 @@
         const expirationDateObj = new Date(purchaseDateObj.getTime() + (days * 24 * 60 * 60 * 1000));
         const isExpired = Date.now() > expirationDateObj.getTime();
         const formattedExpDate = expirationDateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        const isHiddenForClient = !!item.deletedForClient;
+        const clientVisibilityBadge = isHiddenForClient
+          ? `<span style="font-weight:700; padding:3px 7px; border-radius:6px; font-size:0.74rem; background:rgba(239,68,68,0.18); color:#fca5a5; border:1px solid rgba(239,68,68,0.35);"><i class="fa-solid fa-eye-slash"></i> Oculta p/ cliente</span>`
+          : `<span style="font-weight:700; padding:3px 7px; border-radius:6px; font-size:0.74rem; background:rgba(16,185,129,0.18); color:#10b981; border:1px solid rgba(16,185,129,0.35);"><i class="fa-solid fa-eye"></i> Visible p/ cliente</span>`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -2755,8 +3089,12 @@
               ${isExpired ? `Venció: ${formattedExpDate}` : `Expira: ${formattedExpDate}`}
             </span>
           </td>
+          <td>${clientVisibilityBadge}</td>
           <td>
-            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px;" onclick="openEditGeneratedAccountModal('${item.id}')">
+            <button class="btn ${isHiddenForClient ? 'btn-success' : 'btn-danger'}" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px;" onclick="toggleHidePurchaseForClient('${item.id}')" title="${isHiddenForClient ? 'Volver a mostrar en el historial del comprador' : 'Ocultar solo para el comprador (no se verá en su historial de compras)'}">
+              <i class="fa-solid ${isHiddenForClient ? 'fa-eye' : 'fa-eye-slash'}"></i> ${isHiddenForClient ? 'Mostrar' : 'Ocultar'}
+            </button>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.72rem; min-height:28px;" onclick="openEditGeneratedAccountModal('${item.id}')" title="Editar credenciales">
               <i class="fa-solid fa-pen"></i> Editar
             </button>
           </td>
@@ -2766,7 +3104,7 @@
     }
 
     function modifyOwnerBalance(isAdd) {
-      if (!currentUser) return;
+      if (!requireOwner()) return;
       const delta = 50;
       const idx = localDB.users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
       if (idx !== -1) {
@@ -2782,6 +3120,7 @@
 
     function handleOwnerCreateUser(e) {
       e.preventDefault();
+      if (!requireOwner()) return;
       const u = document.getElementById('ow-name').value.trim();
       const p = document.getElementById('ow-pass').value.trim();
       const r = document.getElementById('ow-role').value;
@@ -2809,6 +3148,143 @@
       showToast(`Usuario ${u} creado exitosamente.`, 'success');
     }
 
+    function toggleUserTablePassword(elId) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const real = el.getAttribute('data-real');
+      if (el.textContent === '••••••••') {
+        el.textContent = real;
+      } else {
+        el.textContent = '••••••••';
+      }
+    }
+
+    let currentBalanceMode = 'ADD'; // 'ADD', 'SUB', 'SET'
+
+    function selectBalanceMode(mode) {
+      currentBalanceMode = mode;
+      document.querySelectorAll('.bal-mode-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'rgba(255,255,255,0.05)';
+        b.style.borderColor = 'var(--border-color)';
+        b.style.color = '#fff';
+      });
+
+      const activeBtn = document.getElementById(`bal-mode-${mode.toLowerCase()}`);
+      const label = document.getElementById('edit-bal-amount-label');
+
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        if (mode === 'ADD') {
+          activeBtn.style.background = 'rgba(16, 185, 129, 0.18)';
+          activeBtn.style.borderColor = 'var(--accent-emerald)';
+          activeBtn.style.color = 'var(--accent-emerald)';
+          if (label) label.textContent = 'Monto a Sumar (USD $)';
+        } else if (mode === 'SUB') {
+          activeBtn.style.background = 'rgba(239, 68, 68, 0.18)';
+          activeBtn.style.borderColor = 'var(--accent-red)';
+          activeBtn.style.color = '#f87171';
+          if (label) label.textContent = 'Monto a Restar / Descontar (USD $)';
+        } else if (mode === 'SET') {
+          activeBtn.style.background = 'rgba(0, 210, 255, 0.18)';
+          activeBtn.style.borderColor = 'var(--accent-cyan)';
+          activeBtn.style.color = 'var(--accent-cyan)';
+          if (label) label.textContent = 'Nuevo Saldo Exacto a Fijar (USD $)';
+        }
+      }
+
+      calcBalanceModalPreview();
+    }
+
+    function setQuickBalanceVal(val) {
+      const input = document.getElementById('edit-bal-input-amount');
+      if (input) {
+        input.value = val;
+        calcBalanceModalPreview();
+      }
+    }
+
+    function openEditUserBalanceModal(username) {
+      if (!requireOwner()) return;
+      const user = localDB.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (!user) {
+        showToast('Usuario no encontrado.', 'error');
+        return;
+      }
+
+      document.getElementById('edit-bal-username-hidden').value = user.username;
+      document.getElementById('edit-bal-target-user').textContent = user.username;
+      document.getElementById('edit-bal-current-display').textContent = `$${(user.balance || 0).toFixed(2)} USD`;
+      document.getElementById('edit-bal-input-amount').value = '10';
+
+      selectBalanceMode('ADD');
+      document.getElementById('edit-user-balance-modal').style.display = 'flex';
+    }
+
+    function calcBalanceModalPreview() {
+      const username = document.getElementById('edit-bal-username-hidden')?.value;
+      const inputVal = parseFloat(document.getElementById('edit-bal-input-amount')?.value) || 0;
+      const previewEl = document.getElementById('edit-bal-preview-result');
+      if (!username || !previewEl) return;
+
+      const user = localDB.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      const current = user ? (user.balance || 0) : 0;
+      let finalBal = current;
+
+      if (currentBalanceMode === 'ADD') {
+        finalBal = current + inputVal;
+      } else if (currentBalanceMode === 'SUB') {
+        finalBal = Math.max(0, current - inputVal);
+      } else if (currentBalanceMode === 'SET') {
+        finalBal = Math.max(0, inputVal);
+      }
+
+      previewEl.textContent = `$${finalBal.toFixed(2)} USD`;
+    }
+
+    function handleSaveUserBalance(e) {
+      e.preventDefault();
+      if (!requireOwner()) return;
+
+      const username = document.getElementById('edit-bal-username-hidden').value;
+      const inputVal = parseFloat(document.getElementById('edit-bal-input-amount').value) || 0;
+
+      const idx = localDB.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+      if (idx === -1) {
+        showToast('Usuario no encontrado.', 'error');
+        return;
+      }
+
+      const prevBal = localDB.users[idx].balance || 0;
+      let newBal = prevBal;
+
+      if (currentBalanceMode === 'ADD') {
+        newBal = prevBal + inputVal;
+      } else if (currentBalanceMode === 'SUB') {
+        newBal = Math.max(0, prevBal - inputVal);
+      } else if (currentBalanceMode === 'SET') {
+        newBal = Math.max(0, inputVal);
+      }
+
+      localDB.users[idx].balance = parseFloat(newBal.toFixed(2));
+
+      if (currentUser && currentUser.username.toLowerCase() === username.toLowerCase()) {
+        currentUser.balance = localDB.users[idx].balance;
+      }
+
+      pushToCloud();
+      updateUI();
+      renderOwnerUsers();
+      closeModal('edit-user-balance-modal');
+
+      let actionDesc = '';
+      if (currentBalanceMode === 'ADD') actionDesc = `Se agregaron +$${inputVal.toFixed(2)} USD`;
+      else if (currentBalanceMode === 'SUB') actionDesc = `Se descontaron -$${inputVal.toFixed(2)} USD`;
+      else actionDesc = `Saldo fijado en $${inputVal.toFixed(2)} USD`;
+
+      showToast(`¡Saldo actualizado para ${username}! (${actionDesc}) -> Total: $${newBal.toFixed(2)} USD`, 'success');
+    }
+
     function renderOwnerUsers() {
       const tbody = document.getElementById('owner-users-tbody');
       if (!tbody) return;
@@ -2816,17 +3292,29 @@
 
       localDB.users.forEach(u => {
         const isFounder = (u.username.toLowerCase() === 'eriikadmin');
+        const userPassElId = 'usr-pwd-' + u.id;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="font-weight:700;">${escapeHtml(u.username)}</td>
-          <td><code>${escapeHtml(u.password)}</code></td>
+          <td>
+            <span style="display:inline-flex; align-items:center; gap:6px;">
+              <code id="${userPassElId}" data-real="${escapeHtml(u.password)}" style="letter-spacing:1px;">••••••••</code>
+              <button type="button" class="btn btn-secondary" style="padding:2px 6px; font-size:0.68rem; min-height:24px;" onclick="toggleUserTablePassword('${userPassElId}')" title="Mostrar/Ocultar contraseña">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </span>
+          </td>
           <td><span class="role-badge">${escapeHtml(u.role)}</span></td>
-          <td style="color:var(--accent-emerald); font-weight:700;">$${(u.balance || 0).toFixed(2)} USD</td>
+          <td style="color:var(--accent-emerald); font-weight:700; font-size:0.95rem;">$${(u.balance || 0).toFixed(2)} USD</td>
           <td style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(u.lastLogin || 'Nunca')} (${escapeHtml(u.lastDevice || '-')})</td>
           <td><span style="font-size:0.72rem; padding:3px 7px; border-radius:6px; background:rgba(255,255,255,0.05); font-weight:600;">${escapeHtml(u.creator || 'FUNDADOR (EriikAdmin)')}</span></td>
           <td>
-            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.72rem; min-height:28px;" onclick="adminAddBalance('${escapeHtml(u.username)}', 10)">+$10 USD</button>
-            ${!isFounder ? `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.72rem; min-height:28px;" onclick="adminDeleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button class="btn btn-primary" style="padding:4px 10px; font-size:0.72rem; min-height:28px; background:linear-gradient(135deg, var(--accent-red), #b91c1c);" onclick="openEditUserBalanceModal('${escapeHtml(u.username)}')" title="Editar, sumar, restar o fijar saldo">
+                <i class="fa-solid fa-pen-to-square"></i> Editar Saldo
+              </button>
+              ${!isFounder ? `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.72rem; min-height:28px;" onclick="adminDeleteUser('${u.id}')" title="Eliminar usuario"><i class="fa-solid fa-trash"></i></button>` : ''}
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -2834,6 +3322,7 @@
     }
 
     function adminAddBalance(username, amt) {
+      if (!requireOwner()) return;
       const idx = localDB.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
       if (idx !== -1) {
         localDB.users[idx].balance = (localDB.users[idx].balance || 0) + amt;
@@ -2848,6 +3337,7 @@
     }
 
     function adminDeleteUser(id) {
+      if (!requireOwner()) return;
       localDB.users = localDB.users.filter(u => u.id !== id);
       pushToCloud();
       renderOwnerUsers();
@@ -3283,6 +3773,11 @@
       
       const currSelect = document.getElementById('global-currency-select');
       if (currSelect) currSelect.value = currentCurrency;
+
+      // Inicializar preview de ajuste global si el form existe
+      if (document.getElementById('global-adjust-val')) {
+        updateGlobalPricePreview();
+      }
     });
   </script>
 </body>
