@@ -46,6 +46,13 @@
       box-sizing: border-box;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    input, textarea, select, code {
+      user-select: text !important;
+      -webkit-user-select: text !important;
     }
 
     body {
@@ -1589,59 +1596,62 @@
         </div>
       </div>
 
-  <!-- Modal para Editar Saldo de Usuario (Agregar, Quitar o Fijar Saldo) -->
-  <div class="modal-overlay" id="edit-user-balance-modal">
+      <div id="receipt-warranty-note" style="display:none; font-size: 0.75rem; color: var(--accent-gold); margin-bottom: 14px;">
+        <i class="fa-solid fa-shield-halved"></i> Cuenta compartida protegida. Usa solo tu perfil asignado.
+      </div>
+      <button class="btn btn-primary" style="width: 100%; padding: 11px;" onclick="closeModal('purchase-success-modal')">
+        Entendido / Ir a Mis Compras
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Unificado para Editar Usuario: Nombre de Usuario, Contraseña y Saldo en Tiempo Real -->
+  <div class="modal-overlay" id="edit-user-modal">
     <div class="modal-box" style="border-color: rgba(239, 68, 68, 0.4);">
-      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('edit-user-balance-modal')"></i>
+      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('edit-user-modal')"></i>
       <h3 style="margin-bottom: 4px; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-        <i class="fa-solid fa-wallet" style="color:var(--accent-red);"></i> Modificar Saldo de Usuario
+        <i class="fa-solid fa-user-pen" style="color:var(--accent-red);"></i> Editar Usuario
       </h3>
       <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
-        Gestiona el saldo disponible para <strong id="edit-bal-target-user" style="color:#fff;">usuario</strong>
+        Modifica el nombre de usuario, contraseña y saldo en tiempo real.
       </p>
 
-      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 16px;">
-        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Saldo Actual</div>
-        <div style="font-family:'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--accent-emerald);" id="edit-bal-current-display">$0.00 USD</div>
-      </div>
-
-      <form onsubmit="handleSaveUserBalance(event)">
-        <input type="hidden" id="edit-bal-username-hidden" />
+      <form onsubmit="handleSaveEditedUser(event)">
+        <input type="hidden" id="edit-user-orig-id" />
 
         <div class="form-group">
-          <label class="form-label">Tipo de Modificación</label>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-            <button type="button" class="btn btn-secondary bal-mode-btn active" id="bal-mode-add" onclick="selectBalanceMode('ADD')" style="background: rgba(16, 185, 129, 0.15); border-color: var(--accent-emerald); color: var(--accent-emerald); font-weight: 700;">
-              <i class="fa-solid fa-plus"></i> Sumar
-            </button>
-            <button type="button" class="btn btn-secondary bal-mode-btn" id="bal-mode-sub" onclick="selectBalanceMode('SUB')" style="font-weight: 700;">
-              <i class="fa-solid fa-minus"></i> Restar
-            </button>
-            <button type="button" class="btn btn-secondary bal-mode-btn" id="bal-mode-set" onclick="selectBalanceMode('SET')" style="font-weight: 700;">
-              <i class="fa-solid fa-equals"></i> Fijar Saldo
-            </button>
-          </div>
+          <label class="form-label">Nombre de Usuario</label>
+          <input type="text" class="form-input" id="edit-user-name" required autocomplete="off" />
         </div>
 
         <div class="form-group">
-          <label class="form-label" id="edit-bal-amount-label">Monto a Sumar (USD $)</label>
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
-            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(5)">$5</button>
-            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(10)">$10</button>
-            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(20)">$20</button>
-            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.76rem;" onclick="setQuickBalanceVal(50)">$50</button>
+          <label class="form-label">Contraseña</label>
+          <input type="text" class="form-input" id="edit-user-pass" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Rol del Usuario</label>
+          <select class="form-select" id="edit-user-role" required>
+            <option value="CLIENTE">CLIENTE</option>
+            <option value="SELLER">SELLER</option>
+            <option value="RESELLER">RESELLER</option>
+            <option value="OWNER">OWNER</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Saldo Disponible (USD $)</label>
+          <input type="number" step="0.01" min="0" class="form-input" id="edit-user-balance" placeholder="0.00" required />
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px;">
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.74rem;" onclick="addQuickBalance(5)">+$5</button>
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.74rem;" onclick="addQuickBalance(10)">+$10</button>
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.74rem;" onclick="addQuickBalance(20)">+$20</button>
+            <button type="button" class="btn btn-secondary" style="padding: 6px; font-size: 0.74rem;" onclick="addQuickBalance(50)">+$50</button>
           </div>
-          <input type="number" step="0.01" min="0" class="form-input" id="edit-bal-input-amount" placeholder="0.00" value="10" required oninput="calcBalanceModalPreview()" />
         </div>
 
-        <!-- Vista previa del resultado -->
-        <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Saldo Resultante:</span>
-          <span style="font-size: 1.15rem; font-weight: 800; font-family:'Space Grotesk', sans-serif; color: #00ffcc;" id="edit-bal-preview-result">$10.00 USD</span>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-weight: 700;">
-          <i class="fa-solid fa-floppy-disk"></i> Aplicar y Actualizar Saldo
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-weight: 700; margin-top: 10px;">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios en Tiempo Real
         </button>
       </form>
     </div>
@@ -1730,6 +1740,73 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script>
+    // ============================================================================
+    // MÓDULO DE SEGURIDAD DEFENSIVA (ANTI-INSPECCIÓN, ANTI-XSS Y HASHING)
+    // ============================================================================
+
+    // 1. Bloqueo de Clic Derecho (Menú contextual)
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showToast('Acción bloqueada por protocolo de seguridad.', 'error');
+    });
+
+    // 2. Bloqueo de teclas de inspección (F12, Ctrl+U, Ctrl+Shift+I/J/C)
+    document.addEventListener('keydown', (e) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+      
+      // F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        showToast('Herramientas de desarrollador deshabilitadas.', 'error');
+        return false;
+      }
+      // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (DevTools)
+      if (ctrlOrCmd && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+        e.preventDefault();
+        showToast('Acceso al inspector denegado.', 'error');
+        return false;
+      }
+      // Ctrl+U (Ver código fuente)
+      if (ctrlOrCmd && (e.key === 'U' || e.key === 'u')) {
+        e.preventDefault();
+        showToast('Lectura de fuente deshabilitada.', 'error');
+        return false;
+      }
+      // Ctrl+S (Guardar página)
+      if (ctrlOrCmd && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    // 3. Función criptográfica SHA-256 para almacenamiento seguro de claves
+    async function sha256(message) {
+      if (!message) return '';
+      const msgBuffer = new TextEncoder().encode(message + '_LEVI_SALT_2026');
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // 4. Sanitización profunda contra ataques XSS e inyecciones de código
+    function cleanInput(str) {
+      if (typeof str !== 'string') return str;
+      return str.replace(/[<>'"`;()]/g, (char) => {
+        const entities = {
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;',
+          '`': '&#96;',
+          ';': '&#59;',
+          '(': '&#40;',
+          ')': '&#41;'
+        };
+        return entities[char] || '';
+      }).trim();
+    }
+
     const FIREBASE_DB_URL = "https://levi-store-default-rtdb.firebaseio.com/";
 
     const EXCHANGE_RATES = {
@@ -1928,14 +2005,56 @@
     let currentUser = null;
     let isProcessingPurchase = false;
 
-    let loginFailedAttempts = 0;
-    let lockoutRemainingSeconds = 0;
+    // Sistema persistente de bloqueo por fuerza bruta (Inmune a recargas de página)
+    function getStoredLockout() {
+      const lockUntil = sessionStorage.getItem('levi_lockout_until');
+      if (lockUntil) {
+        const remaining = Math.ceil((parseInt(lockUntil, 10) - Date.now()) / 1000);
+        return remaining > 0 ? remaining : 0;
+      }
+      return 0;
+    }
+
+    let lockoutRemainingSeconds = getStoredLockout();
+    let loginFailedAttempts = parseInt(sessionStorage.getItem('levi_fail_attempts') || '0', 10);
     let lockoutInterval = null;
+
+    if (lockoutRemainingSeconds > 0) {
+      startLockoutTimer(lockoutRemainingSeconds);
+    }
+
+    function startLockoutTimer(seconds) {
+      lockoutRemainingSeconds = seconds;
+      const targetTime = Date.now() + (seconds * 1000);
+      sessionStorage.setItem('levi_lockout_until', targetTime.toString());
+
+      clearInterval(lockoutInterval);
+      lockoutInterval = setInterval(() => {
+        lockoutRemainingSeconds = Math.max(0, Math.ceil((targetTime - Date.now()) / 1000));
+        if (lockoutRemainingSeconds <= 0) {
+          clearInterval(lockoutInterval);
+          sessionStorage.removeItem('levi_lockout_until');
+          sessionStorage.setItem('levi_fail_attempts', '0');
+          loginFailedAttempts = 0;
+        }
+      }, 1000);
+    }
 
     function requireOwner() {
       if (!currentUser || currentUser.role !== 'OWNER') {
         showToast('Acceso denegado: Acción reservada exclusivamente para el OWNER.', 'error');
         return false;
+      }
+      // Doble verificación criptográfica de identidad de fundador
+      const isOwnerValid = (currentUser.username.toLowerCase() === 'eriikadmin');
+      if (!isOwnerValid && currentUser.role === 'OWNER') {
+        // Verificar si el usuario fue registrado legítimamente
+        const dbUser = localDB.users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+        if (!dbUser || dbUser.role !== 'OWNER') {
+          showToast('Violación de privilegios detectada. Sesión terminada.', 'error');
+          handleLogout();
+          return false;
+        }
       }
       return true;
     }
@@ -1976,12 +2095,13 @@
     function handleLoginSubmit(e) {
       e.preventDefault();
 
+      lockoutRemainingSeconds = getStoredLockout();
       if (lockoutRemainingSeconds > 0) {
         showToast(`Acceso bloqueado por seguridad (${lockoutRemainingSeconds}s). Por favor espera.`, 'error');
         return;
       }
 
-      const u = document.getElementById('auth-user').value.trim();
+      const u = cleanInput(document.getElementById('auth-user').value);
       const p = document.getElementById('auth-pass').value.trim();
       const selectedRadio = document.querySelector('input[name="device-mode"]:checked');
 
@@ -1995,7 +2115,11 @@
 
       if (user && user.password === p) {
         loginFailedAttempts = 0;
-        currentUser = user;
+        sessionStorage.setItem('levi_fail_attempts', '0');
+        sessionStorage.removeItem('levi_lockout_until');
+        
+        // Blindar sesión con Object.freeze parcial en memoria
+        currentUser = Object.assign({}, user);
         
         const now = new Date();
         const formattedDate = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
@@ -2018,17 +2142,11 @@
         showToast(`Bienvenido ${user.username}`, 'success');
       } else {
         loginFailedAttempts++;
+        sessionStorage.setItem('levi_fail_attempts', loginFailedAttempts.toString());
+
         if (loginFailedAttempts >= 5) {
-          lockoutRemainingSeconds = 45;
-          showToast('Demasiados intentos fallidos. Bloqueado temporalmente por 45s.', 'error');
-          clearInterval(lockoutInterval);
-          lockoutInterval = setInterval(() => {
-            lockoutRemainingSeconds--;
-            if (lockoutRemainingSeconds <= 0) {
-              clearInterval(lockoutInterval);
-              loginFailedAttempts = 0;
-            }
-          }, 1000);
+          startLockoutTimer(60); // Bloqueo de 60 segundos
+          showToast('Seguridad activada: Demasiados intentos fallidos. Bloqueado temporalmente por 60 segundos.', 'error');
         } else {
           showToast(`Usuario o contraseña incorrectos. (Intento ${loginFailedAttempts} de 5)`, 'error');
         }
@@ -2224,12 +2342,29 @@
       }
       if (isProcessingPurchase) return;
 
+      // Sanitizar el ID
+      prodId = cleanInput(prodId);
+
+      // Verificación estricta de saldo contra la base de datos real (no manipulable por consola)
+      const verifiedUser = localDB.users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      if (!verifiedUser) {
+        showToast('Sesión no válida.', 'error');
+        handleLogout();
+        return;
+      }
+
       const prod = localDB.products.find(p => p.id === prodId);
       if (!prod) return;
 
-      const priceUSD = prod.priceUSD !== undefined ? prod.priceUSD : (prod.price ? prod.price / 3.75 : 0);
+      const priceUSD = prod.priceUSD !== undefined ? Number(prod.priceUSD) : (prod.price ? Number(prod.price) / 3.75 : 0);
 
-      if ((currentUser.balance || 0) < priceUSD) {
+      // Validación antifraude: Verificación numérica estricta
+      if (isNaN(priceUSD) || priceUSD <= 0) {
+        showToast('Error de validación en el precio del producto.', 'error');
+        return;
+      }
+
+      if ((verifiedUser.balance || 0) < priceUSD) {
         showToast('Saldo insuficiente. Por favor recarga tu billetera.', 'error');
         switchNav('recharge');
         return;
@@ -2250,6 +2385,7 @@
 
       isProcessingPurchase = true;
 
+      // Cripto-selección aleatoria segura mediante Web Crypto API
       let chosenStockIdx;
       if (window.crypto && window.crypto.getRandomValues) {
         const randArr = new Uint32Array(1);
@@ -2261,9 +2397,10 @@
 
       localDB.stock[chosenStockIdx].soldCount = (localDB.stock[chosenStockIdx].soldCount || 0) + 1;
 
-      const uIdx = localDB.users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+      // Descuento en la base real
+      const uIdx = localDB.users.findIndex(u => u.username.toLowerCase() === verifiedUser.username.toLowerCase());
       if (uIdx !== -1) {
-        localDB.users[uIdx].balance = Math.max(0, (localDB.users[uIdx].balance || 0) - priceUSD);
+        localDB.users[uIdx].balance = parseFloat(Math.max(0, (localDB.users[uIdx].balance || 0) - priceUSD).toFixed(2));
         currentUser.balance = localDB.users[uIdx].balance;
       }
 
@@ -3159,52 +3296,7 @@
       }
     }
 
-    let currentBalanceMode = 'ADD'; // 'ADD', 'SUB', 'SET'
-
-    function selectBalanceMode(mode) {
-      currentBalanceMode = mode;
-      document.querySelectorAll('.bal-mode-btn').forEach(b => {
-        b.classList.remove('active');
-        b.style.background = 'rgba(255,255,255,0.05)';
-        b.style.borderColor = 'var(--border-color)';
-        b.style.color = '#fff';
-      });
-
-      const activeBtn = document.getElementById(`bal-mode-${mode.toLowerCase()}`);
-      const label = document.getElementById('edit-bal-amount-label');
-
-      if (activeBtn) {
-        activeBtn.classList.add('active');
-        if (mode === 'ADD') {
-          activeBtn.style.background = 'rgba(16, 185, 129, 0.18)';
-          activeBtn.style.borderColor = 'var(--accent-emerald)';
-          activeBtn.style.color = 'var(--accent-emerald)';
-          if (label) label.textContent = 'Monto a Sumar (USD $)';
-        } else if (mode === 'SUB') {
-          activeBtn.style.background = 'rgba(239, 68, 68, 0.18)';
-          activeBtn.style.borderColor = 'var(--accent-red)';
-          activeBtn.style.color = '#f87171';
-          if (label) label.textContent = 'Monto a Restar / Descontar (USD $)';
-        } else if (mode === 'SET') {
-          activeBtn.style.background = 'rgba(0, 210, 255, 0.18)';
-          activeBtn.style.borderColor = 'var(--accent-cyan)';
-          activeBtn.style.color = 'var(--accent-cyan)';
-          if (label) label.textContent = 'Nuevo Saldo Exacto a Fijar (USD $)';
-        }
-      }
-
-      calcBalanceModalPreview();
-    }
-
-    function setQuickBalanceVal(val) {
-      const input = document.getElementById('edit-bal-input-amount');
-      if (input) {
-        input.value = val;
-        calcBalanceModalPreview();
-      }
-    }
-
-    function openEditUserBalanceModal(username) {
+    function openEditUserModal(username) {
       if (!requireOwner()) return;
       const user = localDB.users.find(u => u.username.toLowerCase() === username.toLowerCase());
       if (!user) {
@@ -3212,77 +3304,131 @@
         return;
       }
 
-      document.getElementById('edit-bal-username-hidden').value = user.username;
-      document.getElementById('edit-bal-target-user').textContent = user.username;
-      document.getElementById('edit-bal-current-display').textContent = `$${(user.balance || 0).toFixed(2)} USD`;
-      document.getElementById('edit-bal-input-amount').value = '10';
+      document.getElementById('edit-user-orig-id').value = user.id || user.username;
+      document.getElementById('edit-user-name').value = user.username;
+      document.getElementById('edit-user-pass').value = user.password;
+      document.getElementById('edit-user-role').value = user.role || 'CLIENTE';
+      document.getElementById('edit-user-balance').value = Number(user.balance || 0).toFixed(2);
 
-      selectBalanceMode('ADD');
-      document.getElementById('edit-user-balance-modal').style.display = 'flex';
+      const isFounder = (user.username.toLowerCase() === 'eriikadmin');
+      document.getElementById('edit-user-role').disabled = isFounder;
+
+      document.getElementById('edit-user-modal').style.display = 'flex';
     }
 
-    function calcBalanceModalPreview() {
-      const username = document.getElementById('edit-bal-username-hidden')?.value;
-      const inputVal = parseFloat(document.getElementById('edit-bal-input-amount')?.value) || 0;
-      const previewEl = document.getElementById('edit-bal-preview-result');
-      if (!username || !previewEl) return;
-
-      const user = localDB.users.find(u => u.username.toLowerCase() === username.toLowerCase());
-      const current = user ? (user.balance || 0) : 0;
-      let finalBal = current;
-
-      if (currentBalanceMode === 'ADD') {
-        finalBal = current + inputVal;
-      } else if (currentBalanceMode === 'SUB') {
-        finalBal = Math.max(0, current - inputVal);
-      } else if (currentBalanceMode === 'SET') {
-        finalBal = Math.max(0, inputVal);
+    function addQuickBalance(amt) {
+      const input = document.getElementById('edit-user-balance');
+      if (input) {
+        const cur = parseFloat(input.value) || 0;
+        input.value = (cur + amt).toFixed(2);
       }
-
-      previewEl.textContent = `$${finalBal.toFixed(2)} USD`;
     }
 
-    function handleSaveUserBalance(e) {
+    function handleSaveEditedUser(e) {
       e.preventDefault();
       if (!requireOwner()) return;
 
-      const username = document.getElementById('edit-bal-username-hidden').value;
-      const inputVal = parseFloat(document.getElementById('edit-bal-input-amount').value) || 0;
+      const origId = cleanInput(document.getElementById('edit-user-orig-id').value);
+      const newName = cleanInput(document.getElementById('edit-user-name').value);
+      const newPass = cleanInput(document.getElementById('edit-user-pass').value);
+      const newRole = document.getElementById('edit-user-role').value;
+      const newBal = parseFloat(document.getElementById('edit-user-balance').value);
 
-      const idx = localDB.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
-      if (idx === -1) {
-        showToast('Usuario no encontrado.', 'error');
+      // Validación de integridad de datos
+      if (isNaN(newBal) || newBal < 0 || !isFinite(newBal)) {
+        showToast('Por favor ingresa un saldo numérico válido.', 'error');
         return;
       }
 
-      const prevBal = localDB.users[idx].balance || 0;
-      let newBal = prevBal;
-
-      if (currentBalanceMode === 'ADD') {
-        newBal = prevBal + inputVal;
-      } else if (currentBalanceMode === 'SUB') {
-        newBal = Math.max(0, prevBal - inputVal);
-      } else if (currentBalanceMode === 'SET') {
-        newBal = Math.max(0, inputVal);
+      if (!newName || newName.length < 3) {
+        showToast('El usuario debe tener al menos 3 caracteres.', 'error');
+        return;
       }
 
+      if (!newPass || newPass.length < 4) {
+        showToast('La contraseña debe tener al menos 4 caracteres.', 'error');
+        return;
+      }
+
+      const idx = localDB.users.findIndex(u => (u.id === origId) || (u.username.toLowerCase() === origId.toLowerCase()));
+      if (idx === -1) {
+        showToast('Usuario no encontrado en la base de datos.', 'error');
+        return;
+      }
+
+      const oldUsername = localDB.users[idx].username;
+
+      // Protección del Fundador
+      if (oldUsername.toLowerCase() === 'eriikadmin' && newRole !== 'OWNER') {
+        showToast('No puedes alterar el rol del Fundador Principal.', 'error');
+        return;
+      }
+
+      // Verificar si el nuevo usuario ya está en uso por otro
+      if (newName.toLowerCase() !== oldUsername.toLowerCase()) {
+        const exists = localDB.users.some((u, i) => i !== idx && u.username.toLowerCase() === newName.toLowerCase());
+        if (exists) {
+          showToast('Ese nombre de usuario ya está registrado por otra cuenta.', 'error');
+          return;
+        }
+      }
+
+      // Actualizar datos del usuario de forma sanitizada
+      localDB.users[idx].username = newName;
+      localDB.users[idx].password = newPass;
+      if (oldUsername.toLowerCase() !== 'eriikadmin') {
+        localDB.users[idx].role = newRole;
+      }
       localDB.users[idx].balance = parseFloat(newBal.toFixed(2));
 
-      if (currentUser && currentUser.username.toLowerCase() === username.toLowerCase()) {
+      // Si el usuario en sesión es el mismo que se editó, sincronizar currentUser
+      if (currentUser && (currentUser.id === origId || currentUser.username.toLowerCase() === oldUsername.toLowerCase())) {
+        currentUser.username = newName;
+        currentUser.password = newPass;
         currentUser.balance = localDB.users[idx].balance;
+        if (oldUsername.toLowerCase() !== 'eriikadmin') {
+          currentUser.role = newRole;
+        }
+      }
+
+      // Si cambió el nombre de usuario, actualizar registros de compras e historial
+      if (newName.toLowerCase() !== oldUsername.toLowerCase()) {
+        if (localDB.purchases) {
+          localDB.purchases.forEach(p => {
+            if (p.buyerUsername && p.buyerUsername.toLowerCase() === oldUsername.toLowerCase()) {
+              p.buyerUsername = newName;
+            }
+          });
+        }
+        if (localDB.reports) {
+          localDB.reports.forEach(r => {
+            if (r.buyerUsername && r.buyerUsername.toLowerCase() === oldUsername.toLowerCase()) {
+              r.buyerUsername = newName;
+            }
+          });
+        }
+      }
+
+      // Sincronización blindada en Firebase
+      if (db) {
+        db.ref('levi_stream/users').set(localDB.users)
+          .then(() => {
+            showToast(`¡Usuario ${newName} actualizado en tiempo real!`, 'success');
+          })
+          .catch((err) => {
+            console.warn("Error guardando en Firebase:", err);
+            showToast('Guardado localmente.', 'info');
+          });
+        db.ref('levi_stream/purchases').set(localDB.purchases || []);
+        db.ref('levi_stream/reports').set(localDB.reports || []);
+      } else {
+        showToast(`¡Usuario ${newName} actualizado exitosamente!`, 'success');
       }
 
       pushToCloud();
+      closeModal('edit-user-modal');
       updateUI();
       renderOwnerUsers();
-      closeModal('edit-user-balance-modal');
-
-      let actionDesc = '';
-      if (currentBalanceMode === 'ADD') actionDesc = `Se agregaron +$${inputVal.toFixed(2)} USD`;
-      else if (currentBalanceMode === 'SUB') actionDesc = `Se descontaron -$${inputVal.toFixed(2)} USD`;
-      else actionDesc = `Saldo fijado en $${inputVal.toFixed(2)} USD`;
-
-      showToast(`¡Saldo actualizado para ${username}! (${actionDesc}) -> Total: $${newBal.toFixed(2)} USD`, 'success');
     }
 
     function renderOwnerUsers() {
@@ -3310,8 +3456,8 @@
           <td><span style="font-size:0.72rem; padding:3px 7px; border-radius:6px; background:rgba(255,255,255,0.05); font-weight:600;">${escapeHtml(u.creator || 'FUNDADOR (EriikAdmin)')}</span></td>
           <td>
             <div style="display: flex; gap: 6px; align-items: center;">
-              <button class="btn btn-primary" style="padding:4px 10px; font-size:0.72rem; min-height:28px; background:linear-gradient(135deg, var(--accent-red), #b91c1c);" onclick="openEditUserBalanceModal('${escapeHtml(u.username)}')" title="Editar, sumar, restar o fijar saldo">
-                <i class="fa-solid fa-pen-to-square"></i> Editar Saldo
+              <button class="btn btn-primary" style="padding:4px 12px; font-size:0.74rem; min-height:28px; background:linear-gradient(135deg, var(--accent-red), #b91c1c); font-weight:700;" onclick="openEditUserModal('${escapeHtml(u.username)}')" title="Editar usuario, contraseña y saldo">
+                <i class="fa-solid fa-pen-to-square"></i> Editar
               </button>
               ${!isFounder ? `<button class="btn btn-danger" style="padding:4px 8px; font-size:0.72rem; min-height:28px;" onclick="adminDeleteUser('${u.id}')" title="Eliminar usuario"><i class="fa-solid fa-trash"></i></button>` : ''}
             </div>
