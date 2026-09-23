@@ -126,24 +126,26 @@
       transition: background-image 0.3s ease;
     }
 
+    /* Posicionamiento en PC: Casi centrado y desplazado a la derecha */
     body.mode-pc #auth-screen {
       justify-content: flex-end;
       align-items: center;
-      padding: 40px 12vw 40px 40px;
+      padding: 40px 10vw 40px 40px;
       background-position: center center;
     }
 
+    /* Posicionamiento en Móvil: Centrado y ligeramente subido hacia arriba */
     body.mode-mobile #auth-screen {
       justify-content: center;
-      align-items: center;
-      padding: 25px 16px 80px 16px;
+      align-items: flex-start;
+      padding: 45px 16px 80px 16px;
       background-position: center top;
     }
 
     .auth-glass-box {
       width: 100%;
       max-width: 420px;
-      background: rgba(10, 10, 16, 0.55);
+      background: rgba(10, 10, 16, 0.62);
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 24px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(239, 68, 68, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.25);
@@ -158,10 +160,8 @@
     body.mode-mobile .auth-glass-box {
       max-width: 380px;
       padding: 26px 22px;
-      background: rgba(10, 10, 16, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      margin-bottom: 8px;
+      margin-top: 10px;
+      background: rgba(10, 10, 16, 0.72);
     }
 
     .preview-mode-switch {
@@ -787,9 +787,9 @@
       background-position: center top;
       position: relative;
       display: flex;
-      align-items: flex-end;
+      align-items: flex-start;
       justify-content: center;
-      padding: 14px;
+      padding: 24px 14px 14px 14px;
       overflow: hidden;
     }
 
@@ -934,6 +934,7 @@
       z-index: 99990;
     }
 
+    /* Reglas responsivas según modo */
     body.mode-mobile .sidebar {
       background: #0f0f17 !important;
       border-right: 1.5px solid rgba(239, 68, 68, 0.35) !important;
@@ -1600,7 +1601,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 14px;">
             <div>
               <h3 style="font-size: 1.15rem; font-weight: 800;"><i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-gold);"></i> Reportes de Clientes (Solo Owner)</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">Edita la cuenta con fallas y márcala como solucionada. El cliente recibirá un anuncio en el centro de su pantalla.</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Edita la cuenta con fallas y márcala como solucionada.</p>
             </div>
             <button class="btn btn-secondary" onclick="renderOwnerReports()"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
           </div>
@@ -1630,7 +1631,7 @@
         <div class="glass" style="max-width: 580px; margin: 0 auto; padding: 26px 22px;">
           <h3 style="margin-bottom: 6px; font-size: 1.2rem; font-weight: 800;"><i class="fa-solid fa-bullhorn" style="color:var(--accent-red);"></i> Enviar Anuncio al Centro de Pantalla</h3>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
-            Envía anuncios que aparecerán en el centro de la pantalla por 8 segundos con botón X a todos los clientes (Global) o a un cliente en específico (Personalizado).
+            Envía anuncios que aparecerán en el centro de la pantalla por 8 segundos con botón X a todos los clientes (Global) o a un cliente en específico (Personalizado). Se muestra estrictamente 1 sola vez.
           </p>
           <form onsubmit="handleSendBroadcast(event)">
             <div class="form-group">
@@ -2016,7 +2017,8 @@
           balance: 992.06, 
           creator: 'FUNDADOR', 
           lastLogin: '22/09/2026 23:40', 
-          lastDevice: 'PC' 
+          lastDevice: 'PC',
+          seenAnnouncements: []
         }
       ],
       products: DEFAULT_PRODUCTS,
@@ -2116,7 +2118,10 @@
         if (parsed.stock) localDB.stock = parsed.stock;
         if (parsed.purchases) localDB.purchases = parsed.purchases;
         if (parsed.reports) localDB.reports = parsed.reports;
-        if (parsed.notifications) localDB.notifications = parsed.notifications;
+        if (parsed.notifications) {
+          // Limpiar permanentemente cualquier aviso residual de reporte solucionado
+          localDB.notifications = parsed.notifications.filter(n => !n.title?.includes('REPORTE SOLUCIONADO') && !n.id?.startsWith('rep_sol_'));
+        }
         if (parsed.config) localDB.config = parsed.config;
       }
     } catch(e) {}
@@ -2152,7 +2157,11 @@
             }
             if (val.purchases) localDB.purchases = Array.isArray(val.purchases) ? val.purchases.filter(Boolean) : Object.values(val.purchases);
             if (val.reports) localDB.reports = Array.isArray(val.reports) ? val.reports.filter(Boolean) : Object.values(val.reports);
-            if (val.notifications) localDB.notifications = Array.isArray(val.notifications) ? val.notifications.filter(Boolean) : Object.values(val.notifications);
+            if (val.notifications) {
+              const rawN = Array.isArray(val.notifications) ? val.notifications.filter(Boolean) : Object.values(val.notifications);
+              // Purgar de forma estricta el popup de reporte solucionado
+              localDB.notifications = rawN.filter(n => !n.title?.includes('REPORTE SOLUCIONADO') && !n.id?.startsWith('rep_sol_'));
+            }
             if (val.config) {
               localDB.config = val.config;
               applyAdaptiveLoginBackground(currentDeviceMode);
@@ -2359,6 +2368,9 @@
         
         user.lastLogin = dateStr;
         user.lastDevice = deviceType;
+        if (!Array.isArray(user.seenAnnouncements)) {
+          user.seenAnnouncements = [];
+        }
         localDB.users[userIdx] = user;
         pushToCloud(true);
 
@@ -2494,6 +2506,7 @@
       const p = (localDB.products || []).find(x => x.id === prodId);
       if (!p) return;
 
+      // Restricción: Los planes de 12 y 14 meses van siempre por WhatsApp
       if (p.deliveryType === 'WHATSAPP' || p.name.includes('12 M') || p.name.includes('14 M')) {
         contactWhatsapp(`Hola Levi Stream Perú, deseo adquirir el plan: ${p.name} por ${formatMoney(p.priceUSD)}`);
         return;
@@ -2506,6 +2519,7 @@
         return;
       }
 
+      // Regla de Stock: Cuentas de 1 dispositivo se generan 2 veces
       const stockIdx = (localDB.stock || []).findIndex(s => {
         if (s.productId !== prodId) return false;
         const max = s.maxUses || (p.devices === 1 ? 2 : 1);
@@ -2635,7 +2649,7 @@
 
       pushToCloud();
       closeModal('report-modal');
-      showToast('Reporte enviado exitosamente al soporte.', 'success');
+      showToast('Reporte enviado con éxito al soporte técnico.', 'success');
     }
 
     function updateUI() {
@@ -2786,7 +2800,8 @@
         balance: initBal,
         creator: currentUser.username,
         lastLogin: 'Nunca',
-        lastDevice: '-'
+        lastDevice: '-',
+        seenAnnouncements: []
       };
 
       localDB.users.push(newUser);
@@ -3335,7 +3350,7 @@
               <i class="fa-solid fa-pen-to-square" style="color:var(--accent-cyan);"></i> Editar
             </button>
             ${!isSolved ? `
-            <button class="btn btn-success" style="padding:4px 8px; font-size:0.75rem;" onclick="markReportAsSolved('${r.id}')" title="Marcar Solucionado y Notificar">
+            <button class="btn btn-success" style="padding:4px 8px; font-size:0.75rem;" onclick="markReportAsSolved('${r.id}')" title="Marcar Solucionado">
               <i class="fa-solid fa-circle-check"></i> Solucionado
             </button>` : ''}
           </td>
@@ -3399,26 +3414,9 @@
 
       rep.status = 'SOLUCIONADO';
 
-      if (!localDB.notifications) localDB.notifications = [];
-      const announcementId = 'rep_sol_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-      const solvedAnnouncement = {
-        id: announcementId,
-        target: 'CUSTOM',
-        targetUser: rep.username,
-        title: 'REPORTE SOLUCIONADO, LEVI STREAMIN SIEMPRE ATENTO',
-        message: `Tu reporte para el servicio ${rep.productName} ha sido verificado y resuelto. Tus credenciales han sido actualizadas. Por favor revisa la sección 'Mis Compras' para visualizar tus datos actualizados.`,
-        date: new Date().toLocaleDateString(),
-        timestamp: Date.now()
-      };
-      localDB.notifications.unshift(solvedAnnouncement);
-
       pushToCloud();
       renderOwnerReports();
       showToast(`Reporte marcado como SOLUCIONADO para ${rep.username}`, 'success');
-
-      if (currentUser && currentUser.username.toLowerCase() === rep.username.toLowerCase()) {
-        showCenterAnnouncement(solvedAnnouncement.title, solvedAnnouncement.message, solvedAnnouncement.date, solvedAnnouncement.id);
-      }
     }
 
     function toggleNotifyTargetUser(type) {
@@ -3477,17 +3475,30 @@
     function checkPendingAnnouncements() {
       if (!currentUser || !localDB.notifications || localDB.notifications.length === 0) return;
 
-      const seenKey = `levi_seen_ann_${currentUser.username.toLowerCase()}`;
-      let seen = [];
-      try {
-        seen = JSON.parse(localStorage.getItem(seenKey) || '[]');
-      } catch(e) {
-        seen = [];
+      // Limpieza preventiva: descartar cualquier aviso de reporte anterior
+      localDB.notifications = localDB.notifications.filter(n => 
+        !n.title?.includes('REPORTE SOLUCIONADO') && 
+        !n.id?.startsWith('rep_sol_')
+      );
+
+      // Sincronización entre dispositivos: verificar visto en la cuenta y en almacenamiento local
+      if (!Array.isArray(currentUser.seenAnnouncements)) {
+        currentUser.seenAnnouncements = [];
       }
+
+      const seenKey = `levi_seen_ann_${currentUser.username.toLowerCase()}`;
+      let localSeen = [];
+      try {
+        localSeen = JSON.parse(localStorage.getItem(seenKey) || '[]');
+      } catch(e) {
+        localSeen = [];
+      }
+
+      const isSeen = (id) => currentUser.seenAnnouncements.includes(id) || localSeen.includes(id);
 
       const pending = localDB.notifications.find(n => {
         if (!n || !n.id) return false;
-        if (seen.includes(n.id)) return false;
+        if (isSeen(n.id)) return false;
         if (n.target === 'GLOBAL') return true;
         if (n.target === 'CUSTOM' && n.targetUser && n.targetUser.toLowerCase() === currentUser.username.toLowerCase()) return true;
         return false;
@@ -3508,13 +3519,26 @@
 
       activeCenterAnnouncementId = annId;
 
+      // Marcar de inmediato como visto tanto en el objeto del usuario (Firebase/PC/Móvil) como en memoria local
       if (currentUser && annId) {
+        if (!Array.isArray(currentUser.seenAnnouncements)) {
+          currentUser.seenAnnouncements = [];
+        }
+        if (!currentUser.seenAnnouncements.includes(annId)) {
+          currentUser.seenAnnouncements.push(annId);
+          const uIdx = (localDB.users || []).findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+          if (uIdx !== -1) {
+            localDB.users[uIdx].seenAnnouncements = currentUser.seenAnnouncements;
+          }
+          pushToCloud(true);
+        }
+
         const seenKey = `levi_seen_ann_${currentUser.username.toLowerCase()}`;
-        let seen = [];
-        try { seen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch(e) { seen = []; }
-        if (!seen.includes(annId)) {
-          seen.push(annId);
-          localStorage.setItem(seenKey, JSON.stringify(seen));
+        let localSeen = [];
+        try { localSeen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch(e) { localSeen = []; }
+        if (!localSeen.includes(annId)) {
+          localSeen.push(annId);
+          localStorage.setItem(seenKey, JSON.stringify(localSeen));
         }
       }
 
@@ -3566,47 +3590,65 @@
     }
 
     (function initSecurityGuards() {
+      // Bloqueo estricto de click derecho
       document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
-        showToast('Acción bloqueada por seguridad de Levi Stream Perú.', 'error');
+        e.stopPropagation();
+        showToast('Acceso protegido por seguridad de Levi Stream Perú.', 'error');
         return false;
-      }, { passive: false });
+      }, { capture: true, passive: false });
 
+      // Bloqueo de combinación de teclas de inspección y descarga de fuentes
       document.addEventListener('keydown', function(e) {
-        const key = e.key ? e.key.toLowerCase() : '';
+        const key = (e.key || '').toLowerCase();
         const code = e.keyCode || e.which;
 
+        // F12
         if (code === 123 || key === 'f12') {
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
 
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (code === 73 || code === 74 || code === 67 || key === 'i' || key === 'j' || key === 'c')) {
+        // Ctrl/Cmd + Shift + I/J/C/K (Devtools)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (code === 73 || code === 74 || code === 67 || code === 75 || key === 'i' || key === 'j' || key === 'c' || key === 'k')) {
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
 
+        // Ctrl/Cmd + U (Ver fuente), S (Guardar), P (Imprimir)
         if ((e.ctrlKey || e.metaKey) && (code === 85 || code === 83 || code === 80 || key === 'u' || key === 's' || key === 'p')) {
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
-      }, { passive: false });
+      }, { capture: true, passive: false });
 
+      // Bloqueo de arrastre de elementos
       document.addEventListener('dragstart', function(e) {
         e.preventDefault();
         return false;
       }, false);
 
+      // Bloqueo de selección fuera de campos editables
+      document.addEventListener('selectstart', function(e) {
+        const target = e.target;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return true;
+        }
+        e.preventDefault();
+        return false;
+      }, false);
+
+      // Limpieza continua de consola
       setInterval(() => {
         try {
           console.clear();
-          console.log('%cLEVI STREAM PERÚ - SISTEMA BLINDADO', 'color: #ef4444; font-size: 20px; font-weight: 900;');
-          console.log('%cTodos los procesos están cifrados y monitoreados en tiempo real.', 'color: #94a3b8;');
+          console.log('%cLEVI STREAM PERÚ - SISTEMA BLINDADO', 'color: #ef4444; font-size: 18px; font-weight: 900;');
+          console.log('%cAcceso seguro verificado. Prohibida la copia o inspección.', 'color: #94a3b8;');
         } catch(e) {}
-      }, 4000);
+      }, 3000);
     })();
 
     function exportFullHTML() {
