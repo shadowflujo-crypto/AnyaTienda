@@ -128,16 +128,16 @@
 
     body.mode-pc #auth-screen {
       justify-content: flex-end;
-      align-items: flex-end;
-      padding: 24px 80px 60px 24px;
+      align-items: center;
+      padding: 40px 12vw 40px 40px;
       background-position: center center;
     }
 
     body.mode-mobile #auth-screen {
       justify-content: center;
-      align-items: flex-end;
-      padding: 16px 16px 30px 16px;
-      background-position: top center;
+      align-items: center;
+      padding: 25px 16px 80px 16px;
+      background-position: center top;
     }
 
     .auth-glass-box {
@@ -2635,7 +2635,7 @@
 
       pushToCloud();
       closeModal('report-modal');
-      showToast('Reporte enviado al soporte exclusivo del Owner.', 'success');
+      showToast('Reporte enviado exitosamente al soporte.', 'success');
     }
 
     function updateUI() {
@@ -3450,7 +3450,7 @@
 
       if (!localDB.notifications) localDB.notifications = [];
       const newAnn = {
-        id: 'ann_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        id: 'ann_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
         target: targetType,
         targetUser: targetUser,
         title: title,
@@ -3466,17 +3466,24 @@
       document.getElementById('notify-message').value = '';
       showToast(`Anuncio publicado en tiempo real.`, 'success');
       updateUI();
-      checkPendingAnnouncements();
+
+      if (currentUser) {
+        if (targetType === 'GLOBAL' || (targetType === 'CUSTOM' && targetUser.toLowerCase() === currentUser.username.toLowerCase())) {
+          showCenterAnnouncement(newAnn.title, newAnn.message, newAnn.date, newAnn.id);
+        }
+      }
     }
 
     function checkPendingAnnouncements() {
       if (!currentUser || !localDB.notifications || localDB.notifications.length === 0) return;
 
-      const seenKey = `levi_seen_announcements_${currentUser.username.toLowerCase()}`;
+      const seenKey = `levi_seen_ann_${currentUser.username.toLowerCase()}`;
       let seen = [];
       try {
         seen = JSON.parse(localStorage.getItem(seenKey) || '[]');
-      } catch(e) {}
+      } catch(e) {
+        seen = [];
+      }
 
       const pending = localDB.notifications.find(n => {
         if (!n || !n.id) return false;
@@ -3500,6 +3507,17 @@
       if (announcementTimeout) clearTimeout(announcementTimeout);
 
       activeCenterAnnouncementId = annId;
+
+      if (currentUser && annId) {
+        const seenKey = `levi_seen_ann_${currentUser.username.toLowerCase()}`;
+        let seen = [];
+        try { seen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch(e) { seen = []; }
+        if (!seen.includes(annId)) {
+          seen.push(annId);
+          localStorage.setItem(seenKey, JSON.stringify(seen));
+        }
+      }
+
       document.getElementById('center-announcement-title').innerText = title;
       document.getElementById('center-announcement-date').innerText = date ? `Fecha: ${date}` : '';
       document.getElementById('center-announcement-body').innerText = message;
@@ -3544,14 +3562,6 @@
       }
 
       document.getElementById('center-announcement-modal').style.display = 'none';
-
-      if (currentUser && activeCenterAnnouncementId) {
-        const seenKey = `levi_seen_announcements_${currentUser.username.toLowerCase()}`;
-        let seen = [];
-        try { seen = JSON.parse(localStorage.getItem(seenKey) || '[]'); } catch(e) {}
-        if (!seen.includes(activeCenterAnnouncementId)) seen.push(activeCenterAnnouncementId);
-        localStorage.setItem(seenKey, JSON.stringify(seen));
-      }
       activeCenterAnnouncementId = null;
     }
 
@@ -3563,32 +3573,22 @@
       }, { passive: false });
 
       document.addEventListener('keydown', function(e) {
-        if (e.keyCode === 123) {
+        const key = e.key ? e.key.toLowerCase() : '';
+        const code = e.keyCode || e.which;
+
+        if (code === 123 || key === 'f12') {
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
-        if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (code === 73 || code === 74 || code === 67 || key === 'i' || key === 'j' || key === 'c')) {
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
-        if (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-        if ((e.ctrlKey && e.keyCode === 85) || (e.metaKey && e.altKey && e.keyCode === 85)) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-        if ((e.ctrlKey && e.keyCode === 83) || (e.metaKey && e.keyCode === 83)) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-        if ((e.ctrlKey && e.keyCode === 80) || (e.metaKey && e.keyCode === 80)) {
+
+        if ((e.ctrlKey || e.metaKey) && (code === 85 || code === 83 || code === 80 || key === 'u' || key === 's' || key === 'p')) {
           e.preventDefault();
           e.stopPropagation();
           return false;
@@ -3606,7 +3606,7 @@
           console.log('%cLEVI STREAM PERÚ - SISTEMA BLINDADO', 'color: #ef4444; font-size: 20px; font-weight: 900;');
           console.log('%cTodos los procesos están cifrados y monitoreados en tiempo real.', 'color: #94a3b8;');
         } catch(e) {}
-      }, 5000);
+      }, 4000);
     })();
 
     function exportFullHTML() {
