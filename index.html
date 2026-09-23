@@ -79,7 +79,7 @@
       height: 100vh;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.4;
+      opacity: 0.35;
     }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -118,6 +118,7 @@
       display: flex;
       z-index: 9999;
       background-color: #07070a;
+      background-image: url("https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80");
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
@@ -134,23 +135,24 @@
       background-position: center center;
     }
 
-    /* Posicionamiento en Móvil: Centrado y ligeramente subido hacia arriba */
+    /* Posicionamiento en Móvil: Centrado y ligeramente hacia abajo con ergonomía */
     body.mode-mobile #auth-screen {
       justify-content: center;
-      align-items: flex-start;
-      padding: 45px 16px 80px 16px;
-      background-position: center top;
+      align-items: center;
+      padding: 80px 16px 50px 16px;
+      background-position: center center;
     }
 
+    /* TARJETA ULTRA TRANSPARENTE CON GLASSMORPHISM REAL */
     .auth-glass-box {
       width: 100%;
       max-width: 420px;
-      background: rgba(10, 10, 16, 0.62);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(12, 13, 22, 0.22));
+      border: 1px solid rgba(255, 255, 255, 0.28);
       border-radius: 24px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(239, 68, 68, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 35px rgba(239, 68, 68, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       padding: 34px 28px;
       position: relative;
       z-index: 10;
@@ -160,8 +162,10 @@
     body.mode-mobile .auth-glass-box {
       max-width: 380px;
       padding: 26px 22px;
-      margin-top: 10px;
-      background: rgba(10, 10, 16, 0.72);
+      margin-top: 30px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(12, 13, 22, 0.26));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .preview-mode-switch {
@@ -170,8 +174,8 @@
       left: 20px;
       z-index: 10005;
       display: inline-flex;
-      background: rgba(15, 16, 24, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(15, 16, 24, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 30px;
       padding: 4px;
       backdrop-filter: blur(12px);
@@ -218,8 +222,8 @@
     .auth-text-input {
       width: 100%;
       padding: 12px 14px 12px 42px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 11px;
       color: #fff;
       font-size: 0.92rem;
@@ -418,16 +422,6 @@
       display: none;
     }
 
-    .bell-badge.active {
-      display: block;
-      animation: pulseBadge 2s infinite;
-    }
-
-    @keyframes pulseBadge {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.8; }
-    }
-
     .balance-box {
       position: relative;
       background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(22, 22, 31, 0.8));
@@ -586,9 +580,7 @@
       transition: transform 0.3s ease;
     }
 
-    .product-card:hover .prod-img {
-      transform: scale(1.05);
-    }
+    .product-card:hover .prod-img { transform: scale(1.05); }
 
     .prod-badge {
       position: absolute;
@@ -715,9 +707,7 @@
     }
 
     @media (max-width: 980px) {
-      .device-preview-dual-grid {
-        grid-template-columns: 1fr;
-      }
+      .device-preview-dual-grid { grid-template-columns: 1fr; }
     }
 
     .mockup-pc-frame {
@@ -740,12 +730,7 @@
       color: var(--text-dim);
     }
 
-    .mockup-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      display: inline-block;
-    }
+    .mockup-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 
     .mockup-content-box {
       width: 100%;
@@ -795,12 +780,94 @@
 
     .mini-glass-preview {
       width: 100%;
-      background: rgba(10, 10, 16, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 13, 22, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 14px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(8px);
       padding: 12px;
       text-align: center;
+    }
+
+    /* PANTALLA CIBERNÉTICA DE DETECCIÓN (3 SEGUNDOS) */
+    #hacker-detector-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #040508;
+      z-index: 99999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: 'Space Grotesk', 'Courier New', monospace;
+      color: #00ffcc;
+      overflow: hidden;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+    }
+
+    #hacker-detector-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .hacker-scanlines {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.55) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 204, 0.02), rgba(0, 0, 255, 0.04));
+      background-size: 100% 3px, 6px 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .hacker-terminal-card {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 520px;
+      background: rgba(8, 10, 18, 0.94);
+      border: 1px solid rgba(0, 255, 204, 0.45);
+      border-radius: 16px;
+      padding: 26px 22px;
+      box-shadow: 0 0 45px rgba(0, 255, 204, 0.18), inset 0 0 20px rgba(0, 255, 204, 0.05);
+      animation: fadeInUp 0.35s ease both;
+    }
+
+    .hacker-radar-scanner {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 255, 204, 0.35);
+      border-top-color: #ef4444;
+      margin: 0 auto 16px auto;
+      position: relative;
+      animation: hackerSpin 1s linear infinite;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+    }
+
+    @keyframes hackerSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hacker-progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 16px 0 10px 0;
+    }
+
+    .hacker-progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ef4444, #00ffcc);
+      box-shadow: 0 0 12px #00ffcc;
+      transition: width 0.08s linear;
     }
 
     .modal-overlay {
@@ -870,10 +937,7 @@
 
     .center-announcement-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(4, 4, 8, 0.88);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -934,7 +998,6 @@
       z-index: 99990;
     }
 
-    /* Reglas responsivas según modo */
     body.mode-mobile .sidebar {
       background: #0f0f17 !important;
       border-right: 1.5px solid rgba(239, 68, 68, 0.35) !important;
@@ -959,6 +1022,34 @@
   </style>
 </head>
 <body class="mode-pc">
+
+  <div id="hacker-detector-screen">
+    <div class="hacker-scanlines"></div>
+    <div class="hacker-terminal-card">
+      <div class="hacker-radar-scanner"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,255,204,0.25); padding-bottom:8px; margin-bottom:14px; font-size:0.75rem; letter-spacing:1px; color:#94a3b8;">
+        <span><i class="fa-solid fa-shield-halved" style="color:var(--accent-red);"></i> LEVI_SEC_KERNEL // v5.0_MAX</span>
+        <span style="color:#00ffcc;" id="hacker-timer-display">00:03.00s</span>
+      </div>
+
+      <div id="hacker-terminal-logs" style="font-size:0.84rem; line-height:1.6; min-height:105px; font-family:'Space Grotesk', monospace;">
+        <div style="color:#f8fafc;"><span style="color:#ef4444;">[SYS]</span> INICIALIZANDO NÚCLEO BLINDADO ANTI-TAMPER...</div>
+        <div style="color:#94a3b8;"><span style="color:#00ffcc;">[SCAN]</span> ANALIZANDO HARDWARE, RESOLUCIÓN Y USER-AGENT...</div>
+        <div style="color:#f59e0b; font-weight:700;" id="hacker-device-detecting-text">DETECTANDO DISPOSITIVO... [PROCESANDO PARÁMETROS]</div>
+        <div id="hacker-device-result-text" style="display:none; color:#00ffcc; font-weight:800; font-size:0.92rem; text-shadow:0 0 10px rgba(0,255,204,0.6);"></div>
+      </div>
+
+      <div class="hacker-progress-bar-bg">
+        <div class="hacker-progress-bar-fill" id="hacker-progress-fill"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#64748b; font-weight:700;">
+        <span id="hacker-progress-status">ANALIZANDO DISPOSITIVO (0%)</span>
+        <span>STATUS: 200 OK // PROTEGIDO</span>
+      </div>
+    </div>
+  </div>
+
   <canvas id="bg-canvas"></canvas>
   <div class="mob-drawer-overlay" id="mob-drawer-overlay" onclick="toggleSidebar()"></div>
 
@@ -1007,7 +1098,7 @@
         </button>
       </form>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.82rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.15); font-size: 0.82rem;">
         <a onclick="contactWhatsapp('Hola Levi Stream Perú, deseo solicitar la creación de una nueva cuenta.')" style="color: #fca5a5; text-decoration: none; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
           <i class="fa-solid fa-user-plus"></i> Crear cuenta
         </a>
@@ -1284,8 +1375,8 @@
                 <i class="fa-solid fa-images" style="color: var(--accent-red);"></i> CAMBIO DE IMAGEN LOGIN
               </h3>
               <p style="font-size: 0.84rem; color: var(--text-muted); margin-top: 4px;">
-                Cambia las imágenes de fondo del Login tanto para <strong>Ordenador PC</strong> como para <strong>Móvil / Celular</strong>.
-                Las imágenes se guardan en tiempo real y se sincronizan para todos los usuarios.
+                Cambia las imágenes de fondo del Login para <strong>Ordenador PC</strong> y <strong>Móvil / Celular</strong>.
+                Las imágenes se sincronizan en tiempo real para todos los clientes.
               </p>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -1339,7 +1430,7 @@
             <i class="fa-solid fa-display" style="color: var(--accent-cyan);"></i> Vista Previa en Vivo: PC vs Móvil
           </h4>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
-            Así visualizan tus clientes el formulario de inicio de sesión según el dispositivo que utilicen.
+            Visualización transparente exacta del formulario según el dispositivo.
           </p>
 
           <div class="device-preview-dual-grid">
@@ -1356,8 +1447,8 @@
                     <div style="display:inline-flex; width:30px; height:30px; border-radius:8px; background:var(--accent-red); align-items:center; justify-content:center; color:#fff; font-size:13px; margin-bottom:4px;"><i class="fa-solid fa-play"></i></div>
                     <div style="font-size:0.85rem; font-weight:800; color:#fff;">LEVI STREAM</div>
                     <div style="font-size:0.65rem; color:var(--text-muted); margin-bottom:8px;">Plataforma SaaS</div>
-                    <div style="background:rgba(255,255,255,0.06); border-radius:6px; padding:5px; margin-bottom:5px; font-size:0.7rem; text-align:left; color:#94a3b8;">Usuario...</div>
-                    <div style="background:rgba(255,255,255,0.06); border-radius:6px; padding:5px; margin-bottom:8px; font-size:0.7rem; text-align:left; color:#94a3b8;">Contraseña...</div>
+                    <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.25); border-radius:6px; padding:5px; margin-bottom:5px; font-size:0.7rem; text-align:left; color:#94a3b8;">Usuario...</div>
+                    <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.25); border-radius:6px; padding:5px; margin-bottom:8px; font-size:0.7rem; text-align:left; color:#94a3b8;">Contraseña...</div>
                     <div style="background:var(--accent-red); border-radius:6px; padding:6px; font-size:0.72rem; font-weight:700; color:#fff;">Iniciar Sesión</div>
                     <div style="display:flex; justify-content:space-between; font-size:0.62rem; color:#fca5a5; margin-top:8px;">
                       <span>Crear cuenta</span>
@@ -1376,8 +1467,8 @@
                     <div style="display:inline-flex; width:28px; height:28px; border-radius:8px; background:var(--accent-red); align-items:center; justify-content:center; color:#fff; font-size:12px; margin-bottom:4px;"><i class="fa-solid fa-play"></i></div>
                     <div style="font-size:0.82rem; font-weight:800; color:#fff;">LEVI STREAM</div>
                     <div style="font-size:0.62rem; color:var(--text-muted); margin-bottom:6px;">Plataforma SaaS</div>
-                    <div style="background:rgba(255,255,255,0.06); border-radius:6px; padding:5px; margin-bottom:5px; font-size:0.68rem; text-align:left; color:#94a3b8;">Usuario...</div>
-                    <div style="background:rgba(255,255,255,0.06); border-radius:6px; padding:5px; margin-bottom:8px; font-size:0.68rem; text-align:left; color:#94a3b8;">Contraseña...</div>
+                    <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.25); border-radius:6px; padding:5px; margin-bottom:5px; font-size:0.68rem; text-align:left; color:#94a3b8;">Usuario...</div>
+                    <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.25); border-radius:6px; padding:5px; margin-bottom:8px; font-size:0.68rem; text-align:left; color:#94a3b8;">Contraseña...</div>
                     <div style="background:var(--accent-red); border-radius:6px; padding:6px; font-size:0.7rem; font-weight:700; color:#fff;">Iniciar Sesión</div>
                     <div style="display:flex; justify-content:space-between; font-size:0.58rem; color:#fca5a5; margin-top:8px;">
                       <span>Crear cuenta</span>
@@ -1601,7 +1692,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom: 14px;">
             <div>
               <h3 style="font-size: 1.15rem; font-weight: 800;"><i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-gold);"></i> Reportes de Clientes (Solo Owner)</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">Edita la cuenta con fallas y márcala como solucionada.</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Edita la cuenta con fallas y márcala como solucionada sin generar notificaciones automáticas innecesarias.</p>
             </div>
             <button class="btn btn-secondary" onclick="renderOwnerReports()"><i class="fa-solid fa-rotate-right"></i> Actualizar</button>
           </div>
@@ -1631,7 +1722,7 @@
         <div class="glass" style="max-width: 580px; margin: 0 auto; padding: 26px 22px;">
           <h3 style="margin-bottom: 6px; font-size: 1.2rem; font-weight: 800;"><i class="fa-solid fa-bullhorn" style="color:var(--accent-red);"></i> Enviar Anuncio al Centro de Pantalla</h3>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
-            Envía anuncios que aparecerán en el centro de la pantalla por 8 segundos con botón X a todos los clientes (Global) o a un cliente en específico (Personalizado). Se muestra estrictamente 1 sola vez.
+            Envía anuncios que aparecerán en el centro de la pantalla por 8 segundos con botón X a todos los clientes (Global) o a un cliente en específico (Personalizado). Se muestra estrictamente 1 sola vez tanto en móvil como en PC.
           </p>
           <form onsubmit="handleSendBroadcast(event)">
             <div class="form-group">
@@ -1897,6 +1988,7 @@
     </div>
   </div>
 
+  <!-- ANUNCIO CENTRAL CON TEMPORIZADOR DE 8 SEGUNDOS Y BOTÓN X -->
   <div class="center-announcement-overlay" id="center-announcement-modal">
     <div class="center-announcement-card">
       <i class="fa-solid fa-xmark" onclick="dismissCenterAnnouncement()" style="position: absolute; top: 14px; right: 16px; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'" title="Cerrar"></i>
@@ -1930,9 +2022,22 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script>
+    /* ----------------------------------------------------
+       SEGURIDAD DE KERNEL: SANITIZACIÓN & BLINDAJE
+       ---------------------------------------------------- */
     function cleanInput(str) {
       if (typeof str !== 'string') return str;
       return str.replace(/[<>'"`;()]/g, '').trim();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     const FIREBASE_DB_URL = "https://levi-store-default-rtdb.firebaseio.com/";
@@ -2016,7 +2121,7 @@
           role: 'OWNER', 
           balance: 992.06, 
           creator: 'FUNDADOR', 
-          lastLogin: '22/09/2026 23:40', 
+          lastLogin: '23/09/2026 07:20', 
           lastDevice: 'PC',
           seenAnnouncements: []
         }
@@ -2043,11 +2148,6 @@
       }
     } catch(err) {
       console.warn("Firebase offline:", err);
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function formatMoney(amountUSD, curr = currentCurrency) {
@@ -2119,7 +2219,6 @@
         if (parsed.purchases) localDB.purchases = parsed.purchases;
         if (parsed.reports) localDB.reports = parsed.reports;
         if (parsed.notifications) {
-          // Limpiar permanentemente cualquier aviso residual de reporte solucionado
           localDB.notifications = parsed.notifications.filter(n => !n.title?.includes('REPORTE SOLUCIONADO') && !n.id?.startsWith('rep_sol_'));
         }
         if (parsed.config) localDB.config = parsed.config;
@@ -2159,7 +2258,6 @@
             if (val.reports) localDB.reports = Array.isArray(val.reports) ? val.reports.filter(Boolean) : Object.values(val.reports);
             if (val.notifications) {
               const rawN = Array.isArray(val.notifications) ? val.notifications.filter(Boolean) : Object.values(val.notifications);
-              // Purgar de forma estricta el popup de reporte solucionado
               localDB.notifications = rawN.filter(n => !n.title?.includes('REPORTE SOLUCIONADO') && !n.id?.startsWith('rep_sol_'));
             }
             if (val.config) {
@@ -2506,7 +2604,6 @@
       const p = (localDB.products || []).find(x => x.id === prodId);
       if (!p) return;
 
-      // Restricción: Los planes de 12 y 14 meses van siempre por WhatsApp
       if (p.deliveryType === 'WHATSAPP' || p.name.includes('12 M') || p.name.includes('14 M')) {
         contactWhatsapp(`Hola Levi Stream Perú, deseo adquirir el plan: ${p.name} por ${formatMoney(p.priceUSD)}`);
         return;
@@ -2519,7 +2616,7 @@
         return;
       }
 
-      // Regla de Stock: Cuentas de 1 dispositivo se generan 2 veces
+      // Regla de Stock: Cuentas de 1 dispositivo admiten 2 compras
       const stockIdx = (localDB.stock || []).findIndex(s => {
         if (s.productId !== prodId) return false;
         const max = s.maxUses || (p.devices === 1 ? 2 : 1);
@@ -3413,7 +3510,6 @@
       if (!rep) return;
 
       rep.status = 'SOLUCIONADO';
-
       pushToCloud();
       renderOwnerReports();
       showToast(`Reporte marcado como SOLUCIONADO para ${rep.username}`, 'success');
@@ -3475,13 +3571,11 @@
     function checkPendingAnnouncements() {
       if (!currentUser || !localDB.notifications || localDB.notifications.length === 0) return;
 
-      // Limpieza preventiva: descartar cualquier aviso de reporte anterior
       localDB.notifications = localDB.notifications.filter(n => 
         !n.title?.includes('REPORTE SOLUCIONADO') && 
         !n.id?.startsWith('rep_sol_')
       );
 
-      // Sincronización entre dispositivos: verificar visto en la cuenta y en almacenamiento local
       if (!Array.isArray(currentUser.seenAnnouncements)) {
         currentUser.seenAnnouncements = [];
       }
@@ -3519,7 +3613,6 @@
 
       activeCenterAnnouncementId = annId;
 
-      // Marcar de inmediato como visto tanto en el objeto del usuario (Firebase/PC/Móvil) como en memoria local
       if (currentUser && annId) {
         if (!Array.isArray(currentUser.seenAnnouncements)) {
           currentUser.seenAnnouncements = [];
@@ -3590,7 +3683,7 @@
     }
 
     (function initSecurityGuards() {
-      // Bloqueo estricto de click derecho
+      // Bloqueo estricto de click derecho y menú contextual
       document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -3598,7 +3691,7 @@
         return false;
       }, { capture: true, passive: false });
 
-      // Bloqueo de combinación de teclas de inspección y descarga de fuentes
+      // Bloqueo total de combinaciones de teclas de inspección, guardado e impresión
       document.addEventListener('keydown', function(e) {
         const key = (e.key || '').toLowerCase();
         const code = e.keyCode || e.which;
@@ -3610,28 +3703,37 @@
           return false;
         }
 
-        // Ctrl/Cmd + Shift + I/J/C/K (Devtools)
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (code === 73 || code === 74 || code === 67 || code === 75 || key === 'i' || key === 'j' || key === 'c' || key === 'k')) {
+        // Ctrl/Cmd + Shift + I/J/C/K/E (DevTools)
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (code === 73 || code === 74 || code === 67 || code === 75 || code === 69 || key === 'i' || key === 'j' || key === 'c' || key === 'k' || key === 'e')) {
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
 
-        // Ctrl/Cmd + U (Ver fuente), S (Guardar), P (Imprimir)
+        // Ctrl/Cmd + U (Ver fuente), S (Guardar archivo), P (Imprimir)
         if ((e.ctrlKey || e.metaKey) && (code === 85 || code === 83 || code === 80 || key === 'u' || key === 's' || key === 'p')) {
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
+
+        // Bloquear Ctrl/Cmd + A fuera de inputs/textareas
+        if ((e.ctrlKey || e.metaKey) && (code === 65 || key === 'a')) {
+          const target = e.target;
+          if (!target || (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA')) {
+            e.preventDefault();
+            return false;
+          }
+        }
       }, { capture: true, passive: false });
 
-      // Bloqueo de arrastre de elementos
+      // Bloqueo de arrastre de elementos e imágenes
       document.addEventListener('dragstart', function(e) {
         e.preventDefault();
         return false;
       }, false);
 
-      // Bloqueo de selección fuera de campos editables
+      // Bloqueo de selección de texto en áreas protegidas
       document.addEventListener('selectstart', function(e) {
         const target = e.target;
         if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
@@ -3641,14 +3743,27 @@
         return false;
       }, false);
 
-      // Limpieza continua de consola
+      // Monitoreo de DevTools por variación de dimensiones y purga de consola
+      let devtoolsOpen = false;
+      const threshold = 160;
       setInterval(() => {
+        const widthDiff = window.outerWidth - window.innerWidth > threshold;
+        const heightDiff = window.outerHeight - window.innerHeight > threshold;
+        if (widthDiff || heightDiff) {
+          if (!devtoolsOpen) {
+            devtoolsOpen = true;
+            try { console.clear(); } catch(e) {}
+          }
+        } else {
+          devtoolsOpen = false;
+        }
+
         try {
           console.clear();
-          console.log('%cLEVI STREAM PERÚ - SISTEMA BLINDADO', 'color: #ef4444; font-size: 18px; font-weight: 900;');
-          console.log('%cAcceso seguro verificado. Prohibida la copia o inspección.', 'color: #94a3b8;');
+          console.log('%cLEVI STREAM PERÚ - KERNEL BLINDADO v5.0', 'color: #ef4444; font-size: 20px; font-weight: 900; text-shadow: 0 0 10px rgba(239,68,68,0.5);');
+          console.log('%cAcceso verificado. Copia, inspección y extracción de código bloqueadas.', 'color: #00ffcc; font-weight: bold;');
         } catch(e) {}
-      }, 3000);
+      }, 2000);
     })();
 
     function exportFullHTML() {
@@ -3742,10 +3857,60 @@
     window.addEventListener('DOMContentLoaded', () => {
       initCanvasBackground();
       detectUserDeviceAuto();
+      runHackerDetectionSequence();
       renderStore();
       updateRechargeConversionHint();
       refreshDualPreview();
     });
+
+    function runHackerDetectionSequence() {
+      const splash = document.getElementById('hacker-detector-screen');
+      const progressFill = document.getElementById('hacker-progress-fill');
+      const progressStatus = document.getElementById('hacker-progress-status');
+      const deviceDetectingText = document.getElementById('hacker-device-detecting-text');
+      const deviceResultText = document.getElementById('hacker-device-result-text');
+      const timerDisplay = document.getElementById('hacker-timer-display');
+      if (!splash) return;
+
+      const deviceType = detectUserDeviceAuto();
+      const isMobile = (deviceType === 'mobile');
+      const screenInfo = `${window.innerWidth}x${window.innerHeight}`;
+
+      const totalDuration = 3000;
+      const startTime = performance.now();
+
+      const interval = setInterval(() => {
+        const elapsed = performance.now() - startTime;
+        const ratio = Math.min(1, elapsed / totalDuration);
+        const percent = Math.floor(ratio * 100);
+
+        if (progressFill) progressFill.style.width = `${percent}%`;
+        if (progressStatus) progressStatus.innerText = `ANALIZANDO DISPOSITIVO (${percent}%)`;
+
+        const remainSec = Math.max(0, (totalDuration - elapsed) / 1000).toFixed(2);
+        if (timerDisplay) timerDisplay.innerText = `00:0${remainSec}s`;
+
+        if (elapsed >= 1400 && deviceResultText && deviceResultText.style.display === 'none') {
+          if (deviceDetectingText) deviceDetectingText.style.display = 'none';
+          deviceResultText.style.display = 'block';
+          deviceResultText.innerHTML = isMobile
+            ? `<i class="fa-solid fa-mobile-screen"></i> DISPOSITIVO DETECTADO: 📱 MÓVIL / CELULAR (${screenInfo})`
+            : `<i class="fa-solid fa-desktop"></i> DISPOSITIVO DETECTADO: 💻 ORDENADOR PC (${screenInfo})`;
+          
+          setDevicePreviewMode(isMobile ? 'mobile' : 'pc');
+        }
+
+        if (elapsed >= totalDuration) {
+          clearInterval(interval);
+          if (progressFill) progressFill.style.width = '100%';
+          if (progressStatus) progressStatus.innerText = 'ACCESO CONCEDIDO (100%)';
+          setTimeout(() => {
+            splash.classList.add('fade-out');
+            setTimeout(() => { splash.style.display = 'none'; }, 500);
+          }, 250);
+        }
+      }, 30);
+    }
 
     window.addEventListener('resize', () => {
       detectUserDeviceAuto();
