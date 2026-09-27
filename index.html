@@ -2107,7 +2107,7 @@
       }
     };
 
-    const DEFAULT_FIREBASE_DB_URL = "";
+    const DEFAULT_FIREBASE_DB_URL = "https://anya-streaming-default-rtdb.firebaseio.com/";
     let ACTIVE_FIREBASE_URL = localStorage.getItem('anya_custom_firebase_url') || DEFAULT_FIREBASE_DB_URL;
 
     // Exchange Rates
@@ -2276,6 +2276,7 @@
        Only listens to the separated branches of ANYA_STREAMING/
        ========================================================================= */
     let db = null;
+    let firebaseReadyPromise = Promise.resolve(false);
 
     function initFirebase(targetUrl = ACTIVE_FIREBASE_URL) {
       if (!targetUrl || !/^https:\/\//i.test(targetUrl)) {
@@ -2296,10 +2297,30 @@
 
           firebase.initializeApp({ databaseURL: targetUrl });
           db = firebase.database();
-          ACTIVE_FIREBASE_URL = targetUrl;
+          ACTIVE_FIREBASE_URL = targetUrl.endsWith('/') ? targetUrl : targetUrl + '/';
           
           updateFirebaseUrlDisplay();
+          db.ref('.info/connected').on('value', snap => {
+            const statusEl = document.getElementById('firebase-connection-status');
+            if (!statusEl) return;
+            statusEl.innerHTML = snap.val() === true
+              ? '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Firebase en tiempo real'
+              : '<i class="fa-solid fa-link-slash" style="color:#f59e0b;"></i> Firebase desconectado';
+          });
           attachGranularListeners();
+          // Load users once before allowing login. Realtime listeners continue afterward.
+          firebaseReadyPromise = db.ref('ANYA_STREAMING/users').once('value').then(snap => {
+            const users = snap.val() || {};
+            memoryDB.users = users;
+            saveCacheLocally(false);
+            renderSubUsers();
+            renderOwnerUsers();
+            populateNotifyUserOptions();
+            return true;
+          }).catch(err => {
+            console.error('Firebase users preload error:', err);
+            return Promise.reject(err);
+          });
           checkInitialSeed();
           updateLiveStorageMetrics();
         }
@@ -3744,14 +3765,24 @@
       presenceDisconnectRef = null;
     }
 
-    function handleLoginSubmit(e) {
+    async function handleLoginSubmit(e) {
       e.preventDefault();
       const u = cleanInput(document.getElementById('auth-user').value);
       const p = document.getElementById('auth-pass').value.trim();
+      const submitBtn = e.submitter || document.querySelector('#auth-screen button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
 
-      const user = Object.values(memoryDB.users || {}).find(x => x.username.toLowerCase() === u.toLowerCase());
+      try {
+        // Always refresh users from Firebase before validating credentials.
+        if (!db) throw new Error('Firebase no está conectado.');
+        await firebaseReadyPromise;
+        const snap = await db.ref('ANYA_STREAMING/users').once('value');
+        memoryDB.users = snap.val() || {};
+        saveCacheLocally(false);
 
-      if (user && user.password === p) {
+        const user = Object.values(memoryDB.users || {}).find(x => x && x.username && x.username.toLowerCase() === u.toLowerCase());
+
+        if (user && user.password === p) {
         const now = new Date();
         const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const deviceType = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 880) ? 'Móvil' : 'PC';
@@ -3774,8 +3805,21 @@
         updateUI();
         switchNav('store');
         showToast(`Bienvenido a ANYA STREAMING, ${user.username}`, 'success');
-      } else {
-        showToast('Usuario o contraseña incorrectos.', 'error');
+        } else {
+          showToast('Usuario o contraseña incorrectos.', 'error');
+        }
+      } catch (err) {
+        console.error('Login/Firebase error:', err);
+        const msg = String(err && err.message || 'Error desconocido');
+        if (/permission_denied|PERMISSION_DENIED/i.test(msg)) {
+          showToast('Firebase rechazó la lectura de usuarios. Revisa las Security Rules.', 'error');
+        } else if (/network|offline|failed to fetch/i.test(msg)) {
+          showToast('No se pudo conectar con Firebase. Comprueba tu conexión.', 'error');
+        } else {
+          showToast('No se pudo iniciar sesión: ' + msg, 'error');
+        }
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     }
 
