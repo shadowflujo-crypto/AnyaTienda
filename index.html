@@ -4010,8 +4010,14 @@
 
       const subSection = document.getElementById('subusers-menu-section');
       const ownerSection = document.getElementById('owner-menu-section');
+      const githubHeaderPill = document.getElementById('github-sync-status-btn');
       if (subSection) subSection.style.display = (isOwner() || isSeller()) ? 'block' : 'none';
       if (ownerSection) ownerSection.style.display = isOwner() ? 'block' : 'none';
+      // GitHub es una herramienta exclusiva del OWNER: no aparece en el encabezado de Seller/Cliente.
+      if (githubHeaderPill) {
+        githubHeaderPill.style.display = isOwner() ? 'inline-flex' : 'none';
+        githubHeaderPill.setAttribute('aria-hidden', isOwner() ? 'false' : 'true');
+      }
 
       const createPanel = document.querySelector('#view-manage-subusers form[onsubmit*="handleCreateSubUser"]');
       if (createPanel) createPanel.closest('.glass').style.display = (isOwner() || isSeller()) ? '' : 'none';
