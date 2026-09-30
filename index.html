@@ -962,6 +962,8 @@
     .github-help-item{padding:12px;border:1px solid var(--border-color);border-radius:12px;background:rgba(255,255,255,.03)}
     .github-help-item b{display:block;color:#fff;margin-bottom:4px;font-size:.8rem}.github-help-item span{display:block;color:var(--text-muted);font-size:.73rem;line-height:1.45}
     @media (max-width:700px){.github-help-grid{grid-template-columns:1fr}.table-container{overflow-x:auto;-webkit-overflow-scrolling:touch}.user-action-group{flex-direction:column;align-items:stretch}.user-action-group .btn{width:100%}}
+    .balance-conversion-hint{margin-top:6px;font-size:.72rem;color:var(--text-muted);font-weight:700;}
+    #fx-live-status{transition:opacity .25s ease;}
 </style>
 </head>
 <body class="mode-pc">
@@ -1449,8 +1451,12 @@
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label">Saldo Inicial a Transferir (USD $)</label>
-                <input type="number" class="form-input" id="sub-init-balance" min="0" step="0.5" value="0" required />
+                <label class="form-label">Saldo Inicial</label>
+                <div style="display:grid;grid-template-columns:1fr 120px;gap:8px;">
+                  <input type="number" class="form-input" id="sub-init-balance" min="0" step="0.01" value="0" required oninput="updateBalanceConversionHints()" />
+                  <select class="form-select" id="sub-init-currency" onchange="updateBalanceConversionHints()"><option value="USD">USD $</option><option value="PEN">PEN S/</option></select>
+                </div>
+                <div id="sub-init-balance-hint" class="balance-conversion-hint">Se guardará: $0.00 USD · S/ 0.00 PEN</div>
               </div>
               <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-check"></i> Registrar Usuario</button>
             </form>
@@ -1459,7 +1465,7 @@
             <h4 style="margin-bottom: 14px; font-size: 1.1rem; font-weight: 800;"><i class="fa-solid fa-users" style="color:var(--accent-emerald);"></i> Paneles y Clientes Asignados</h4>
             <div class="table-container">
               <table>
-                <thead><tr><th>Usuario</th><th>Rol</th><th>Saldo USD</th><th>Acciones</th></tr></thead>
+                <thead><tr><th>Usuario</th><th>Rol</th><th>Saldo</th><th>Acciones</th></tr></thead>
                 <tbody id="subusers-table-body"></tbody>
               </table>
             </div>
@@ -1481,7 +1487,7 @@
           </div>
           <div class="table-container">
             <table>
-              <thead><tr><th>Usuario</th><th>Contraseña</th><th>Rol</th><th>Saldo USD</th><th>Creado Por</th><th>Último Inicio</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Usuario</th><th>Contraseña</th><th>Rol</th><th>Saldo USD / PEN</th><th>Creado Por</th><th>Último Inicio</th><th>Acciones</th></tr></thead>
               <tbody id="owner-users-tbody"></tbody>
             </table>
           </div>
@@ -1913,8 +1919,12 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Saldo (USD $)</label>
-          <input type="number" class="form-input" id="edit-user-balance" step="0.1" min="0" required />
+          <label class="form-label">Saldo</label>
+          <div style="display:grid;grid-template-columns:1fr 120px;gap:8px;">
+            <input type="number" class="form-input" id="edit-user-balance" step="0.01" min="0" required oninput="updateBalanceConversionHints()" />
+            <select class="form-select" id="edit-user-balance-currency" onchange="updateBalanceConversionHints()"><option value="USD">USD $</option><option value="PEN">PEN S/</option></select>
+          </div>
+          <div id="edit-user-balance-hint" class="balance-conversion-hint">Se guardará: $0.00 USD · S/ 0.00 PEN</div>
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-floppy-disk"></i> Guardar Cambios</button>
       </form>
@@ -1930,7 +1940,14 @@
         <div><h3 style="margin:0;font-size:1.15rem;font-weight:900;">Mi saldo · OWNER</h3><p style="margin:3px 0 0;color:var(--text-muted);font-size:.76rem;">Puedes establecer el saldo del OWNER manualmente.</p></div>
       </div>
       <form onsubmit="handleSaveOwnerBalance(event)">
-        <div class="form-group"><label class="form-label">Nuevo saldo (USD $)</label><input type="number" class="form-input" id="owner-balance-value" step="0.01" min="0" required /></div>
+        <div class="form-group">
+          <label class="form-label">Nuevo saldo</label>
+          <div style="display:grid;grid-template-columns:1fr 120px;gap:8px;">
+            <input type="number" class="form-input" id="owner-balance-value" step="0.01" min="0" required oninput="updateBalanceConversionHints()" />
+            <select class="form-select" id="owner-balance-currency" onchange="updateBalanceConversionHints()"><option value="USD">USD $</option><option value="PEN">PEN S/</option></select>
+          </div>
+          <div id="owner-balance-hint" class="balance-conversion-hint">Se guardará: $0.00 USD · S/ 0.00 PEN</div>
+        </div>
         <div class="owner-balance-preview"><span>Saldo actual</span><strong id="owner-balance-current">$0.00</strong></div>
         <button type="submit" class="btn btn-primary" style="width:100%;margin-top:14px;"><i class="fa-solid fa-check"></i> Guardar mi saldo</button>
       </form>
@@ -2136,26 +2153,79 @@
     const DEFAULT_FIREBASE_DB_URL = "https://anya-streaming-default-rtdb.firebaseio.com/";
     let ACTIVE_FIREBASE_URL = localStorage.getItem('anya_custom_firebase_url') || DEFAULT_FIREBASE_DB_URL;
 
-    // Exchange Rates
+    // Tasas de cambio: USD es la moneda base y se actualizan fuera de Firebase.
     const EXCHANGE_RATES = {
-      USD: { rate: 1.0, symbol: '$', name: 'Dólares' },
-      PEN: { rate: 3.75, symbol: 'S/', name: 'Soles' },
+      USD: { rate: 1.0, symbol: '$', name: 'Dólares estadounidenses' },
+      PEN: { rate: 3.75, symbol: 'S/', name: 'Soles peruanos' },
       EUR: { rate: 0.92, symbol: '€', name: 'Euros' },
-      COP: { rate: 3950.0, symbol: '$', name: 'Pesos COP' },
-      MXN: { rate: 17.20, symbol: '$', name: 'Pesos MXN' },
-      ARS: { rate: 890.0, symbol: '$', name: 'Pesos ARS' },
-      CLP: { rate: 940.0, symbol: '$', name: 'Pesos CLP' },
+      COP: { rate: 3950.0, symbol: '$', name: 'Pesos colombianos' },
+      MXN: { rate: 17.20, symbol: '$', name: 'Pesos mexicanos' },
+      ARS: { rate: 890.0, symbol: '$', name: 'Pesos argentinos' },
+      CLP: { rate: 940.0, symbol: '$', name: 'Pesos chilenos' },
       BOB: { rate: 6.95, symbol: 'Bs', name: 'Bolivianos' },
       VES: { rate: 36.50, symbol: 'Bs', name: 'Bolívares' },
-      BRL: { rate: 5.10, symbol: 'R$', name: 'Reales' },
+      BRL: { rate: 5.10, symbol: 'R$', name: 'Reales brasileños' },
       GTQ: { rate: 7.80, symbol: 'Q', name: 'Quetzales' },
-      CRC: { rate: 515.0, symbol: '₡', name: 'Colones' },
-      DOP: { rate: 59.0, symbol: '$', name: 'Pesos DOP' },
-      UYU: { rate: 39.0, symbol: '$', name: 'Pesos UYU' },
+      CRC: { rate: 515.0, symbol: '₡', name: 'Colones costarricenses' },
+      DOP: { rate: 59.0, symbol: '$', name: 'Pesos dominicanos' },
+      UYU: { rate: 39.0, symbol: '$', name: 'Pesos uruguayos' },
       PYG: { rate: 7500.0, symbol: '₲', name: 'Guaraníes' }
     };
+    const FX_API_URL = 'https://api.exchangerate.fun/latest?base=USD';
+    const FX_CACHE_KEY = 'anya_live_fx_cache_v1';
+    const FX_REFRESH_MS = 60 * 60 * 1000;
+    let fxLastUpdated = null;
+
+    async function fetchLiveExchangeRates(force = false) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(FX_CACHE_KEY) || 'null');
+        const fresh = cached && cached.ts && (Date.now() - cached.ts < FX_REFRESH_MS);
+        if (!force && fresh && cached.rates) { applyLiveRates(cached.rates, cached.date || null); return true; }
+      } catch (_) {}
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 10000);
+        const res = await fetch(FX_API_URL, { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timer);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (!data || !data.rates || !Number(data.rates.PEN)) throw new Error('Tasa inválida');
+        applyLiveRates(data.rates, data.date || null);
+        try { localStorage.setItem(FX_CACHE_KEY, JSON.stringify({ ts: Date.now(), date: data.date || null, rates: data.rates })); } catch (_) {}
+        return true;
+      } catch (err) { console.warn('No se pudo actualizar el tipo de cambio:', err); return false; }
+    }
+
+    function applyLiveRates(rates, date = null) {
+      Object.keys(EXCHANGE_RATES).forEach(code => {
+        if (code !== 'USD' && Number.isFinite(Number(rates[code]))) EXCHANGE_RATES[code].rate = Number(rates[code]);
+      });
+      EXCHANGE_RATES.USD.rate = 1;
+      fxLastUpdated = date || new Date().toISOString();
+      updateCurrencyStatus(); updateRechargeConversionHint(); updateBalanceConversionHints();
+      if (typeof renderStore === 'function') renderStore();
+      if (currentUser) { if (typeof renderOrders === 'function') renderOrders(); updateUI(); renderOwnerUsers(); renderSubUsers(); }
+    }
+
+    function updateCurrencyStatus() {
+      const el = document.getElementById('fx-live-status');
+      if (!el) return;
+      el.innerHTML = `<i class="fa-solid fa-chart-line"></i> USD → PEN: <strong>${Number(EXCHANGE_RATES.PEN.rate || 0).toFixed(4)}</strong>${fxLastUpdated ? ` · ${escapeHtml(String(fxLastUpdated))}` : ''}`;
+    }
+
+    function convertCurrency(amount, from, to) {
+      const value = Number(amount) || 0;
+      if (from === to) return value;
+      const fromRate = Number(EXCHANGE_RATES[from]?.rate || 0);
+      const toRate = Number(EXCHANGE_RATES[to]?.rate || 0);
+      if (!fromRate || !toRate) return 0;
+      return value / fromRate * toRate;
+    }
 
     let currentCurrency = localStorage.getItem('anya_active_currency') || 'PEN';
+    setTimeout(() => fetchLiveExchangeRates(false), 50);
+    setInterval(() => fetchLiveExchangeRates(true), FX_REFRESH_MS);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) fetchLiveExchangeRates(false); });
     let selectedRechargeMethodName = 'Yape / Plin (Perú)';
     let currentStoreFilter = 'ALL';
     let currentDeviceMode = 'pc';
@@ -3130,6 +3200,21 @@
     /* =========================================================================
        UI RENDERING FUNCTIONS
        ========================================================================= */
+    function updateBalanceConversionHints() {
+      const pairs = [
+        ['sub-init-balance','sub-init-currency','sub-init-balance-hint'],
+        ['edit-user-balance','edit-user-balance-currency','edit-user-balance-hint'],
+        ['owner-balance-value','owner-balance-currency','owner-balance-hint']
+      ];
+      pairs.forEach(([inputId, currencyId, hintId]) => {
+        const input = document.getElementById(inputId), cur = document.getElementById(currencyId), hint = document.getElementById(hintId);
+        if (!input || !cur || !hint) return;
+        const amount = Number(input.value) || 0, from = cur.value || 'USD';
+        const usd = convertCurrency(amount, from, 'USD'), pen = convertCurrency(amount, from, 'PEN');
+        hint.textContent = `Se guardará: $${usd.toFixed(2)} USD · S/ ${pen.toFixed(2)} PEN`;
+      });
+    }
+
     function formatMoney(amountUSD, curr = currentCurrency) {
       const conf = EXCHANGE_RATES[curr] || EXCHANGE_RATES.USD;
       const converted = (amountUSD || 0) * conf.rate;
@@ -3616,18 +3701,23 @@
       const input = document.getElementById('owner-balance-value');
       const current = document.getElementById('owner-balance-current');
       if (input) input.value = value.toFixed(2);
+      const ownerCur = document.getElementById('owner-balance-currency');
+      if (ownerCur) ownerCur.value = 'USD';
       if (current) current.textContent = '$' + value.toFixed(2);
+      updateBalanceConversionHints();
       openModal('owner-balance-modal');
     }
 
     async function handleSaveOwnerBalance(e) {
       e.preventDefault();
       if (!isOwner() || !db) return denyAccess('Solo el OWNER puede modificar su saldo.');
-      const newBalance = Number(document.getElementById('owner-balance-value')?.value);
-      if (!Number.isFinite(newBalance) || newBalance < 0) return showToast('Ingresa un saldo válido.', 'error');
+      const entered = Number(document.getElementById('owner-balance-value')?.value);
+      const currency = document.getElementById('owner-balance-currency')?.value || 'USD';
+      const newBalance = convertCurrency(entered, currency, 'USD');
+      if (!Number.isFinite(entered) || entered < 0 || !Number.isFinite(newBalance)) return showToast('Ingresa un saldo válido.', 'error');
       try {
-        await db.ref(`ANYA_STREAMING/users/${currentUser.id}/balance`).set(newBalance);
-        currentUser.balance = newBalance;
+        await db.ref(`ANYA_STREAMING/users/${currentUser.id}/balance`).set(Number(newBalance.toFixed(8)));
+        currentUser.balance = Number(newBalance.toFixed(8));
         if (memoryDB.users[currentUser.id]) memoryDB.users[currentUser.id].balance = newBalance;
         saveCacheLocally(false); updateUI(); renderOwnerUsers(); closeModal('owner-balance-modal');
         showToast(`Tu saldo ahora es $${newBalance.toFixed(2)} USD.`, 'success');
@@ -3681,7 +3771,7 @@
           <td><strong>${escapeHtml(s.username)}</strong></td>
           <td><code>${escapeHtml(s.password)}</code></td>
           <td><span class="role-badge">${escapeHtml(s.role)}</span></td>
-          <td style="color:var(--accent-emerald);font-weight:700;">$${Number(s.balance||0).toFixed(2)}</td>
+          <td style="color:var(--accent-emerald);font-weight:700;">$${Number(s.balance||0).toFixed(2)} USD<br><span style="font-size:.68rem;color:var(--text-muted);">S/ ${convertCurrency(Number(s.balance||0),'USD','PEN').toFixed(2)}</span></td>
           <td>${onlineBadge(s)}</td>
           <td style="font-size:.75rem;color:var(--accent-cyan);">${escapeHtml(s.creator || '-')}</td>
           <td>${actions}</td>`;
@@ -3695,19 +3785,21 @@
       const name = cleanInput(document.getElementById('sub-name').value);
       const pass = document.getElementById('sub-pass').value.trim();
       const role = isSeller() ? 'CLIENTE' : document.getElementById('sub-role').value;
-      const initBal = parseFloat(document.getElementById('sub-init-balance').value) || 0;
+      const enteredBal = parseFloat(document.getElementById('sub-init-balance').value) || 0;
+      const initCurrency = document.getElementById('sub-init-currency')?.value || 'USD';
+      const initBal = convertCurrency(enteredBal, initCurrency, 'USD');
       if (!name || !pass) return showToast('Usuario y contraseña son obligatorios.', 'error');
-      if (initBal < 0) return showToast('El saldo inicial no puede ser negativo.', 'error');
+      if (enteredBal < 0 || !Number.isFinite(initBal)) return showToast('El saldo inicial no puede ser negativo.', 'error');
       if (isSeller() && role !== 'CLIENTE') return denyAccess('Un SELLER solo puede crear CLIENTES.');
       const exists = Object.values(memoryDB.users || {}).some(u => String(u.username || '').toLowerCase() === name.toLowerCase());
       if (exists) return showToast('Ese nombre de usuario ya está registrado.', 'error');
       const uid = 'u_' + Date.now();
-      const newUser = { id: uid, username: name, password: pass, role: role, balance: initBal, creator: currentUser.username, creatorId: currentUser.id, createdAt: new Date().toISOString(), lastLogin: 'Nunca', lastSeen: null, online: false, lastDevice: '-' };
+      const newUser = { id: uid, username: name, password: pass, role: role, balance: Number(initBal.toFixed(8)), creator: currentUser.username, creatorId: currentUser.id, createdAt: new Date().toISOString(), lastLogin: 'Nunca', lastSeen: null, online: false, lastDevice: '-' };
       try {
         if (!db) throw new Error('Firebase no está conectado.');
         await db.ref(`ANYA_STREAMING/users/${uid}`).set(newUser);
         memoryDB.users[uid] = newUser; saveCacheLocally(false);
-        document.getElementById('sub-name').value = ''; document.getElementById('sub-pass').value = ''; document.getElementById('sub-init-balance').value = '0';
+        document.getElementById('sub-name').value = ''; document.getElementById('sub-pass').value = ''; document.getElementById('sub-init-balance').value = '0'; document.getElementById('sub-init-currency').value = 'USD'; updateBalanceConversionHints();
         renderSubUsers(); renderOwnerUsers(); populateNotifyUserOptions(); queueSilentGitHubSync(1000);
         showToast(`Cliente ${name} creado correctamente.`, 'success');
       } catch (err) { showToast('No se pudo crear el cliente: ' + (err.message || 'error de Firebase'), 'error'); }
@@ -3722,8 +3814,10 @@
       document.getElementById('edit-user-password').value = u.password;
       document.getElementById('edit-user-role').value = isSeller() ? 'CLIENTE' : u.role;
       document.getElementById('edit-user-balance').value = Number(u.balance || 0);
+      document.getElementById('edit-user-balance-currency').value = 'USD';
       const roleGroup = document.getElementById('edit-user-role')?.closest('.form-group');
       if (roleGroup) roleGroup.style.display = isSeller() ? 'none' : '';
+      updateBalanceConversionHints();
       openModal('edit-user-details-modal');
     }
 
@@ -3735,11 +3829,13 @@
       const name = cleanInput(document.getElementById('edit-user-name').value);
       const pass = document.getElementById('edit-user-password').value.trim();
       const role = isSeller() ? 'CLIENTE' : document.getElementById('edit-user-role').value;
-      const bal = parseFloat(document.getElementById('edit-user-balance').value);
-      if (!name || !pass || !Number.isFinite(bal) || bal < 0) return showToast('Revisa usuario, contraseña y saldo.', 'error');
+      const enteredBal = parseFloat(document.getElementById('edit-user-balance').value);
+      const balCurrency = document.getElementById('edit-user-balance-currency')?.value || 'USD';
+      const bal = convertCurrency(enteredBal, balCurrency, 'USD');
+      if (!name || !pass || !Number.isFinite(enteredBal) || enteredBal < 0 || !Number.isFinite(bal)) return showToast('Revisa usuario, contraseña y saldo.', 'error');
       const duplicate = Object.values(memoryDB.users || {}).some(x => x.id !== uid && String(x.username || '').toLowerCase() === name.toLowerCase());
       if (duplicate) return showToast('Ese usuario ya existe.', 'error');
-      const updates = { username: name, password: pass, role: role, balance: bal, updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
+      const updates = { username: name, password: pass, role: role, balance: Number(bal.toFixed(8)), updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
       try {
         if (!db) throw new Error('Firebase no está conectado.');
         await db.ref(`ANYA_STREAMING/users/${uid}`).update(updates);
