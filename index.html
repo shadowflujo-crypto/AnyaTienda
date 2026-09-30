@@ -954,7 +954,15 @@
     .role-security-banner strong{color:#fff}.role-security-banner i{color:var(--accent-cyan);font-size:1rem}
 
     .realtime-status-dot{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.realtime-status-dot:before{content:"";width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 12px rgba(16,185,129,.75);animation:anyPulse 1.8s infinite}.migration-live-card{position:relative;overflow:hidden}.migration-live-card:after{content:"";position:absolute;inset:auto -20% -80%;height:150px;background:radial-gradient(circle,rgba(0,210,255,.13),transparent 65%);pointer-events:none}
-  </style>
+      .owner-balance-preview{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border-color);color:var(--text-muted);font-size:.8rem}
+    .owner-balance-preview strong{color:var(--accent-pink);font-size:1.05rem}
+    .user-action-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .security-mini-card{border:1px solid rgba(236,72,153,.18);background:linear-gradient(135deg,rgba(236,72,153,.07),rgba(0,210,255,.04));border-radius:16px;padding:14px 16px}
+    .github-help-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+    .github-help-item{padding:12px;border:1px solid var(--border-color);border-radius:12px;background:rgba(255,255,255,.03)}
+    .github-help-item b{display:block;color:#fff;margin-bottom:4px;font-size:.8rem}.github-help-item span{display:block;color:var(--text-muted);font-size:.73rem;line-height:1.45}
+    @media (max-width:700px){.github-help-grid{grid-template-columns:1fr}.table-container{overflow-x:auto;-webkit-overflow-scrolling:touch}.user-action-group{flex-direction:column;align-items:stretch}.user-action-group .btn{width:100%}}
+</style>
 </head>
 <body class="mode-pc">
 
@@ -1088,7 +1096,6 @@
           <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Abrir Menú"><i class="fa-solid fa-bars"></i></button>
           <div>
             <h2 style="font-family:'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight:700;" id="page-title">Tienda Oficial</h2>
-            <div class="badge-spark"><i class="fa-solid fa-bolt"></i> Actualización en tiempo real</div>
           </div>
         </div>
         <div class="header-right">
@@ -1145,13 +1152,7 @@
               <div style="font-size: 0.72rem; color: var(--text-muted);">Soporte directo disponible</div>
             </div>
           </div>
-          <div class="trust-item">
-            <div class="trust-icon" style="background: rgba(0, 210, 255, 0.15); color: var(--accent-cyan);"><i class="fa-solid fa-cloud"></i></div>
-            <div>
-              <div style="font-size: 0.82rem; font-weight: 700; color: #fff;">Actualización en tiempo real</div>
-              <div style="font-size: 0.72rem; color: var(--text-muted);">Cambios sincronizados al instante</div>
-            </div>
-          </div>
+
         </div>
 
         <div class="store-filter-bar">
@@ -1372,7 +1373,7 @@
           <div class="glass stock-import-card" style="padding: 22px;">
             <div class="stock-import-head">
               <div>
-                <div class="section-kicker"><span class="pulse-dot"></span> STOCK SEGURO · TIEMPO REAL</div>
+                <div class="section-kicker"><span class="pulse-dot"></span> STOCK SEGURO</div>
                 <h4 style="font-size:1.25rem; margin:6px 0 4px; font-weight:900;">Carga masiva de cuentas</h4>
                 <p class="stock-help">Pega una cuenta por línea en formato <b>usuario:contraseña</b>. El sistema separa cada cuenta y la guarda individualmente.</p>
               </div>
@@ -1405,7 +1406,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
               <div>
                 <h4 style="font-size: 1.15rem; font-weight: 800;"><i class="fa-solid fa-layer-group" style="color:var(--accent-cyan);"></i> Inventario de Stock</h4>
-                <p style="font-size: 0.78rem; color: var(--text-muted);">Actualizaciones atómicas directas a cada ID de cuenta.</p>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Cambios directos por cuenta, sin recargar toda la base.</p>
               </div>
               <div style="display: flex; gap: 8px; align-items: center;">
                 <select id="stock-filter-status" class="form-select" style="padding:6px 10px; font-size:0.8rem;" onchange="renderStockTable()">
@@ -1471,7 +1472,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
             <div>
               <h4 style="font-size: 1.15rem; font-weight: 800;"><i class="fa-solid fa-users-gear" style="color:var(--accent-pink);"></i> Todos los Usuarios Registrados</h4>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">Sincronización granular en ANYA_STREAMING/users.</p>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Panel administrativo: edita clientes y Sellers, controla saldos y revisa actividad.</p>
             </div>
             <div style="display: flex; gap: 8px;">
               <input type="text" id="users-search-input" class="form-input" style="width: 200px; padding: 6px 10px; font-size: 0.82rem;" placeholder="Buscar usuario..." oninput="renderOwnerUsers()" />
@@ -1565,7 +1566,7 @@
             </form>
           </div>
 
-          <!-- Real-Time Spark Storage Meter -->
+          <!-- Storage Meter -->
           <div class="glass" style="padding: 24px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom: 16px;">
               <div>
@@ -1573,7 +1574,7 @@
                   <i class="fa-solid fa-database" style="color: var(--accent-emerald);"></i> Consumo de Almacenamiento en Tiempo Real
                 </h3>
                 <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
-                  Medición en vivo del tamaño de datos en memoria y Firebase Realtime Database (Límite gratuito: 1,024 MB / 1 GB).
+                  Medición en vivo del tamaño de datos en memoria y Firebase Realtime Database (Referencia de almacenamiento: 1 GB).
                 </p>
               </div>
               <button class="btn btn-secondary" onclick="updateLiveStorageMetrics()"><i class="fa-solid fa-rotate-right"></i> Recalcular Ahora</button>
@@ -1590,7 +1591,7 @@
               </div>
               <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.74rem; color:var(--text-dim);">
                 <span>0 MB Usados</span>
-                <span id="storage-percentage-label">0.0001% de 1 GB Gratuito</span>
+                <span id="storage-percentage-label">0.0001% de 1 GB</span>
                 <span>1,024 MB Límite gratuito</span>
               </div>
             </div>
@@ -1695,7 +1696,7 @@
                 <i class="fa-brands fa-github text-emerald-400"></i> Respaldo & Sincronización GitHub
               </h3>
               <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-                Mantiene una copia versionada de seguridad en tu cuenta de GitHub sin interferir con las operaciones ligeras de Firebase.
+                GitHub sirve como respaldo del estado de tu tienda. No es necesario para que Firebase funcione.
               </p>
             </div>
             <button class="btn btn-github" onclick="triggerManualGitHubSync()"><i class="fa-solid fa-cloud-arrow-up"></i> Forzar Guardado GitHub</button>
@@ -1703,8 +1704,9 @@
 
           <form onsubmit="handleSaveGitHubConfig(event)" style="display:flex; flex-direction:column; gap:16px;">
             <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">Token Personal GitHub (PAT con permiso repo)</label>
-              <input type="password" id="gh-token-input" class="form-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+              <label class="form-label">Token de GitHub (PAT)</label>
+              <input type="password" id="gh-token-input" class="form-input" placeholder="Pega aquí tu token de GitHub" autocomplete="off" />
+              <div class="security-mini-card" style="margin-top:8px;"><div style="font-size:.78rem;color:#fff;font-weight:800;"><i class="fa-solid fa-circle-info" style="color:var(--accent-cyan);"></i> ¿Qué datos son estos?</div><div style="font-size:.73rem;color:var(--text-muted);line-height:1.5;margin-top:5px;"><b>Token:</b> permiso para guardar el respaldo. <b>Usuario:</b> tu nombre de GitHub. <b>Repositorio:</b> nombre exacto del repositorio. <b>Archivo:</b> dónde guardar el JSON. <b>Rama:</b> normalmente <code>main</code>. El token no es tu contraseña de GitHub.</div></div>
             </div>
 
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
@@ -1730,6 +1732,14 @@
             </div>
 
             <button type="submit" class="btn btn-primary" style="margin-top:8px;"><i class="fa-solid fa-floppy-disk"></i> Guardar Configuración GitHub</button>
+            <div class="github-help-grid">
+              <div class="github-help-item"><b>1 · Crea un repositorio</b><span>En GitHub crea un repositorio, por ejemplo <code>anya-streaming-backup</code>. No necesitas subir manualmente el JSON.</span></div>
+              <div class="github-help-item"><b>2 · Usuario</b><span>Es tu nombre de usuario de GitHub, el que aparece en tu perfil.</span></div>
+              <div class="github-help-item"><b>3 · Repositorio</b><span>Solo el nombre del repositorio, sin <code>https://github.com/</code>.</span></div>
+              <div class="github-help-item"><b>4 · Token</b><span>Crea un Fine-grained Personal Access Token con acceso únicamente al repositorio de respaldo y permiso <b>Contents: Read and write</b>.</span></div>
+              <div class="github-help-item"><b>5 · Archivo</b><span>Puedes dejar <code>anya_stream_database.json</code>. El sistema lo crea o actualiza.</span></div>
+              <div class="github-help-item"><b>6 · Rama</b><span>Si tu repositorio usa la rama principal habitual, escribe <code>main</code>.</span></div>
+            </div>
           </form>
         </div>
       </section>
@@ -1907,6 +1917,22 @@
           <input type="number" class="form-input" id="edit-user-balance" step="0.1" min="0" required />
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-floppy-disk"></i> Guardar Cambios</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Owner Balance Modal -->
+  <div class="modal-overlay" id="owner-balance-modal">
+    <div class="modal-box">
+      <i class="fa-solid fa-xmark close-modal-btn" onclick="closeModal('owner-balance-modal')"></i>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div style="width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(236,72,153,.14);color:var(--accent-pink);"><i class="fa-solid fa-wallet"></i></div>
+        <div><h3 style="margin:0;font-size:1.15rem;font-weight:900;">Mi saldo · OWNER</h3><p style="margin:3px 0 0;color:var(--text-muted);font-size:.76rem;">Puedes establecer el saldo del OWNER manualmente.</p></div>
+      </div>
+      <form onsubmit="handleSaveOwnerBalance(event)">
+        <div class="form-group"><label class="form-label">Nuevo saldo (USD $)</label><input type="number" class="form-input" id="owner-balance-value" step="0.01" min="0" required /></div>
+        <div class="owner-balance-preview"><span>Saldo actual</span><strong id="owner-balance-current">$0.00</strong></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:14px;"><i class="fa-solid fa-check"></i> Guardar mi saldo</button>
       </form>
     </div>
   </div>
@@ -2134,12 +2160,14 @@
     let currentStoreFilter = 'ALL';
     let currentDeviceMode = 'pc';
     let currentUser = null;
+    let loginFailCount = 0;
+    let loginLockUntil = 0;
 
     // Automated silent background synchronization with GitHub
     let autoSyncTimer = null;
     let isAutoSyncing = false;
 
-    function queueSilentGitHubSync(delayMs = 2500) {
+    function queueSilentGitHubSync(delayMs = 8000) {
       if (autoSyncTimer) clearTimeout(autoSyncTimer);
       autoSyncTimer = setTimeout(() => {
         executeSilentGitHubPush();
@@ -2148,7 +2176,7 @@
 
     async function executeSilentGitHubPush() {
       const cfg = memoryDB.config || {};
-      if (!cfg.githubToken || !cfg.githubOwner || !cfg.githubRepo || isAutoSyncing) {
+      if (!getGitHubToken() || !cfg.githubOwner || !cfg.githubRepo || isAutoSyncing) {
         return;
       }
 
@@ -2169,7 +2197,7 @@
         try {
           const checkRes = await fetch(`${url}?ref=${encodeURIComponent(branch)}`, {
             headers: {
-              'Authorization': `Bearer ${cfg.githubToken}`,
+              'Authorization': `Bearer ${getGitHubToken()}`,
               'Accept': 'application/vnd.github.v3+json'
             }
           });
@@ -2182,14 +2210,13 @@
         }
 
         const safeConfig = Object.assign({}, memoryDB.config || {});
-        delete safeConfig.githubToken;
         const safeDatabase = Object.assign({}, memoryDB, { config: safeConfig });
         const snapshot = {
           meta: {
             brand: "ANYA STREAMING",
             autoSyncedAt: new Date().toISOString(),
             firebaseUrl: ACTIVE_FIREBASE_URL,
-            version: "2.4.0-Spark"
+            version: "2.4.0"
           },
           database: safeDatabase
         };
@@ -2207,7 +2234,7 @@
         const putRes = await fetch(url, {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${cfg.githubToken}`,
+            'Authorization': `Bearer ${getGitHubToken()}`,
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
           },
@@ -2216,14 +2243,14 @@
 
         if (putRes.ok && dot) {
           dot.className = 'github-dot online';
-          if (text) text.innerText = 'GitHub OK';
+          if (text) text.innerText = 'Respaldo OK';
         }
       } catch (err) {
         console.debug('Silent GitHub sync skipped or network down:', err);
       } finally {
         isAutoSyncing = false;
         setTimeout(() => {
-          if (text) text.innerText = 'GitHub';
+          if (text) text.innerText = 'Respaldo';
         }, 3000);
       }
     }
@@ -2239,7 +2266,6 @@
       config: {
         bgPc: DEFAULT_BG_PC,
         bgMobile: DEFAULT_BG_MOBILE,
-        githubToken: '',
         githubOwner: '',
         githubRepo: '',
         githubPath: 'anya_stream_database.json',
@@ -2263,6 +2289,7 @@
     } catch(e) {
       console.warn("Cache load warning:", e);
     }
+    try { if (memoryDB.config && memoryDB.config.githubToken) { localStorage.setItem('anya_github_token', memoryDB.config.githubToken); delete memoryDB.config.githubToken; } } catch(e) {}
 
     function saveCacheLocally(queueGithub = true) {
       try {
@@ -2378,7 +2405,7 @@
         setTimeout(() => {
           updateFirebaseUrlDisplay();
           updateLiveStorageMetrics();
-          showToast('TODO migrado y conectado en tiempo real.', 'success');
+          showToast('Migración completa y conexión establecida.', 'success');
         }, 700);
       } catch (err) {
         console.error('Firebase migration error:', err);
@@ -2432,7 +2459,7 @@
 
         if (totalEl) totalEl.innerText = formatByteSize(totalBytes);
         if (barEl) barEl.style.width = Math.max(0.2, Math.min(100, percentage * 50)).toFixed(2) + '%';
-        if (pctEl) pctEl.innerText = `${percentage < 0.0001 ? '< 0.0001%' : percentage.toFixed(4) + '%'} de 1 GB Gratuito`;
+        if (pctEl) pctEl.innerText = `${percentage < 0.0001 ? '< 0.0001%' : percentage.toFixed(4) + '%'} de 1 GB`;
 
         const mProdSize = document.getElementById('metric-products-size');
         const mProdCount = document.getElementById('metric-products-count');
@@ -2472,7 +2499,7 @@
           brand: "ANYA STREAMING",
           exportedAt: new Date().toISOString(),
           firebaseUrl: ACTIVE_FIREBASE_URL,
-          version: "2.4.0-Spark"
+          version: "2.4.0"
         },
         database: memoryDB
       };
@@ -2493,7 +2520,6 @@
     function copyDatabaseSnapshotJSON() {
       try {
         const safeConfig = Object.assign({}, memoryDB.config || {});
-        delete safeConfig.githubToken;
         const snapshot = {
           brand: "ANYA STREAMING",
           exportedAt: new Date().toISOString(),
@@ -2679,7 +2705,7 @@
 
     /* =========================================================================
        ANYA IMAGE PIPELINE — LOCAL FILE -> COMPRESSED WEBP DATA
-       Spark-compatible: no Firebase Storage bucket required.
+       Optimización de imágenes integrada.
        ========================================================================= */
     const ANYA_IMAGE_MAX_BYTES = 250 * 1024;
     const ANYA_IMAGE_MAX_SIDE = 1200;
@@ -2953,7 +2979,7 @@
         hiddenForClient: false
       };
 
-      // Perform multi-path atomic update in Firebase Spark
+      // Perform multi-path atomic update in Firebase
       if (db) {
         const updates = {};
         updates[`ANYA_STREAMING/stock/${stockItem.id}/timesUsed`] = newTimesUsed;
@@ -3578,6 +3604,36 @@
       return false;
     }
 
+    function canManageClient(u) {
+      if (!currentUser || !u) return false;
+      if (isOwner()) return u.role !== 'OWNER' || u.id === currentUser.id;
+      return isSeller() && u.role === 'CLIENTE' && (u.creatorId === currentUser.id || String(u.creator || '').toLowerCase() === String(currentUser.username || '').toLowerCase());
+    }
+
+    function openOwnerBalanceModal() {
+      if (!isOwner()) return denyAccess('Solo el OWNER puede modificar su saldo.');
+      const value = Number(currentUser.balance || 0);
+      const input = document.getElementById('owner-balance-value');
+      const current = document.getElementById('owner-balance-current');
+      if (input) input.value = value.toFixed(2);
+      if (current) current.textContent = '$' + value.toFixed(2);
+      openModal('owner-balance-modal');
+    }
+
+    async function handleSaveOwnerBalance(e) {
+      e.preventDefault();
+      if (!isOwner() || !db) return denyAccess('Solo el OWNER puede modificar su saldo.');
+      const newBalance = Number(document.getElementById('owner-balance-value')?.value);
+      if (!Number.isFinite(newBalance) || newBalance < 0) return showToast('Ingresa un saldo válido.', 'error');
+      try {
+        await db.ref(`ANYA_STREAMING/users/${currentUser.id}/balance`).set(newBalance);
+        currentUser.balance = newBalance;
+        if (memoryDB.users[currentUser.id]) memoryDB.users[currentUser.id].balance = newBalance;
+        saveCacheLocally(false); updateUI(); renderOwnerUsers(); closeModal('owner-balance-modal');
+        showToast(`Tu saldo ahora es $${newBalance.toFixed(2)} USD.`, 'success');
+      } catch (err) { showToast('No se pudo guardar el saldo: ' + (err.message || 'error de Firebase'), 'error'); }
+    }
+
     /* =========================================================================
        USER MANAGEMENT & SECURITY
        ========================================================================= */
@@ -3602,7 +3658,7 @@
           <td><span style="font-size:.78rem;color:var(--accent-cyan);">${escapeHtml(u.creator || 'FUNDADOR')}</span></td>
           <td>${onlineBadge(u)}</td>
           <td style="font-size:.72rem;color:var(--text-dim);">${escapeHtml(u.lastDevice || '-')}</td>
-          <td>${u.role !== 'OWNER' ? `<button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem;margin-right:4px;" onclick="openEditUserDetailsModal('${u.id}')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-danger" style="padding:4px 8px;font-size:.75rem;" onclick="deleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>` : '<span class="role-badge">PROTEGIDO</span>'}</td>`;
+          <td><div class="user-action-group">${u.id === currentUser?.id && isOwner() ? `<button class="btn btn-primary" style="padding:5px 9px;font-size:.73rem;" onclick="openOwnerBalanceModal()"><i class="fa-solid fa-wallet"></i> Mi saldo</button><span class="role-badge">OWNER</span>` : u.role !== 'OWNER' ? `<button class="btn btn-secondary" style="padding:5px 9px;font-size:.73rem;" onclick="openEditUserDetailsModal('${u.id}')"><i class="fa-solid fa-pen"></i> Editar</button><button class="btn btn-danger" style="padding:5px 9px;font-size:.73rem;" onclick="deleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>` : '<span class="role-badge">PROTEGIDO</span>'}</div></td>`;
         tbody.appendChild(tr);
       });
     }
@@ -3633,7 +3689,7 @@
       });
     }
 
-    function handleCreateSubUser(e) {
+    async function handleCreateSubUser(e) {
       e.preventDefault();
       if (!isOwner() && !isSeller()) return denyAccess('Solo OWNER o SELLER pueden crear clientes.');
       const name = cleanInput(document.getElementById('sub-name').value);
@@ -3641,25 +3697,20 @@
       const role = isSeller() ? 'CLIENTE' : document.getElementById('sub-role').value;
       const initBal = parseFloat(document.getElementById('sub-init-balance').value) || 0;
       if (!name || !pass) return showToast('Usuario y contraseña son obligatorios.', 'error');
+      if (initBal < 0) return showToast('El saldo inicial no puede ser negativo.', 'error');
       if (isSeller() && role !== 'CLIENTE') return denyAccess('Un SELLER solo puede crear CLIENTES.');
-      const exists = Object.values(memoryDB.users || {}).some(u => u.username.toLowerCase() === name.toLowerCase());
+      const exists = Object.values(memoryDB.users || {}).some(u => String(u.username || '').toLowerCase() === name.toLowerCase());
       if (exists) return showToast('Ese nombre de usuario ya está registrado.', 'error');
       const uid = 'u_' + Date.now();
-      const newUser = {
-        id: uid, username: name, password: pass, role: role, balance: initBal,
-        creator: currentUser.username, creatorId: currentUser.id,
-        createdAt: new Date().toISOString(), lastLogin: 'Nunca', lastSeen: null,
-        online: false, lastDevice: '-'
-      };
-      if (db) db.ref(`ANYA_STREAMING/users/${uid}`).set(newUser);
-      memoryDB.users[uid] = newUser;
-      saveCacheLocally(false);
-      document.getElementById('sub-name').value = '';
-      document.getElementById('sub-pass').value = '';
-      document.getElementById('sub-init-balance').value = '0';
-      renderSubUsers(); renderOwnerUsers(); populateNotifyUserOptions();
-      queueSilentGitHubSync(1000);
-      showToast(`Cliente ${name} creado correctamente.`, 'success');
+      const newUser = { id: uid, username: name, password: pass, role: role, balance: initBal, creator: currentUser.username, creatorId: currentUser.id, createdAt: new Date().toISOString(), lastLogin: 'Nunca', lastSeen: null, online: false, lastDevice: '-' };
+      try {
+        if (!db) throw new Error('Firebase no está conectado.');
+        await db.ref(`ANYA_STREAMING/users/${uid}`).set(newUser);
+        memoryDB.users[uid] = newUser; saveCacheLocally(false);
+        document.getElementById('sub-name').value = ''; document.getElementById('sub-pass').value = ''; document.getElementById('sub-init-balance').value = '0';
+        renderSubUsers(); renderOwnerUsers(); populateNotifyUserOptions(); queueSilentGitHubSync(1000);
+        showToast(`Cliente ${name} creado correctamente.`, 'success');
+      } catch (err) { showToast('No se pudo crear el cliente: ' + (err.message || 'error de Firebase'), 'error'); }
     }
 
     function openEditUserDetailsModal(uid) {
@@ -3676,7 +3727,7 @@
       openModal('edit-user-details-modal');
     }
 
-    function handleSaveUserDetails(e) {
+    async function handleSaveUserDetails(e) {
       e.preventDefault();
       const uid = document.getElementById('edit-user-id').value;
       const u = memoryDB.users[uid];
@@ -3684,29 +3735,35 @@
       const name = cleanInput(document.getElementById('edit-user-name').value);
       const pass = document.getElementById('edit-user-password').value.trim();
       const role = isSeller() ? 'CLIENTE' : document.getElementById('edit-user-role').value;
-      const bal = parseFloat(document.getElementById('edit-user-balance').value) || 0;
-      const duplicate = Object.values(memoryDB.users || {}).some(x => x.id !== uid && x.username.toLowerCase() === name.toLowerCase());
+      const bal = parseFloat(document.getElementById('edit-user-balance').value);
+      if (!name || !pass || !Number.isFinite(bal) || bal < 0) return showToast('Revisa usuario, contraseña y saldo.', 'error');
+      const duplicate = Object.values(memoryDB.users || {}).some(x => x.id !== uid && String(x.username || '').toLowerCase() === name.toLowerCase());
       if (duplicate) return showToast('Ese usuario ya existe.', 'error');
       const updates = { username: name, password: pass, role: role, balance: bal, updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
-      if (db) db.ref(`ANYA_STREAMING/users/${uid}`).update(updates);
-      Object.assign(u, updates);
-      if (currentUser.id === uid) currentUser = Object.assign({}, u);
-      saveCacheLocally(false);
-      closeModal('edit-user-details-modal');
-      renderSubUsers(); renderOwnerUsers(); updateUI();
-      queueSilentGitHubSync(1000);
-      showToast('Cliente actualizado en tiempo real.', 'success');
+      try {
+        if (!db) throw new Error('Firebase no está conectado.');
+        await db.ref(`ANYA_STREAMING/users/${uid}`).update(updates);
+        Object.assign(u, updates);
+        if (currentUser.id === uid) currentUser = Object.assign({}, u);
+        saveCacheLocally(false); closeModal('edit-user-details-modal');
+        renderSubUsers(); renderOwnerUsers(); updateUI(); queueSilentGitHubSync(1000);
+        showToast('Cambios guardados correctamente.', 'success');
+      } catch (err) {
+        showToast('No se pudo guardar: ' + (err.message || 'error de Firebase'), 'error');
+      }
     }
 
-    function deleteUser(uid) {
+    async function deleteUser(uid) {
       if (!isOwner()) return denyAccess('Solo el OWNER puede eliminar usuarios.');
       const u = memoryDB.users[uid];
       if (!u || u.role === 'OWNER') return showToast('No puedes eliminar al OWNER principal.', 'error');
-      if (db) db.ref(`ANYA_STREAMING/users/${uid}`).remove();
-      delete memoryDB.users[uid];
-      saveCacheLocally(false); renderSubUsers(); renderOwnerUsers();
-      queueSilentGitHubSync(1000);
-      showToast(`Usuario ${u.username} eliminado.`, 'info');
+      if (!confirm(`¿Eliminar definitivamente a ${u.username}?`)) return;
+      try {
+        if (!db) throw new Error('Firebase no está conectado.');
+        await db.ref(`ANYA_STREAMING/users/${uid}`).remove();
+        delete memoryDB.users[uid]; saveCacheLocally(false); renderSubUsers(); renderOwnerUsers(); queueSilentGitHubSync(1000);
+        showToast(`Usuario ${u.username} eliminado.`, 'info');
+      } catch (err) { showToast('No se pudo eliminar: ' + (err.message || 'error de Firebase'), 'error'); }
     }
 
     function handleChangePassword(e) {
@@ -3753,7 +3810,7 @@
         if (presenceHeartbeat) clearInterval(presenceHeartbeat);
         presenceHeartbeat = setInterval(() => {
           if (currentUser && db) ref.update({ online: true, lastSeen: new Date().toISOString() });
-        }, 30000);
+        }, 60000);
       } catch (err) { console.warn('Presence error:', err); }
     }
 
@@ -3767,6 +3824,7 @@
 
     async function handleLoginSubmit(e) {
       e.preventDefault();
+      if (Date.now() < loginLockUntil) return showToast(`Demasiados intentos. Espera ${Math.ceil((loginLockUntil - Date.now()) / 1000)}s.`, 'error');
       const u = cleanInput(document.getElementById('auth-user').value);
       const p = document.getElementById('auth-pass').value.trim();
       const submitBtn = e.submitter || document.querySelector('#auth-screen button[type="submit"]');
@@ -3783,6 +3841,7 @@
         const user = Object.values(memoryDB.users || {}).find(x => x && x.username && x.username.toLowerCase() === u.toLowerCase());
 
         if (user && user.password === p) {
+        loginFailCount = 0;
         const now = new Date();
         const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const deviceType = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 880) ? 'Móvil' : 'PC';
@@ -3806,7 +3865,9 @@
         switchNav('store');
         showToast(`Bienvenido a ANYA STREAMING, ${user.username}`, 'success');
         } else {
-          showToast('Usuario o contraseña incorrectos.', 'error');
+          loginFailCount++;
+          if (loginFailCount >= 5) { loginLockUntil = Date.now() + 30000; loginFailCount = 0; showToast('Demasiados intentos. Acceso pausado durante 30 segundos.', 'error'); }
+          else showToast('Usuario o contraseña incorrectos.', 'error');
         }
       } catch (err) {
         console.error('Login/Firebase error:', err);
@@ -4051,49 +4112,28 @@
     /* =========================================================================
        GITHUB BACKUP LOGIC (SAFE ISOLATION)
        ========================================================================= */
+    function getGitHubToken() { try { return localStorage.getItem('anya_github_token') || ''; } catch(e) { return ''; } }
+
     function renderGitHubConfigView() {
-      const cfg = memoryDB.config || {};
-      const t = document.getElementById('gh-token-input');
-      const o = document.getElementById('gh-owner-input');
-      const r = document.getElementById('gh-repo-input');
-      const p = document.getElementById('gh-path-input');
-      const b = document.getElementById('gh-branch-input');
-
-      if (t) t.value = cfg.githubToken || '';
-      if (o) o.value = cfg.githubOwner || '';
-      if (r) r.value = cfg.githubRepo || '';
-      if (p) p.value = cfg.githubPath || 'anya_stream_database.json';
-      if (b) b.value = cfg.githubBranch || 'main';
-
-      const dot = document.getElementById('github-status-dot');
-      if (dot) {
-        dot.className = 'github-dot' + (cfg.githubToken ? ' online' : '');
-      }
+      const cfg = memoryDB.config || {}; const token = getGitHubToken();
+      const t = document.getElementById('gh-token-input'), o = document.getElementById('gh-owner-input'), r = document.getElementById('gh-repo-input'), p = document.getElementById('gh-path-input'), b = document.getElementById('gh-branch-input');
+      if (t) t.value = token; if (o) o.value = cfg.githubOwner || ''; if (r) r.value = cfg.githubRepo || ''; if (p) p.value = cfg.githubPath || 'anya_stream_database.json'; if (b) b.value = cfg.githubBranch || 'main';
+      const dot = document.getElementById('github-status-dot'); if (dot) dot.className = 'github-dot' + (token && cfg.githubOwner && cfg.githubRepo ? ' online' : '');
     }
 
     function handleSaveGitHubConfig(e) {
       e.preventDefault();
-      const updates = {
-        githubToken: document.getElementById('gh-token-input').value.trim(),
-        githubOwner: document.getElementById('gh-owner-input').value.trim(),
-        githubRepo: document.getElementById('gh-repo-input').value.trim(),
-        githubPath: document.getElementById('gh-path-input').value.trim() || 'anya_stream_database.json',
-        githubBranch: document.getElementById('gh-branch-input').value.trim() || 'main'
-      };
-
-      if (db) {
-        db.ref('ANYA_STREAMING/config').update(updates);
-      }
-      Object.assign(memoryDB.config, updates);
-      saveCacheLocally();
-      renderGitHubConfigView();
-      queueSilentGitHubSync(500);
+      const token = document.getElementById('gh-token-input').value.trim();
+      const updates = { githubOwner: document.getElementById('gh-owner-input').value.trim(), githubRepo: document.getElementById('gh-repo-input').value.trim(), githubPath: document.getElementById('gh-path-input').value.trim() || 'anya_stream_database.json', githubBranch: document.getElementById('gh-branch-input').value.trim() || 'main' };
+      try { if (token) localStorage.setItem('anya_github_token', token); else localStorage.removeItem('anya_github_token'); } catch(e) {}
+      if (db) db.ref('ANYA_STREAMING/config').update(updates);
+      Object.assign(memoryDB.config, updates); delete memoryDB.config.githubToken; saveCacheLocally(false); renderGitHubConfigView(); queueSilentGitHubSync(500);
       showToast('Configuración de GitHub guardada.', 'success');
     }
 
     async function triggerManualGitHubSync() {
       const cfg = memoryDB.config || {};
-      if (!cfg.githubToken || !cfg.githubOwner || !cfg.githubRepo) {
+      if (!getGitHubToken() || !cfg.githubOwner || !cfg.githubRepo) {
         showToast('Completa los campos de GitHub primero.', 'error');
         switchNav('owner-github');
         return;
@@ -4109,7 +4149,7 @@
         try {
           const checkRes = await fetch(`${url}?ref=${encodeURIComponent(branch)}`, {
             headers: {
-              'Authorization': `Bearer ${cfg.githubToken}`,
+              'Authorization': `Bearer ${getGitHubToken()}`,
               'Accept': 'application/vnd.github.v3+json'
             }
           });
@@ -4132,7 +4172,7 @@
         const putRes = await fetch(url, {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${cfg.githubToken}`,
+            'Authorization': `Bearer ${getGitHubToken()}`,
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
           },
