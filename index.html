@@ -964,7 +964,131 @@
     @media (max-width:700px){.github-help-grid{grid-template-columns:1fr}.table-container{overflow-x:auto;-webkit-overflow-scrolling:touch}.user-action-group{flex-direction:column;align-items:stretch}.user-action-group .btn{width:100%}}
     .balance-conversion-hint{margin-top:6px;font-size:.72rem;color:var(--text-muted);font-weight:700;}
     #fx-live-status{transition:opacity .25s ease;}
-</style>
+
+    /* Ajustes de rendimiento y lectura */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      .ambient-orb { animation: none !important; }
+    }
+    @media (max-width: 760px) {
+      .header-right { gap: 6px; }
+      #global-currency-select { max-width: 105px; }
+      .owner-products-hero { border-radius: 16px; }
+      .glass { max-width: 100%; }
+    }
+
+
+    /* ANYA STREAMING · pulido visual y microinteracciones ligeras */
+    :root {
+      color-scheme: dark;
+      --border-color: rgba(167, 139, 250, .16);
+      --accent-pink: #f472b6;
+      --accent-pink-hover: #ec4899;
+      --accent-pink-glow: rgba(244, 114, 182, .2);
+    }
+    html { scroll-behavior: smooth; scrollbar-color: #5b3159 #090910; scrollbar-width: thin; }
+    body {
+      background-image: radial-gradient(ellipse at 15% 0%, rgba(168,85,247,.09), transparent 34%),
+                        radial-gradient(ellipse at 100% 35%, rgba(236,72,153,.07), transparent 32%);
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(236,72,153,.35); color: #fff; }
+    :focus-visible { outline: 2px solid #f9a8d4 !important; outline-offset: 3px; }
+    .glass, .modal-content, .product-card, .stat-card, .dashboard-card, .security-mini-card {
+      border-color: rgba(255,255,255,.09);
+      box-shadow: 0 12px 36px rgba(0,0,0,.16);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .glass, .product-card, .stat-card, .dashboard-card {
+      transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease, background-color .2s ease;
+    }
+    .glass:hover, .product-card:hover, .stat-card:hover, .dashboard-card:hover {
+      border-color: rgba(244,114,182,.23);
+      box-shadow: 0 16px 42px rgba(0,0,0,.22), 0 0 0 1px rgba(244,114,182,.035);
+    }
+    .btn, button, .nav-btn, .tab-btn {
+      transition: transform .16s ease, filter .16s ease, border-color .16s ease, background-color .16s ease;
+    }
+    .btn:hover, button:hover { filter: brightness(1.08); }
+    .btn:active, button:active, .nav-btn:active { transform: scale(.985); }
+    .btn-primary {
+      box-shadow: 0 7px 20px rgba(236,72,153,.16);
+    }
+    input, textarea, select {
+      border-color: rgba(255,255,255,.12) !important;
+      background-color: rgba(7,7,12,.72) !important;
+      transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(244,114,182,.65) !important;
+      box-shadow: 0 0 0 3px rgba(244,114,182,.09) !important;
+    }
+    .nav-btn { border: 1px solid transparent; }
+    .nav-btn:hover { background: rgba(255,255,255,.045); border-color: rgba(255,255,255,.07); }
+    .nav-btn.active, .nav-btn[aria-current="page"] {
+      background: linear-gradient(100deg, rgba(236,72,153,.15), rgba(168,85,247,.09));
+      border-color: rgba(244,114,182,.19);
+    }
+    .badge-spark { backdrop-filter: blur(8px); }
+    .catalog-grid { align-items: stretch; }
+    .catalog-grid > * { min-width: 0; }
+    img { max-width: 100%; }
+    a { color: inherit; text-underline-offset: 3px; }
+    a:hover { text-decoration-color: rgba(244,114,182,.7); }
+    .table-container { scrollbar-width: thin; scrollbar-color: #573052 transparent; }
+    .table-container table { min-width: 100%; }
+    .modal-overlay { overscroll-behavior: contain; }
+    .modal-content { max-height: min(88dvh, 900px); overflow-y: auto; }
+    @media (max-width: 760px) {
+      body { padding-bottom: env(safe-area-inset-bottom); }
+      .glass, .modal-content, .product-card, .stat-card, .dashboard-card { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+      .btn, button { min-height: 40px; }
+      .modal-content { width: calc(100% - 20px); max-height: 88dvh; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+
+    /* Presentación limpia para APK y URL */
+    .resource-text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      color: var(--accent-cyan);
+      font-size: .92rem;
+      font-weight: 600;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      text-decoration: underline;
+      text-decoration-color: rgba(0,210,255,.45);
+      text-underline-offset: 4px;
+      transition: color .18s ease, text-decoration-color .18s ease;
+    }
+    .resource-text-link:hover { color: #fff; text-decoration-color: currentColor; }
+    .resource-action-button { display: inline-flex; justify-content: center; align-items: center; gap: 9px; border-radius: 11px; min-height: 44px; }
+    .resource-mode-label { display: inline-flex; width: fit-content; color: var(--text-muted); font-size: .72rem; letter-spacing: .02em; padding: 5px 9px; border: 1px solid var(--border-color); border-radius: 7px; background: rgba(255,255,255,.025); }
+    .field-help { display: block; margin-top: 7px; color: var(--text-dim); font-size: .75rem; line-height: 1.5; }
+    #view-apk-url .owner-products-hero, #view-owner-apk-url .owner-products-hero { padding: clamp(18px, 3vw, 28px); border-radius: 18px; border: 1px solid var(--border-color); background: linear-gradient(135deg, rgba(21,22,34,.94), rgba(12,13,20,.94)); }
+    #view-apk-url .product-card, #view-owner-apk-url .product-card { border-radius: 14px; border-color: rgba(255,255,255,.09); box-shadow: 0 8px 24px rgba(0,0,0,.14); }
+    #view-apk-url .product-card:hover, #view-owner-apk-url .product-card:hover { border-color: rgba(0,210,255,.24); transform: translateY(-2px); box-shadow: 0 12px 26px rgba(0,0,0,.22); }
+    #view-apk-url .prod-info, #view-owner-apk-url .prod-info { padding: 20px; }
+    #view-owner-apk-url .glass { border: 1px solid var(--border-color); border-radius: 16px; background: rgba(17,18,27,.82); box-shadow: 0 12px 32px rgba(0,0,0,.16); }
+    #view-owner-apk-url .form-input, #view-owner-apk-url .form-textarea { border-radius: 10px; transition: border-color .18s ease, box-shadow .18s ease; }
+    #view-owner-apk-url .form-input:focus, #view-owner-apk-url .form-textarea:focus { border-color: rgba(0,210,255,.55); box-shadow: 0 0 0 3px rgba(0,210,255,.08); outline: none; }
+    #view-apk-url .live-pill, #view-owner-apk-url .live-pill { letter-spacing: .07em; font-size: .65rem; }
+    @media (max-width: 640px) {
+      #view-owner-apk-url .prod-info, #view-apk-url .prod-info { padding: 16px; }
+      #view-owner-apk-url .product-editor-grid > .span-6 { grid-column: 1 / -1; }
+      #view-owner-apk-url form .btn { min-height: 42px; }
+    }
+
+  </style>
 </head>
 <body class="mode-pc">
 
@@ -1048,6 +1172,7 @@
           <div class="nav-btn" id="nav-btn-orders" onclick="switchNav('orders')"><i class="fa-solid fa-receipt"></i> Mis Compras</div>
           <div class="nav-btn" id="nav-btn-recharge" onclick="switchNav('recharge')"><i class="fa-solid fa-wallet"></i> Billetera / Recargas</div>
           <div class="nav-btn" id="nav-btn-profile" onclick="switchNav('profile')"><i class="fa-solid fa-user-shield"></i> Mi Perfil</div>
+          <div class="nav-btn" id="nav-btn-apk-url" onclick="switchNav('apk-url')"><i class="fa-solid fa-mobile-screen-button"></i> APK Y URL</div>
 
           <div id="subusers-menu-section" style="display:none; margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 8px;">
             <div style="font-size: 0.68rem; color: var(--text-dim); font-weight: 700; padding: 4px 10px; text-transform: uppercase;">Revendedores / Paneles</div>
@@ -1057,6 +1182,7 @@
           <div id="owner-menu-section" style="display:none; margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 8px;">
             <div style="font-size: 0.68rem; color: var(--accent-pink); font-weight: 800; padding: 4px 10px; text-transform: uppercase;">Panel Owner</div>
             <div class="nav-btn" id="nav-btn-owner-products" onclick="switchNav('owner-products')"><i class="fa-solid fa-boxes-stacked"></i> Gestionar Tienda</div>
+            <div class="nav-btn" id="nav-btn-owner-apk-url" onclick="switchNav('owner-apk-url')"><i class="fa-solid fa-link"></i> Gestión APK Y URL</div>
             <div class="nav-btn" id="nav-btn-owner-stock" onclick="switchNav('owner-stock')"><i class="fa-solid fa-key"></i> Gestión de Cuentas (Stock)</div>
             <div class="nav-btn" id="nav-btn-owner-users" onclick="switchNav('owner-users')"><i class="fa-solid fa-users-gear"></i> Todos los Usuarios</div>
             <div class="nav-btn" id="nav-btn-owner-sales-audit" onclick="switchNav('owner-sales-audit')"><i class="fa-solid fa-list-check"></i> Cuentas Generadas</div>
@@ -1533,6 +1659,39 @@
         </div>
       </section>
 
+      <section id="view-apk-url" style="display:none;">
+        <div class="owner-products-hero" style="margin-bottom:18px">
+          <span class="live-pill"><i class="fa-solid fa-circle"></i> RECURSOS OFICIALES</span>
+          <h3 style="margin-top:12px">APK Y URL</h3>
+          <p>Accede a enlaces y aplicaciones publicados por la administración de ANYA STREAMING.</p>
+        </div>
+        <div id="apk-url-list" class="catalog-grid"></div>
+      </section>
+
+      <section id="view-owner-apk-url" style="display:none;">
+        <div class="owner-products-hero" style="margin-bottom:18px">
+          <span class="live-pill"><i class="fa-solid fa-circle"></i> PANEL OWNER</span>
+          <h3 style="margin-top:12px">Gestión de APK Y URL</h3>
+          <p>Publica enlaces para que estén disponibles en la sección APK Y URL de todos los usuarios.</p>
+        </div>
+        <div class="glass" style="padding:22px;margin-bottom:18px">
+          <form onsubmit="saveApkUrl(event)">
+            <input type="hidden" id="apk-url-edit-id">
+            <div class="product-editor-grid">
+              <div class="span-6 form-group"><label class="form-label">Nombre de la plataforma</label><input class="form-input" id="apk-url-name" placeholder="Ej. Netflix TV, App Android" required maxlength="80"></div>
+              <div class="span-6 form-group"><label class="form-label">URL o enlace</label><input class="form-input" id="apk-url-link" type="url" placeholder="https://..." required maxlength="1500"></div>
+              <div class="span-6 form-group"><label class="form-label" for="apk-url-display-mode">Forma de mostrar el enlace</label><select class="form-input" id="apk-url-display-mode"><option value="button">Como botón</option><option value="link">Como enlace de texto</option></select><small class="field-help">Elige por publicación: botón para destacar o texto sencillo para mostrar solo el link.</small></div>
+              <div class="span-6 form-group"><label class="form-label" for="apk-url-note">Nota opcional</label><textarea class="form-textarea" id="apk-url-note" rows="2" placeholder="Versión, compatibilidad o instrucciones (opcional)" maxlength="500"></textarea></div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Guardar publicación</button>
+              <button class="btn btn-secondary" type="button" onclick="resetApkUrlForm()">Limpiar</button>
+            </div>
+          </form>
+        </div>
+        <div id="owner-apk-url-list" class="catalog-grid"></div>
+      </section>
+
       <section id="view-owner-storage" style="display:none;">
         <div style="display: flex; flex-direction: column; gap: 20px;">
           
@@ -1756,7 +1915,7 @@
             <i class="fa-solid fa-database" style="color:var(--accent-emerald);"></i> Respaldo & Compatibilidad Futura
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-            Descarga copias de seguridad de ANYA STREAMING en formato JSON o migra datos anteriores sin alterar la cuota de Firebase.
+            Descarga el código disponible de la tienda en TXT o respalda los datos locales en JSON. Las descargas no escriben datos en Firebase.
           </p>
 
           <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px; padding: 18px; margin-bottom: 22px;">
@@ -1766,6 +1925,9 @@
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
               <button class="btn btn-success" onclick="downloadBackupJSON()" style="flex: 1; min-width: 200px;">
                 <i class="fa-solid fa-download"></i> Descargar Copia JSON
+              </button>
+              <button class="btn btn-primary" onclick="downloadUpdatedHTMLTxt()" style="flex: 1; min-width: 200px;">
+                <i class="fa-solid fa-file-arrow-down"></i> Descargar HTML actualizado (.txt)
               </button>
               <label class="btn btn-secondary" style="flex: 1; min-width: 200px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
                 <i class="fa-solid fa-upload"></i> Restaurar JSON
@@ -1993,6 +2155,7 @@
       </div>
       <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 4px; font-weight: 800;">¡Compra Exitosa!</h3>
       <p id="receipt-platform-name" style="color: var(--accent-pink); font-weight:700; margin-bottom: 16px; font-size: 0.95rem;"></p>
+      <div id="receipt-order-details" style="text-align:left;color:var(--text-muted);font-size:.78rem;line-height:1.8;margin-bottom:14px;padding:12px;border:1px solid var(--border-color);border-radius:12px;background:rgba(255,255,255,.025)"></div>
       
       <div style="background: rgba(0,0,0,0.55); border: 1px solid var(--border-color); padding: 14px; border-radius: 12px; text-align: left; margin-bottom: 16px;">
         <div style="margin-bottom: 8px;">
@@ -2005,6 +2168,7 @@
         </div>
       </div>
 
+      <button class="btn btn-secondary" style="width:100%;margin-bottom:9px" onclick="downloadPurchaseReceipt()"><i class="fa-solid fa-file-lines"></i> Descargar comprobante TXT</button>
       <button class="btn btn-primary" style="width: 100%;" onclick="closeModal('purchase-success-modal'); switchNav('orders');">
         <i class="fa-solid fa-receipt"></i> Ver en Mis Compras
       </button>
@@ -2333,6 +2497,7 @@
       purchases: {},
       reports: {},
       notifications: {},
+      apkUrls: {},
       config: {
         bgPc: DEFAULT_BG_PC,
         bgMobile: DEFAULT_BG_MOBILE,
@@ -2354,6 +2519,7 @@
         if (parsed.purchases) memoryDB.purchases = parsed.purchases;
         if (parsed.reports) memoryDB.reports = parsed.reports;
         if (parsed.notifications) memoryDB.notifications = parsed.notifications;
+        if (parsed.apkUrls) memoryDB.apkUrls = parsed.apkUrls;
         if (parsed.config) memoryDB.config = Object.assign({}, memoryDB.config, parsed.config);
       }
     } catch(e) {
@@ -2657,6 +2823,10 @@
       bindCollection('notifications', {
         render: () => checkNotificationsBadge(),
         remove: () => checkNotificationsBadge()
+      });
+      bindCollection('apkUrls', {
+        render: () => { renderApkUrls(); renderOwnerApkUrls(); },
+        remove: () => { renderApkUrls(); renderOwnerApkUrls(); }
       });
 
       // Config is small, but still updated field-by-field to avoid downloading the whole branch.
@@ -3076,6 +3246,17 @@
       document.getElementById('receipt-platform-name').innerText = p.name;
       document.getElementById('receipt-user').innerText = stockItem.user;
       document.getElementById('receipt-pass').innerText = stockItem.pass;
+      const receiptDetails = document.getElementById('receipt-order-details');
+      if (receiptDetails) receiptDetails.innerHTML =
+        `<div><strong>ID de orden:</strong> ${escapeHtml(purId)}</div>` +
+        `<div><strong>Fecha de compra:</strong> ${escapeHtml(now.toLocaleString())}</div>` +
+        `<div><strong>Tipo de servicio:</strong> ${escapeHtml(p.name || 'Suscripción')}</div>` +
+        `<div><strong>Plan:</strong> ${escapeHtml(p.name || '')}</div>` +
+        `<div><strong>Pantallas:</strong> ${escapeHtml(String(p.devices || 1))}</div>` +
+        `<div><strong>Vigencia:</strong> ${escapeHtml(String(p.duration || 30))} días</div>` +
+        `<div><strong>Vence:</strong> ${escapeHtml(expires.toLocaleDateString())}</div>` +
+        `<div><strong>Total:</strong> ${escapeHtml(String(p.price))}</div>` +
+        `<div><strong>Estado:</strong> PAGADO</div>`;
       openModal('purchase-success-modal');
 
       updateUI();
@@ -4025,14 +4206,91 @@
       if (manageTitle && isSeller()) manageTitle.innerHTML = '<i class="fa-solid fa-user-gear" style="color:var(--accent-cyan);"></i> Mis Clientes y Paneles — crear y modificar';
     }
 
+    function renderApkUrls() {
+      const host = document.getElementById('apk-url-list');
+      if (!host) return;
+      const items = Object.values(memoryDB.apkUrls || {}).filter(x => x && x.active !== false);
+      host.innerHTML = items.length ? items.map(x => `
+        <article class="product-card"><div class="prod-info">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div class="brand-icon"><i class="fa-solid fa-mobile-screen-button"></i></div><div><h3 style="font-size:1rem">${escapeHtml(x.name || 'Recurso')}</h3><span class="live-pill">DISPONIBLE</span></div></div>
+          ${x.note ? `<p style="color:var(--text-muted);font-size:.82rem;line-height:1.6;margin-bottom:14px">${escapeHtml(x.note)}</p>` : ''}
+          ${x.displayMode === 'link' ? `<a class="resource-text-link" href="${safeHttpUrl(x.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(x.linkLabel || x.url || 'Abrir enlace')} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : `<a class="btn btn-primary resource-action-button" href="${safeHttpUrl(x.url)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir enlace</a>`}
+        </div></article>`).join('') : '<div class="glass" style="padding:24px;color:var(--text-muted)">Todavía no hay APK ni enlaces publicados.</div>';
+    }
+
+    function renderOwnerApkUrls() {
+      const host = document.getElementById('owner-apk-url-list');
+      if (!host) return;
+      const items = Object.values(memoryDB.apkUrls || {});
+      host.innerHTML = items.length ? items.map(x => `
+        <article class="product-card"><div class="prod-info">
+          <h3 style="font-size:1rem;margin-bottom:8px">${escapeHtml(x.name || 'Recurso')}</h3>
+          <p style="color:var(--text-muted);font-size:.78rem;word-break:break-all;margin-bottom:8px">${escapeHtml(x.url || '')}</p>
+          <span class="resource-mode-label">Mostrar como: ${x.displayMode === 'link' ? 'Enlace de texto' : 'Botón'}</span>
+          ${x.note ? `<p style="font-size:.8rem;color:var(--text-muted);margin:12px 0">${escapeHtml(x.note)}</p>` : ''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+            <button class="btn btn-secondary" onclick="editApkUrl('${escapeHtml(x.id)}')"><i class="fa-solid fa-pen"></i> Editar</button>
+            <button class="btn btn-danger" onclick="deleteApkUrl('${escapeHtml(x.id)}')"><i class="fa-solid fa-trash"></i> Eliminar</button>
+          </div>
+        </div></article>`).join('') : '<div class="glass" style="padding:24px;color:var(--text-muted)">No hay publicaciones. Usa el formulario para añadir la primera.</div>';
+    }
+
+    function safeHttpUrl(value) {
+      try { const u = new URL(String(value || '')); return /^https?:$/.test(u.protocol) ? u.href.replace(/&/g, '&amp;').replace(/"/g, '&quot;') : '#'; }
+      catch (_) { return '#'; }
+    }
+
+    function resetApkUrlForm() {
+      ['apk-url-edit-id','apk-url-name','apk-url-link','apk-url-note'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+      const displayMode = document.getElementById('apk-url-display-mode'); if (displayMode) displayMode.value = 'button';
+    }
+
+    function saveApkUrl(event) {
+      event.preventDefault();
+      if (!isOwner()) return denyAccess('Solo el OWNER puede publicar enlaces.');
+      const name = document.getElementById('apk-url-name').value.trim();
+      const url = document.getElementById('apk-url-link').value.trim();
+      const note = document.getElementById('apk-url-note').value.trim();
+      const displayMode = document.getElementById('apk-url-display-mode').value === 'link' ? 'link' : 'button';
+      if (!name || !/^https?:\/\/\S+$/i.test(url)) return showToast('Ingresa un nombre y una URL válida (https:// o http://).','error');
+      const id = document.getElementById('apk-url-edit-id').value || ('resource_' + Date.now());
+      const previous = (memoryDB.apkUrls && memoryDB.apkUrls[id]) || {};
+      const item = { ...previous, id, name, url, note, displayMode, active: true, updatedAt: Date.now() };
+      memoryDB.apkUrls = memoryDB.apkUrls || {};
+      memoryDB.apkUrls[id] = item;
+      saveCacheLocally(false);
+      if (db) db.ref('ANYA_STREAMING/apkUrls/' + id).set(item).then(() => showToast('Enlace publicado correctamente.','success')).catch(() => showToast('Guardado localmente; Firebase no confirmó el cambio.','error'));
+      else showToast('Guardado en este dispositivo; Firebase no está conectado.','error');
+      resetApkUrlForm(); renderApkUrls(); renderOwnerApkUrls();
+    }
+
+    function editApkUrl(id) {
+      if (!isOwner()) return denyAccess('Solo el OWNER puede editar enlaces.');
+      const x = memoryDB.apkUrls && memoryDB.apkUrls[id]; if (!x) return;
+      document.getElementById('apk-url-edit-id').value = x.id;
+      document.getElementById('apk-url-name').value = x.name || '';
+      document.getElementById('apk-url-link').value = x.url || '';
+      document.getElementById('apk-url-note').value = x.note || '';
+      document.getElementById('apk-url-display-mode').value = x.displayMode === 'link' ? 'link' : 'button';
+      document.getElementById('view-owner-apk-url').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+
+    function deleteApkUrl(id) {
+      if (!isOwner()) return denyAccess('Solo el OWNER puede eliminar enlaces.');
+      if (!confirm('¿Eliminar esta publicación de APK Y URL?')) return;
+      delete memoryDB.apkUrls[id]; saveCacheLocally(false);
+      if (db) db.ref('ANYA_STREAMING/apkUrls/' + id).remove().catch(() => showToast('No se pudo confirmar la eliminación en Firebase.','error'));
+      renderApkUrls(); renderOwnerApkUrls(); showToast('Publicación eliminada.','success');
+    }
+
     function switchNav(navId) {
       if (currentUser) {
-        const ownerOnly = ['owner-products','owner-stock','owner-users','owner-sales-audit','owner-reports','owner-storage','owner-bgs','owner-github','owner-export','owner-notify'];
+        const ownerOnly = ['owner-apk-url','owner-products','owner-stock','owner-users','owner-sales-audit','owner-reports','owner-storage','owner-bgs','owner-github','owner-export','owner-notify'];
         if (ownerOnly.includes(navId) && !isOwner()) return denyAccess('Esta sección es exclusiva del OWNER.');
         if (navId === 'manage-subusers' && !canViewSellerClients()) return denyAccess('No tienes acceso a los clientes/paneles.');
       }
       const views = [
-        'store', 'orders', 'recharge', 'profile', 'manage-subusers',
+        'store', 'orders', 'recharge', 'profile', 'apk-url', 'owner-apk-url', 'manage-subusers',
         'owner-products', 'owner-stock', 'owner-users', 'owner-sales-audit',
         'owner-reports', 'owner-storage', 'owner-bgs', 'owner-github', 'owner-export', 'owner-notify'
       ];
@@ -4046,6 +4304,8 @@
         'orders': 'Mis Compras',
         'recharge': 'Billetera / Recargas',
         'profile': 'Mi Perfil',
+        'apk-url': 'APK Y URL',
+        'owner-apk-url': 'Gestión de APK Y URL',
         'manage-subusers': 'Crear Clientes / Paneles',
         'owner-products': 'Gestionar Tienda',
         'owner-stock': 'Gestión de Cuentas (Stock)',
@@ -4071,6 +4331,8 @@
       if (activeMob) activeMob.classList.add('active');
 
       if (navId === 'store') renderStore();
+      if (navId === 'apk-url') renderApkUrls();
+      if (navId === 'owner-apk-url') renderOwnerApkUrls();
       if (navId === 'orders') renderOrders();
       if (navId === 'owner-products') renderOwnerProducts();
       if (navId === 'owner-stock') { renderOwnerStockOptions(); renderStockTable(); }
@@ -4295,6 +4557,35 @@
     /* =========================================================================
        LOCAL JSON BACKUP & RESTORE
        ========================================================================= */
+    async function downloadUpdatedHTMLTxt() {
+      try {
+        let html = '';
+        try {
+          const response = await fetch(location.href, { cache: 'no-store', credentials: 'same-origin' });
+          if (response.ok) html = await response.text();
+        } catch (_) {}
+        if (!html || !/<html[\s>]/i.test(html)) html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([html], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'ANYA_STREAMING_HTML_actualizado_' + new Date().toISOString().slice(0,10) + '.txt';
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+        showToast('Se descargó el HTML disponible como archivo TXT.','success');
+      } catch (err) { showToast('No se pudo generar el TXT: ' + err.message, 'error'); }
+    }
+
+    function downloadPurchaseReceipt() {
+      const details = document.getElementById('receipt-order-details')?.innerText || '';
+      const platform = document.getElementById('receipt-platform-name')?.innerText || '';
+      const user = document.getElementById('receipt-user')?.innerText || '';
+      const pass = document.getElementById('receipt-pass')?.innerText || '';
+      const text = `ANYA STREAMING - COMPROBANTE DE COMPRA\n${'='.repeat(54)}\n¡Gracias por tu compra!\n\nDETALLES DEL PEDIDO\n${details}\n\nDATOS DE ACCESO\nPlataforma: ${platform}\nUsuario / correo: ${user}\nContraseña: ${pass}\n\nGuarda este comprobante en un lugar seguro.\n`;
+      const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download='ANYA_comprobante_'+Date.now()+'.txt'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+    }
+
     function downloadBackupJSON() {
       const dataStr = JSON.stringify(memoryDB, null, 2);
       const blob = new Blob([dataStr], { type: 'application/json' });
